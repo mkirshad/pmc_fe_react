@@ -19,109 +19,18 @@ type CustomerFormProps = {
 } & CommonProps
 
 const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-})
-
-// Base License Detail Fields
- const validationLicenseDetailFieldsSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-  });
-  
-  // Consumer License Detail Fields
- const validationLicenseDetailFieldsConsumerSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    productsCapacity: z.string().min(1, { message: 'Products Capacity is required' }),
-    wasteGenerated: z.string().min(1, { message: 'Waste Generated is required' }),
-    plasticWasteAcquired: z.string().min(1, { message: 'Plastic Waste Acquired is required' }),
-  });
-  
-  // Collector License Detail Fields
- const validationLicenseDetailFieldsCollectorSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    collectorName: z.string().min(1, { message: 'Collector Name is required' }),
-    collectorCapacity: z.coerce.number().positive({ message: 'Collector Capacity must be a positive number' }),
-  });
-  
-  const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    registration_required_for: z
-      .array(z.string())
-      .min(1, { message: 'At least one registration type is required.' }),
-    single_use_plastic_items: z.array(z.string()).optional(),
-    total_capacity_value: z
-      .string()
-      .min(1, { message: 'Total Capacity Value is required.' })
-      .refine(value => !isNaN(parseFloat(value)) && parseFloat(value) > 0, {
-        message: 'Total Capacity Value must be a positive number.',
-      }).optional(),
-    total_capacity_unit: z.string().min(1, { message: 'Total Capacity Unit is required.' }).optional(),
-    registration_number: z.string().min(1, { message: 'Registration Number is required.' }).optional(),
-    registration_date: z.string().min(1, { message: 'Registration Date is required.' }).optional(),
-    date_of_setting_up: z.string().min(1, { message: 'Date of Setting Up is required.' }).optional(),
-    date_of_commencement_of_production: z
-      .string()
-      .min(1, { message: 'Date of Commencement of Production is required.' }).optional(),
-    flow_diagram: z
-      .union([z.instanceof(File), z.null(), z.undefined()])
-      .optional()
-      .refine(file => {
-        if (file === null || file === undefined) return true; // Skip validation if null or undefined
-        return file.size <= 10 * 1024 * 1024; // Check file size
-      }, {
-        message: 'Flow Diagram must be a file smaller than 10 MB.',
-      }).optional(),
-    is_compliance_with_rules: z.boolean().optional(),
-    valid_consent_permit: z.boolean().optional(),
-    consent_permit: z
-      .union([z.instanceof(File), z.null(), z.undefined()])
-      .optional()
-      .refine(file => {
-        if (file === null || file === undefined) return true;
-        return file.size <= 10 * 1024 * 1024;
-      }, {
-        message: 'Consent Permit must be a file smaller than 10 MB.',
-      }).optional(),
-    total_waste_generated_value: z
-      .string()
-      .min(1, { message: 'Total Waste Generated Value is required.' })
-      .refine(value => !isNaN(parseFloat(value)) && parseFloat(value) > 0, {
-        message: 'Total Waste Generated Value must be a positive number.',
-      }).optional(),
-    total_waste_generated_unit: z.string().min(1, { message: 'Total Waste Generated Unit is required.' }).optional(),
-    is_waste_storage_capacity: z.boolean().optional(),
-    is_waste_disposal_provision: z.boolean().optional(),
-    personnel_or_consumers_list: z
-      .union([z.instanceof(File), z.null(), z.undefined()])
-      .optional()
-      .refine(file => {
-        if (file === null || file === undefined) return true;
-        return file.size <= 10 * 1024 * 1024;
-      }, {
-        message: 'Personnel or Consumers List must be a file smaller than 10 MB.',
-      }).optional(),
-    action_plan: z
-      .union([z.instanceof(File), z.null(), z.undefined()])
-      .optional()
-      .refine(file => {
-        if (file === null || file === undefined) return true;
-        return file.size <= 10 * 1024 * 1024;
-      }, {
-        message: 'Action Plan must be a file smaller than 10 MB.',
-      }).optional(),
-    // applicant: z.string().min(1, { message: 'Applicant is required.' }),
-    products_list: z.array(z.string()).optional(),
-    by_products_list: z.array(z.string()).optional()
-  });
-  
-  
-  // Recycler License Detail Fields
- const validationLicenseDetailFieldsRecyclerSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    registrationNumber: z.string().min(1, { message: 'Registration Number is required' }),
-    totalCapacity: z.coerce.number().positive({ message: 'Total Capacity must be a positive number' }),
-    complianceStatus: z.enum(['compliant', 'non_compliant'], {
-      errorMap: () => ({ message: 'Compliance Status is required' }),
-    }),
-  });
+  flow_diagram: z
+      .instanceof(File) // Ensure the value is a File instance
+      .refine(
+          (file) => file.size <= 10 * 1024 * 1024, // Check file size
+          { message: 'File must be smaller than 10 MB.' }
+      )
+       // Make the field mandatory
+      .refine(
+          (file) => !!file, // Ensure the file is provided
+          { message: 'File is required.' }
+      ),
+});
 
 const DocumentForm = (props: CustomerFormProps) => {
    // Destructure all needed state and actions from the Zustand store
@@ -166,7 +75,7 @@ const {
             },
             ...defaultValues,
         },
-        resolver: zodResolver( completedSections.includes('licenseDetailProducer')?validationLicenseDetailFieldsProducerSchema : completedSections.includes('licenseDetailConsumer')? validationLicenseDetailFieldsConsumerSchema: completedSections.includes('licenseDetailCollector')? validationLicenseDetailFieldsCollectorSchema: completedSections.includes('licenseDetailRecycler')? validationLicenseDetailFieldsRecyclerSchema : validationSchema),
+        resolver: zodResolver(validationSchema),
     })
 
     useEffect(() => {

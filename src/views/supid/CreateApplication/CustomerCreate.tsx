@@ -361,7 +361,6 @@ console.log('id is:', id)
                 formData.append('tracking_number', values.tracking_number || '');
             
                 console.log('number_of_machines:', values.number_of_machines)
-                // Add JSON fields for registration_required_for, plain_plastic_Sheets_for_food_wrapping, and PackagingItems
                 formData.append('registration_required_for', JSON.stringify(values.registration_required_for || []));
                 formData.append('plain_plastic_sheets_for_food_wrapping', JSON.stringify(values.plain_plastic_Sheets_for_food_wrapping || []));
                 formData.append('packaging_items', JSON.stringify(values.PackagingItems || []));
@@ -377,6 +376,7 @@ console.log('id is:', id)
                 formData.append('total_waste_generated_value', values.total_waste_generated_value || '');
                 formData.append('has_waste_storage_capacity', values.has_waste_storage_capacity || '');
                 formData.append('waste_disposal_provision', values.waste_disposal_provision || '');
+
             
                 // Applicant field (assumed to be provided)
                 formData.append('applicant', applicantDetail.id.toString());
@@ -411,6 +411,70 @@ console.log('id is:', id)
         }
     };
     
+
+    const handleDocumentFormSubmit = async (values: LicenseDetailFormSchema) => {
+        console.log('Submitted values LicenseDetail:', values);
+        // onNext(); // Move to the next step
+    
+        // try {
+
+        //     // Update corresponding sections based on completed sections
+        //     if (completedSections.includes('licenseDetailProducer')) {
+        //         const formData = new FormData();
+
+        //         // Add fields corresponding to the Django model
+        //         formData.append('tracking_number', values.tracking_number || '');
+            
+        //         console.log('number_of_machines:', values.number_of_machines)
+        //         formData.append('registration_required_for', JSON.stringify(values.registration_required_for || []));
+        //         formData.append('plain_plastic_sheets_for_food_wrapping', JSON.stringify(values.plain_plastic_Sheets_for_food_wrapping || []));
+        //         formData.append('packaging_items', JSON.stringify(values.PackagingItems || []));
+            
+        //         // Add string fields for number_of_machines and total_capacity_value
+        //         formData.append('number_of_machines', values.number_of_machines || '');
+        //         formData.append('total_capacity_value', values.total_capacity_value || '');
+            
+        //         // Add date field
+        //         formData.append('date_of_setting_up', values.date_of_setting_up || '');
+            
+        //         // Add waste management fields
+        //         formData.append('total_waste_generated_value', values.total_waste_generated_value || '');
+        //         formData.append('has_waste_storage_capacity', values.has_waste_storage_capacity || '');
+        //         formData.append('waste_disposal_provision', values.waste_disposal_provision || '');
+
+            
+        //         // Applicant field (assumed to be provided)
+        //         formData.append('applicant', applicantDetail.id.toString());
+        //         try {
+        //             const response = await AxiosBase.post('/pmc/producers/', formData, {
+        //                 headers: {
+        //                     'Content-Type': 'multipart/form-data',
+        //                 },
+        //             });
+            
+        //             console.log('Post successful:', response.data);
+        //         } catch (error) {
+        //             console.error('Error in POST request:', error.response || error.message);
+        //             setIsSubmiting(false);
+        //         }
+        //         updateLicenseDetailProducer(values as LicenseDetailFieldsProducer);
+        //     }
+        //     if (completedSections.includes('licenseDetailConsumer')) {
+        //         updateLicenseDetailConsumer(values as LicenseDetailFieldsConsumer);
+        //     }
+        //     if (completedSections.includes('licenseDetailCollector')) {
+        //         updateLicenseDetailCollector(values as LicenseDetailFieldsCollector);
+        //     }
+        //     if (completedSections.includes('licenseDetailRecycler')) {
+        //         updateLicenseDetailRecycler(values as LicenseDetailFieldsRecycler);
+        //     }
+    
+        //     setIsSubmiting(false);
+        // } catch (error) {
+        //     console.error('Error in POST request:', error.response || error.message);
+        //     setIsSubmiting(false);
+        // }
+    };
 
     const handleConfirmDiscard = () => {
         setDiscardConfirmationOpen(false)
@@ -664,7 +728,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
 {step === 3 && <DocumentForm
                 newCustomer
                 defaultValues={LicenseDetailFormData}
-                onFormSubmit={handleLicenseDetailFormSubmit}
+                onFormSubmit={handleDocumentFormSubmit}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">

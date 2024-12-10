@@ -27,6 +27,7 @@ const BusinessDetailSectionIndividual = ({ control, errors }: BusinessDetailSect
         updateBusinessEntity,
         businessEntity, // If you need to access the current businessEntity state
         completedSections,
+        businessDetailIndividual,
         markSectionAsCompleted,
     } = useFormStore();
 
@@ -51,7 +52,7 @@ const BusinessDetailSectionIndividual = ({ control, errors }: BusinessDetailSect
                 console.error('Error fetching districts:', error);
             });
 
-        const response2 = AxiosBase.get(`/pmc/tehsils/`, {
+        const response2 = AxiosBase.get(`/pmc/tehsils?district_id=${businessDetailIndividual.district}`, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

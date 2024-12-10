@@ -138,6 +138,7 @@ const parseDate = (dateString) => {
                         render={({ field }) => (
                             <Input
                                 type="file"
+                                accept=".pdf,.png,.jpg,.jpeg" // Allow only specific file types
                                 onChange={(e) => field.onChange(e.target.files[0] || null)} // Correctly set the file without using 'value'
                             />
                         )}

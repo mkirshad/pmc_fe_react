@@ -5,7 +5,7 @@ import { FormItem } from '@/components/ui/Form';
 import NumericInput from '@/components/shared/NumericInput';
 import { Controller, useWatch } from 'react-hook-form';
 import type { FormSectionBaseProps } from './types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable'
 import Checkbox from '@/components/ui/Checkbox'
 import type { SyntheticEvent } from 'react'
@@ -79,13 +79,7 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         }
     };
 
-    const handleByProductsChange = (event, newValue) => {
-        setSelectedByProducts(newValue);
-        const newOptions = newValue.filter(option => !byProductOptions.includes(option));
-        if (newOptions.length > 0) {
-            setByProductOptions(prev => [...prev, ...newOptions]);
-        }
-    };
+ 
 
     // Watch the value of 'registration_required_for'
     const registrationRequiredFor = useWatch({
@@ -94,8 +88,26 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         defaultValue: [], // Ensure it's an array
     });
 
+    // Watch the value of 'registration_required_for'
+    const PackagingItems = useWatch({
+        control,
+        name: 'PackagingItems',
+        defaultValue: [], // Ensure it's an array
+    });
+
   const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
+
+  // Automatically update options when PackagingItems changes
+useEffect(() => {
+    if (Array.isArray(PackagingItems)) {
+        setOptions(PackagingItems);
+        setSelectedOptions(PackagingItems)
+    } else {
+        console.warn('PackagingItems is not an array:', PackagingItems);
+    }
+}, [PackagingItems]);
+
 
   const handleChangeSP = (event, newValue) => {
     setSelectedOptions(newValue);
