@@ -18,9 +18,20 @@ type CustomerFormProps = {
     newCustomer?: boolean
 } & CommonProps
 
-const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-})
+const validationSchema: ZodType<LicenseDetailFormSchema> = 
+ z.object({
+  flow_diagram: z
+      .instanceof(File, { message: 'Document is required.' }) // Ensure the value is a File instance
+      .refine(
+          (file) => file.size <= 10 * 1024 * 1024, // Check file size
+          { message: 'File must be smaller than 10 MB.' }
+      )
+       // Make the field mandatory
+      .refine(
+          (file) => !!file, // Ensure the file is provided
+          { message: 'File is required.' }
+      ),
+});
 
 // Base License Detail Fields
  const validationLicenseDetailFieldsSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -46,6 +57,8 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for: z
       .array(z.string())
       .min(1, { message: 'At least one registration type is required.' }),
+      registration_required_for_other: z
+      .array(z.string()),
     single_use_plastic_items: z.array(z.string()).optional(),
     total_capacity_value: z
       .string()
@@ -166,7 +179,7 @@ const {
             },
             ...defaultValues,
         },
-        resolver: zodResolver( completedSections.includes('licenseDetailProducer')?validationLicenseDetailFieldsProducerSchema : completedSections.includes('licenseDetailConsumer')? validationLicenseDetailFieldsConsumerSchema: completedSections.includes('licenseDetailCollector')? validationLicenseDetailFieldsCollectorSchema: completedSections.includes('licenseDetailRecycler')? validationLicenseDetailFieldsRecyclerSchema : validationSchema),
+        resolver: zodResolver(validationSchema),
     })
 
     useEffect(() => {

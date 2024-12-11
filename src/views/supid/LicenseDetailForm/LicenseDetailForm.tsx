@@ -50,6 +50,8 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for: z
       .array(z.string())
       .min(1, { message: 'At least one registration type is required.' }),
+      registration_required_for_other: z
+      .array(z.string()),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()),
     PackagingItems: z.array(z.string()),
     single_use_plastic_items: z.array(z.string()).optional(),
@@ -89,8 +91,8 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .string()
       .optional(),
     // total_waste_generated_unit: z.string().min(1, { message: 'Total Waste Generated Unit is required.' }).optional(),
-    has_waste_storage_capacity: z.string().optional(),
-    waste_disposal_provision: z.string().optional(),
+    has_waste_storage_capacity: z.string().min(1, { message: 'Waste Storage Capacity is required' }),
+    waste_disposal_provision: z.string().min(1, { message: 'Waste Disposal ProvisionI is required' }),
 
 
     action_plan: z

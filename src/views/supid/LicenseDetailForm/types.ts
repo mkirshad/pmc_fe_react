@@ -25,6 +25,7 @@ export type LicenseDetailFieldsProducer = {
     tracking_number: string;
     
     registration_required_for: ManufacturingType[]; // List of manufacturing types
+    registration_required_for_other: string[];
     plain_plastic_Sheets_for_food_wrapping: SingleUseSheet[]; 
     PackagingItems: string[];
     

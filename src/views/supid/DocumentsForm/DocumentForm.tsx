@@ -18,42 +18,27 @@ type CustomerFormProps = {
     newCustomer?: boolean
 } & CommonProps
 
-const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
+
+
+const validationSchema: ZodType<LicenseDetailFormSchema> = 
+ z.object({
   flow_diagram: z
       .instanceof(File) // Ensure the value is a File instance
       .refine(
           (file) => file.size <= 10 * 1024 * 1024, // Check file size
           { message: 'File must be smaller than 10 MB.' }
-      )
+      ).optional()
        // Make the field mandatory
-      .refine(
-          (file) => !!file, // Ensure the file is provided
-          { message: 'File is required.' }
-      ),
+      // .refine(
+      //     (file) => !!file, // Ensure the file is provided
+      //     { message: 'File is required.' }
+      // ),
 });
 
 const DocumentForm = (props: CustomerFormProps) => {
    // Destructure all needed state and actions from the Zustand store
 
 // Destructure the desired state slices and functions
-const {
-    applicantDetail,
-    updateApplicantDetail,
-    resetApplicantDetail,
-    businessDetail,
-    updateBusinessDetail,
-    resetBusinessDetail,
-    businessDetailIndividual,
-    updateBusinessDetailIndividual,
-    resetBusinessDetailIndividual,
-    businessEntity,
-    updateBusinessEntity,
-    resetBusinessEntity,
-    resetAll,
-    completedSections,
-    getValuesFromStateBusinessEntity,
-    markSectionAsCompleted,
-} = useFormStore();
 
     const {
         onFormSubmit,

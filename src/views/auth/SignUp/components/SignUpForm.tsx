@@ -9,6 +9,7 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import { useSessionUser, useToken } from '@/store/authStore'
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -21,6 +22,9 @@ type SignUpFormSchema = {
     email: string
     confirmPassword: string
 }
+
+
+
 
 const validationSchema: ZodType<SignUpFormSchema> = z
     .object({
@@ -53,30 +57,62 @@ const SignUpForm = (props: SignUpFormProps) => {
         resolver: zodResolver(validationSchema),
     })
 
+    const navigate = useNavigate(); // Initialize navigate
+    const location = useLocation(); // Access the current location
+
+    // Extract redirectUrl from query parameters
+    const searchParams = new URLSearchParams(location.search);
+    const redirectUrl = searchParams.get('redirectUrl') || '/'; // Fallback to a default path if not provided
+
     const onSignUp = async (values: SignUpFormSchema) => {
-        const { userName, password, email } = values
-
+        const { username, password, email } = values;
+    
         if (!disableSubmit) {
-            setSubmitting(true)
-            const result = await signUp({ username:email, password:password, email:'' })
-
-            if (result?.status === 'failed') {
-                setMessage?.(result.message)
-            }else{
-                setSessionSignedIn(false)
-                setToken('')
-                const result2 = await signIn({ username:email, password:password })
-                if (result2?.status === 'failed') {
-                    setMessage?.(result.message)
-                }else{
-                    
-                    setUser({"email":email, "userName":email.split('@')[0]})
+            setSubmitting(true);
+            try {
+                const result = await signUp({ username: email, password, email: '' });
+    
+                // Simulate successful signup
+                if (result?.status === 'failed') {
+                    throw new Error(result.message);
+                } else {
+                    setSessionSignedIn(false);
+                    setToken('');
+                    const result2 = await signIn({ username: email, password });
+    
+                    if (result2?.status === 'failed') {
+                        throw new Error(result2.message);
+                    } else {
+                        setUser({ email, userName: email.split('@')[0] });
+                        navigate(redirectUrl);
+                    }
                 }
+            } catch (error) {
+                console.log('its in error', error.response)
+                setMessage?.('test')
+                if (error.response) {
+                    // Axios Error: Extract detailed messages from response
+                    const errorData = error.response.data;
+                    console.log(errorData)
+    
+                    if (errorData?.username) {
+                        setMessage?.(`Username: ${errorData.username[0]}`); // Show username-specific error
+                    } else if (errorData?.email) {
+                        setMessage?.(`Email: ${errorData.email[0]}`); // Show email-specific error
+                    } else {
+                        setMessage?.('An unknown error occurred.');
+                    }
+                } else {
+                    // General error
+                    setMessage?.(error.message || 'An unknown error occurred.');
+                }
+            } finally {
+                setSubmitting(false);
             }
-
-            setSubmitting(false)
         }
-    }
+    };
+    
+    
 
     return (
         <div className={className}>

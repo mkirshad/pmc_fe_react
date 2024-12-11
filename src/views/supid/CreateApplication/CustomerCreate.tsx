@@ -15,7 +15,7 @@ import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { ApplicantDetailFormSchema } from '../ApplicantDetailForm'
 import Steps from '@/components/ui/Steps';
-import { BiSave } from 'react-icons/bi'
+import { BiArrowBack, BiArrowToRight, BiSave, BiStreetView } from 'react-icons/bi'
 import { BsBack } from 'react-icons/bs'
 import useFormStore from '../../../store/supid/supidStore'
 import { LicenseDetailFields, LicenseDetailFieldsConsumer, LicenseDetailFieldsCollector, LicenseDetailFieldsProducer, LicenseDetailFieldsRecycler } from '../LicenseDetailForm/types'
@@ -93,7 +93,10 @@ console.log('id is:', id)
                 email:response.data.email,
                 // mobileOperator:response.data.mobile_operator,
                 phoneNumber:response.data.mobile_no,
-                id:response.data.id
+                id:response.data.id,
+                has_identity_document:response.data.has_identity_document,
+                has_fee_challan:response.data.has_fee_challan,
+                applicationStatus:response.data.application_status
             }
              updateApplicantDetail(data_applicantDetail);
 
@@ -141,6 +144,7 @@ console.log('id is:', id)
                 const dataProducer = {
                     tracking_number: response.data.producer.tracking_number || '',
                     registration_required_for: (response.data.producer.registration_required_for || []),
+                    registration_required_for_other: (response.data.producer.registration_required_for_other || []),
                     plain_plastic_Sheets_for_food_wrapping: (response.data.producer.plain_plastic_sheets_for_food_wrapping || []),
                     PackagingItems: (response.data.producer.packaging_items || []),
                     number_of_machines: response.data.producer.number_of_machines || '',
@@ -155,8 +159,9 @@ console.log('id is:', id)
                 updateLicenseDetailProducer(dataProducer);
             }
              
-             
-             
+             if(response.data.application_status === 'Fee Challan'){
+                setStep(4)
+             }
 
             // Handle the response data
         })
@@ -226,7 +231,7 @@ console.log('id is:', id)
             const tracking_number = `LHR-PRO-${resp_id.toString().padStart(3, '0')}`;
 
             // Add the ID to the values object
-            const updatedValues = { ...values, 'id':resp_id };
+            const updatedValues = { ...values, 'id':resp_id, 'applicationStatus':'Created' };
             console.log('updatedValues:', updatedValues)
             updateApplicantDetail(updatedValues);
             console.log('applicant state:', applicantDetail)
@@ -362,6 +367,7 @@ console.log('id is:', id)
             
                 console.log('number_of_machines:', values.number_of_machines)
                 formData.append('registration_required_for', JSON.stringify(values.registration_required_for || []));
+                formData.append('registration_required_for_other', JSON.stringify(values.registration_required_for_other || []));
                 formData.append('plain_plastic_sheets_for_food_wrapping', JSON.stringify(values.plain_plastic_Sheets_for_food_wrapping || []));
                 formData.append('packaging_items', JSON.stringify(values.PackagingItems || []));
             
@@ -414,6 +420,32 @@ console.log('id is:', id)
 
     const handleDocumentFormSubmit = async (values: LicenseDetailFormSchema) => {
         console.log('Submitted values LicenseDetail:', values);
+
+        const formData = new FormData();
+
+        // Append fields to FormData
+        if (!applicantDetail.has_identity_document && values.flow_diagram) {
+            formData.append('document', values.flow_diagram);
+        
+            formData.append('document_description',  'Identity Document');
+            formData.append('applicant',  applicantDetail.id.toString());
+
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+            }
+            onNext();
+        } else if(applicantDetail.has_identity_document){
+            onNext();
+        }
+
         // onNext(); // Move to the next step
     
         // try {
@@ -503,7 +535,58 @@ console.log('id is:', id)
         onPrevious()
     }
 
-    const submitApplication = async () =>{
+    const submitApplication = async (values: LicenseDetailFormSchema) =>{
+
+        const formData = new FormData();
+
+        // Append fields to FormData
+        formData.append('document', values.flow_diagram);
+    
+        formData.append('document_description',  'Fee Challan');
+        formData.append('applicant',  applicantDetail.id.toString());
+
+        try {
+            const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Post successful:', response.data);
+        } catch (error) {
+            console.error('Error in POST request:', error.response || error.message);
+        }
+
+
+        
+        const formData2 = new FormData();
+        // Add non-file fields
+        formData2.append('application_status', 'Submitted');
+
+        const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        updateApplicantDetail({applicationStatus: "Submitted"})
+
+
+            
+        // Download Fee Challan            
+        const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+            responseType: 'blob', // Important to get the data as a Blob
+        });        
+        // Create a blob URL for the downloaded file
+        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        // Set filename for the downloaded file
+        link.setAttribute('download', `Recipt.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        // Clean up
+        document.body.removeChild(link);
+
         setThankYouPopupOpen(true); 
         // const formData = new FormData();
     
@@ -611,24 +694,26 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 Discard
                             </Button>
                             <Button
-                                icon={<BsBack />}
+                                icon={<BiArrowBack />}
                                 className="ltr:mr-3 rtl:ml-3"
                                 variant="solid"
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={handleGoBack}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={<BiSave />}
+                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type="submit"
+                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
                                 loading={isSubmiting}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
                             >
-                                Save & Next
+                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                
                             </Button>
                         </div>
                     </div>
@@ -656,24 +741,26 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 Discard
                             </Button>
                             <Button
-                                icon={<BsBack />}
+                                icon={<BiArrowBack />}
                                 className="ltr:mr-3 rtl:ml-3"
                                 variant="solid"
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={handleGoBack}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={<BiSave />}
+                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type="submit"
+                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
                                 loading={isSubmiting}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
                             >
-                                Save & Next
+                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                
                             </Button>
                         </div>
                     </div>
@@ -701,24 +788,26 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 Discard
                             </Button>
                             <Button
-                                icon={<BsBack />}
+                                icon={<BiArrowBack />}
                                 className="ltr:mr-3 rtl:ml-3"
                                 variant="solid"
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={handleGoBack}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={<BiSave />}
+                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type="submit"
+                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
                                 loading={isSubmiting}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
                             >
-                                Save & Next
+                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                
                             </Button>
                         </div>
                     </div>
@@ -746,25 +835,26 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 Discard
                             </Button>
                             <Button
-                                icon={<BsBack />}
+                                icon={<BiArrowBack />}
                                 className="ltr:mr-3 rtl:ml-3"
                                 variant="solid"
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={handleGoBack}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={<BiSave />}
+                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type="submit"
+                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
                                 loading={isSubmiting}
-                                onClick={()=>{onNext()}}
+                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
                             >
-                                Save & Next
+                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                
                             </Button>
                         </div>
                     </div>
@@ -774,7 +864,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
 {step === 4 && <DocumentForm2
                 newCustomer
                 defaultValues={LicenseDetailFormData}
-                onFormSubmit={handleLicenseDetailFormSubmit}
+                onFormSubmit={submitApplication}
             >
                 <Container>
                         <div className="flex items-center justify-between px-8">
@@ -806,9 +896,9 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 <Button
                                     icon={<BiSave />}
                                     variant="solid"
-                                    type="button"
-                                    onClick={submitApplication}
+                                    type="submit"
                                     loading={isSubmiting}
+                                    disabled={applicantDetail.applicationStatus === 'Submitted'}
                                 >
                                     Submit Application
                                 </Button>
@@ -817,7 +907,9 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                     </Container>
             </DocumentForm2>
 }
-{step === 6 &&  <ReviewAndSavePage>
+{step === 6 &&  <ReviewAndSavePage
+                onFormSubmit={submitApplication}
+                >
                 <Container>
                     <div className="flex items-center justify-between px-8">
                         <span></span>
@@ -849,7 +941,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 icon={<BiSave />}
                                 variant="solid"
                                 type="button"
-                                onClick={submitApplication}
+                                // onClick={submitApplication}
                                 loading={isSubmiting}
                             >
                                 Save

@@ -88,13 +88,7 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         }
     };
 
-    // Watch the value of 'registration_required_for'
-    const registrationRequiredFor = useWatch({
-        control,
-        name: 'registration_required_for',
-        defaultValue: [], // Ensure it's an array
-    });
-
+  
   const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
 
@@ -177,6 +171,36 @@ link.click();
 // Clean up
 document.body.removeChild(link);
 
+const formData = new FormData();
+// Add non-file fields
+formData.append('application_status', 'Fee Challan');
+
+const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+    headers: {
+        'Content-Type': 'multipart/form-data',
+    },
+});
+
+updateApplicantDetail({applicationStatus: 'Fee Challan'})
+
+}
+
+const downloadFileReceipt = async () => 
+{
+      // Download Fee Challan            
+      const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+        responseType: 'blob', // Important to get the data as a Blob
+    });        
+    // Create a blob URL for the downloaded file
+    const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = urlBlob;
+    // Set filename for the downloaded file
+    link.setAttribute('download', `Receipt.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    // Clean up
+    document.body.removeChild(link);
 }
 
     return (
@@ -239,8 +263,30 @@ document.body.removeChild(link);
                     />
                 </FormItem>
                 </div>
+            </div>
+            
+            <div>
+                    {applicantDetail.has_fee_challan && <label>Paid Fee Challan Document is already Uploaded!</label>}
+            </div>
+           
 
-                
+                <div className="grid md:grid-cols-2 mb-10 gap-4">
+                    {/* Business Name and Registration Type */}
+
+
+                    {applicantDetail.has_fee_challan && <div>
+                        <a
+                        href='#'
+                            onClick={()=>{downloadFileReceipt()}}
+                            className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                        >
+                            Download Receipt
+                        </a>
+                    </div>
+                    
+            
+                    }
+
             </div>
         </Card>
     );

@@ -24,6 +24,7 @@ export type LicenseDetailFieldsProducer = {
     tracking_number: string;
     
     registration_required_for: ManufacturingType[]; // List of manufacturing types
+    registration_required_for_other: string[];
     single_use_plastic_items: string[];
     
     total_capacity_value: string;

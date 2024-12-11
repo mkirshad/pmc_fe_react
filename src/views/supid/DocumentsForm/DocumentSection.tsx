@@ -11,6 +11,7 @@ import Checkbox from '@/components/ui/Checkbox'
 import type { SyntheticEvent } from 'react'
 import { Autocomplete, TextField, Chip, Hidden, List } from '@mui/material';
 import Group from '@/components/ui/Checkbox/Group';
+import useFormStore from '../../../store/supid/supidStore'
 
 type BusinessDetailSectionProps = FormSectionBaseProps;
 
@@ -26,6 +27,8 @@ let colourOptions = [
     { value: 'slate', label: 'Slate', color: '#253858' },
     { value: 'silver', label: 'Silver', color: '#666666' },
 ]
+
+
 
 const registrationTypes = [
     { value: 'Individual', label: 'Individual' },
@@ -85,12 +88,7 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         }
     };
 
-    // Watch the value of 'registration_required_for'
-    const registrationRequiredFor = useWatch({
-        control,
-        name: 'registration_required_for',
-        defaultValue: [], // Ensure it's an array
-    });
+  
 
   const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -118,7 +116,27 @@ const parseDate = (dateString) => {
     return `${year}-${month}-${day}`;
 };
 
+const {
+    applicantDetail,
+    updateApplicantDetail,
+    resetApplicantDetail,
+    businessDetail,
+    updateBusinessDetail,
+    resetBusinessDetail,
+    businessDetailIndividual,
+    updateBusinessDetailIndividual,
+    resetBusinessDetailIndividual,
+    businessEntity,
+    updateBusinessEntity,
+    resetBusinessEntity,
+    resetAll,
+    completedSections,
+    getValuesFromStateBusinessEntity,
+    markSectionAsCompleted,
+  } = useFormStore();
 
+console.log('has_identity_document');
+console.log('has_identity_document',applicantDetail.has_identity_document)
 
     return (
         <Card>
@@ -148,6 +166,11 @@ const parseDate = (dateString) => {
                 
                 
             </div>
+
+            
+            <div>
+                    {applicantDetail.has_identity_document && <label>Identity Document is already Uploaded!</label>}
+                </div>
         </Card>
     );
 };

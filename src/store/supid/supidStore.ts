@@ -133,7 +133,8 @@ const useFormStore = create<FormStore>((set, get) => ({
                 email: '',
                 mobileOperator: '',
                 phoneNumber: '',
-                id:0
+                id:0,
+                applicationStatus: 'Created'
             },
             completedSections: state.completedSections.filter((section) => section !== 'applicantDetail'),
         })),
@@ -244,6 +245,7 @@ const useFormStore = create<FormStore>((set, get) => ({
                 licenseDetailProducer: {
                     tracking_number: '',
                     registration_required_for: [],
+                    registration_required_for_other: [],
                     plain_plastic_Sheets_for_food_wrapping: [],
                     PackagingItems: [],
                     number_of_machines: '',

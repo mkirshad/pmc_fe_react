@@ -88,6 +88,8 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         defaultValue: [], // Ensure it's an array
     });
 
+
+
     // Watch the value of 'registration_required_for'
     const PackagingItems = useWatch({
         control,
@@ -141,7 +143,7 @@ const parseDate = (dateString) => {
                 {/* Business Name and Registration Type */}
                 
                 <FormItem
-                    label="Registration Required For"
+                    label="Categories of Single Use Plastics*"
                     invalid={Boolean(errors.registration_required_for)}
                     errorMessage={errors.registration_required_for?.message}
                     >
@@ -161,6 +163,33 @@ const parseDate = (dateString) => {
                         )}
                     />
                 </FormItem>
+
+                <FormItem
+                    label="Categories for Other Plastics"
+                    invalid={Boolean(errors.registration_required_for_other)}
+                    errorMessage={errors.registration_required_for_other?.message}
+                    >
+                    <Controller
+                        name="registration_required_for_other"
+                        control={control}
+                        render={({ field }) => (
+                        <Checkbox.Group
+                            value={field.value || []} // Ensure the value is an array
+                            onChange={(selectedValues) => field.onChange(selectedValues)}
+                            className="flex flex-col gap-2"
+                        >
+                            <Checkbox value="Plastic Utensils">Plastic Utensils (Box, Bottle, Bin, Bowel, Tray etc.)</Checkbox>
+                            <Checkbox value="Plastic Pipes & Fittings">Plastic Pipes (Flexible, Rigid, etc.) & Fittings</Checkbox>
+                            <Checkbox value="PET Bottles">PET Bottles</Checkbox>
+                            <Checkbox value="Plastic Furniture">Plastic Furnitures (Chair, Table etc.)</Checkbox>
+                            <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
+                            <Checkbox value="Others">Others</Checkbox>
+                       
+                        </Checkbox.Group>
+                        )}
+                    />
+                </FormItem>
+
                 {/* </div>
                 <div className="grid md:grid-cols-3 gap-4"> */}
 
@@ -188,7 +217,7 @@ const parseDate = (dateString) => {
                     </FormItem>
                     <div></div>
                     <FormItem
-                        label="Add List +"
+                        label="Add List + (If desired item is not in the list, then type and press enter to add)"
                         invalid={Boolean(errors.PackagingItems)}
                         errorMessage={errors.PackagingItems?.message}
                         >
@@ -231,7 +260,10 @@ const parseDate = (dateString) => {
                 ): null
             }
             </div>
-
+            <div className="mb-4">
+                <Divider textAlign="left">
+                </Divider>
+            </div>
                 <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                     label="Number of Machines*"
@@ -336,7 +368,7 @@ const parseDate = (dateString) => {
         
 
                 <FormItem
-                    label="Waste Storage Capacity"
+                    label="Waste Storage Capacity*"
                     invalid={Boolean(errors.has_waste_storage_capacity)}
                     errorMessage={errors.has_waste_storage_capacity?.message}
                 >
@@ -368,7 +400,7 @@ const parseDate = (dateString) => {
                 </FormItem>
 
                 <FormItem
-                    label="Waste Disposal Provision"
+                    label="Waste Disposal ProvisionI*"
                     invalid={Boolean(errors.waste_disposal_provision)}
                     errorMessage={errors.waste_disposal_provision?.message}
                 >

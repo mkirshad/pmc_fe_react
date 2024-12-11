@@ -46,14 +46,14 @@ const Banner = () => {
     >
       <header className="banner-header">
         <div className="logo-section">
+          <img src="/img/logo/epa_logo-removebg-preview.png" alt="GOP Logo" className="header-logo" />
           <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
           <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
+          
           <span className="header-text">PLMIS</span>
         </div>
         <nav className="banner-nav">
-          <Link to="/sign-in" className="nav-link">Apply License</Link>
-          <Link to="/sign-in" className="nav-link">Track Application</Link>
-          <Link to="/sign-in" className="nav-link">Login</Link>
+          <Link to="/sign-in" className="nav-link">Staff Login</Link>
         </nav>
       </header>
 
@@ -68,7 +68,7 @@ const Banner = () => {
           </h1>
         </motion.div>
         <div className="banner-links">
-          <Link to="/sign-in" className="nav-link">
+          <Link to="/sign-up?redirectUrl=/spuid-signup" className="nav-link">
             Apply License
           </Link>
           <Link to="/sign-in" className="nav-link">
