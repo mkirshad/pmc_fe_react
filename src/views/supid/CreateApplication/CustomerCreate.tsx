@@ -194,7 +194,8 @@ console.log('id is:', id)
 
     if (applicantDetail.id > 0 && applicantDetail.id !== 0) {
         try {
-            const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+            formData.append('id', applicantDetail.id.toString());
+            const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -238,11 +239,11 @@ console.log('id is:', id)
 
             formData.append('tracking_number', tracking_number);
             formData.append('registration_for', 'Producer');
-
+            formData.append('id', resp_id.toString());
             // Call updateApplicantDetail with updated values
             // Update Tracking ID
             try {
-                const response = await AxiosBase.put(`/pmc/applicant-detail/${resp_id}/`, formData, {
+                const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
