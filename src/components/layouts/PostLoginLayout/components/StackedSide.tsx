@@ -32,8 +32,8 @@ const StackedSide = ({ children }: CommonProps) => {
                         }
                         headerEnd={
                             <>
-                                <Search />
-                                <LanguageSelector />
+                                {/* <Search /> */}
+                                {/* <LanguageSelector /> */}
                                 <Notification />
                                 <SidePanel />
                                 <UserProfileDropdown hoverable={false} />

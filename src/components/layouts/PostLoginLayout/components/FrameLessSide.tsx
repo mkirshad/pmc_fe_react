@@ -103,8 +103,8 @@ const FrameLessSide = ({ children }: CommonProps) => {
                             }
                             headerEnd={
                                 <>
-                                    <Search />
-                                <LanguageSelector />
+                                    {/* <Search />
+                                <LanguageSelector /> */}
                                 <Notification />
                                 <SidePanel />
                                     <UserProfileDropdown hoverable={false} />
