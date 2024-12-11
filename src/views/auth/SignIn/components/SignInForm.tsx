@@ -63,7 +63,8 @@ const SignInForm = (props: SignInFormProps) => {
             const result = await signIn({ username: email, password: password })
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
+                setMessage?.('Invalid Credentials!')
+                // setMessage?.(result.message)
             }else{
                 setUser({"email":email, "userName":email.split('@')[0]})
             }

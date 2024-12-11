@@ -71,10 +71,11 @@ const SignUpForm = (props: SignUpFormProps) => {
             setSubmitting(true);
             try {
                 const result = await signUp({ username: email, password, email: '' });
-    
+                
                 // Simulate successful signup
                 if (result?.status === 'failed') {
-                    throw new Error(result.message);
+                    throw new Error('Username Already Exist')
+                    // throw new Error(result.message);
                 } else {
                     setSessionSignedIn(false);
                     setToken('');
