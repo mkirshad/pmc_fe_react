@@ -192,10 +192,10 @@ const CustomerEdit = () => {
     // formData.append('mobile_operator', values.mobileOperator);
     formData.append('mobile_no', values.phoneNumber);
     // formData.append('tracking_number', JSON.stringify('ABCD1'));
-
+    formData.append('id', applicantDetail.id.toString())
     if (applicantDetail.id > 0) {
         try {
-            const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+            const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -234,11 +234,11 @@ const CustomerEdit = () => {
             // Add the ID to the values object
             const updatedValues = { ...values, id };
             formData.append('tracking_number', tracking_number);
-
+            formData.append('id', applicantDetail.id.toString());
             // Call updateApplicantDetail with updated values
             // Update Tracking ID
             try {
-                const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+                const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -299,8 +299,9 @@ const CustomerEdit = () => {
 
         if(businessDetail.id > 0 || businessDetailIndividual.id > 0){
             const id = businessDetail.id || businessDetailIndividual.id
+            formData.append('id', id.toString())
             try {
-                const response = await AxiosBase.put(`/pmc/business-profiles/${id}/`, formData, {
+                const response = await AxiosBase.post(`/pmc/business-profiles/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -445,10 +446,10 @@ const CustomerEdit = () => {
             // Add non-file fields
             const formData = new FormData();
             formData.append('assigned_group', (applicantDetail.assignedGroup2));
-
+            formData.append('id', applicantDetail.id.toString())
             if (applicantDetail.id > 0) {
                 try {
-                    const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+                    const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
