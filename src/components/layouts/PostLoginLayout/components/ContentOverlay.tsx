@@ -118,7 +118,7 @@ const ContentOverlay = ({ children }: CommonProps) => {
                             <>
                                 {/* <Search />
                                 <LanguageSelector /> */}
-                                <Notification />
+                                {/* <Notification /> */}
                                 <SidePanel />
                                 <UserProfileDropdown hoverable={false} />
                             </>
