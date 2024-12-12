@@ -18,6 +18,10 @@ type BusinessDetailSectionIndividualProps = FormSectionBaseProps;
 //     { value: 'Ufone', label: 'Ufone' },
 //     { value: 'Warid', label: 'Warid' },
 // ];
+const entityTypes = [
+    { value: 'Individual', label: 'Individual' },
+    { value: 'Company', label: 'Company / Corporation / Partnership' },
+];
 
 const BusinessDetailSectionIndividual = ({ control, errors }: BusinessDetailSectionIndividualProps) => {
     const [districts, setDistricts] = useState([]);
@@ -94,7 +98,42 @@ console.log(districts)
             <h4 className="mb-6">Business Detail</h4>
             <div className="grid md:grid-cols-2 gap-4">
                 
-            
+            <FormItem
+                    label="Business Entity Type"
+                    invalid={Boolean(errors.businessEntityType)}
+                    errorMessage={errors.businessEntityType?.message}
+                >
+                    <Controller
+                        name="businessEntityType"
+                        control={control}
+                        render={({ field }) => (
+                            <div className="flex flex-col gap-2">
+                                {entityTypes.map((option) => (
+                                    <label key={option.value} className="flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            value={option.value}
+                                            checked={field.value === option.value  }
+                                            onChange={() => {
+                                                field.onChange(option.value); // Update form state
+                                                updateBusinessEntity({ businessEntityType: option.value }); // Update Zustand state
+                                                markSectionAsCompleted('businessEntity', true)
+                                                // if(option.value === 'Individual'){
+                                                //     markSectionAsCompleted('businessDetail', false)
+                                                //     markSectionAsCompleted('businessDetailIndividual', true)
+                                                // }else if(option.value === 'Company'){
+                                                //     markSectionAsCompleted('businessDetailIndividual', false)
+                                                //     markSectionAsCompleted('businessDetail', true)
+                                                // }
+                                            }}
+                                        />
+                                        {option.label}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    />
+                </FormItem>
 
                 {/* Name and NTN */}
                 <FormItem

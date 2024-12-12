@@ -167,6 +167,7 @@ const {
                     });
             }
 
+            // Handle Producer Data
             updateLicenseDetail({licenseType: response.data.registration_for})
             if (response.data.producer && response.data.registration_for === 'Producer') {
                 const dataProducer = {
@@ -185,6 +186,51 @@ const {
                 };
             
                 updateLicenseDetailProducer(dataProducer);
+            }
+
+
+            // Handle Consumer Data
+            if (response.data.consumer && response.data.registration_for === 'Consumer') {
+                const dataConsumer = {
+                    registration_required_for: response.data.consumer.registration_required_for || [],
+                    registration_required_for_other: response.data.consumer.registration_required_for_other || [],
+                    plain_plastic_Sheets_for_food_wrapping: response.data.consumer.plain_plastic_sheets_for_food_wrapping || [],
+                    PackagingItems: response.data.consumer.packaging_items || [],
+                    consumption: response.data.consumer.consumption || '',
+                    provision_waste_disposal_bins: response.data.consumer.provision_waste_disposal_bins || 'No',
+                    no_of_waste_disposible_bins: response.data.consumer.no_of_waste_disposable_bins || '',
+                    segregated_plastics_handed_over_to_registered_recyclers:
+                        response.data.consumer.segregated_plastics_handed_over_to_registered_recyclers || 'No',
+                    applicant: response.data.consumer.applicant || '',
+                };
+                updateLicenseDetailConsumer(dataConsumer);
+            }
+
+            // Handle Recycler Data
+            if (response.data.recycler && response.data.registration_for === 'Recycler') {
+                const dataRecycler = {
+                    selectedCategories: response.data.recycler.selected_categories || [],
+                    plastic_waste_acquired_through: response.data.recycler.plastic_waste_acquired_through || [],
+                    has_adequate_pollution_control_systems:
+                        response.data.recycler.has_adequate_pollution_control_systems || 'No',
+                    pollution_control_details: response.data.recycler.pollution_control_details || '',
+                    applicant: response.data.recycler.applicant || '',
+                };
+                updateLicenseDetailRecycler(dataRecycler);
+            }
+
+            // Handle Collector Data
+            if (response.data.collector && response.data.registration_for === 'Collector') {
+                const dataCollector = {
+                    registration_required_for: response.data.collector.registration_required_for || [],
+                    registration_required_for_other: response.data.collector.registration_required_for_other || [],
+                    selectedCategoriesCollector: response.data.collector.selected_categories || [],
+                    total_capacity_value_collector: response.data.collector.total_capacity_value || '',
+                    number_of_vehicles: response.data.collector.number_of_vehicles || '',
+                    number_of_persons: response.data.collector.number_of_persons || '',
+                    applicant: response.data.collector.applicant || '',
+                };
+                updateLicenseDetailCollector(dataCollector);
             }
              
              if(response.data.application_status === 'Fee Challan'){
