@@ -92,7 +92,8 @@ const validationSchemabusinessDetailIndividual = z.object({
     businessEntityType: z
         .string()
         .min(1, { message: 'Business Entity Type is required' })
-        .default("Individual"), // Set the default value here
+        // .default("Individual"), // Set the default value here
+        ,
     name: z.string().min(1, { message: "Name is required" }),
     // ntn: z.string().regex(/^\d{7}$/, { message: "NTN/STRN/PRA No must be a valid 7-digit number" }),
     district: z.number().min(1, { message: "District selection is required" }),

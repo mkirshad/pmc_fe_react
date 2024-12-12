@@ -99,7 +99,7 @@ console.log(districts)
             <div className="grid md:grid-cols-2 gap-4">
                 
             <FormItem
-                    label="Business Entity Type"
+                    label="Business Entity Type*"
                     invalid={Boolean(errors.businessEntityType)}
                     errorMessage={errors.businessEntityType?.message}
                 >

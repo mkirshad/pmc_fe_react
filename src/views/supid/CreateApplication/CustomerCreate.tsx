@@ -473,6 +473,30 @@ const {
                     setIsSubmiting(false);
                 }
                 updateLicenseDetailProducer(values as LicenseDetailFieldsProducer);
+
+
+
+                // Set Applicatn level detail
+                const formData2 = new FormData();
+                formData2.append('registration_for', 'Consumer');
+                formData2.append('applicant', applicantDetail.id.toString());
+                formData2.append('tracking_number', `LHR-PRO-${applicantDetail.id.toString().padStart(3, '0')}`);
+                // Call updateApplicantDetail with updated values
+                // Update Tracking ID
+                
+                    const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+        
+                    console.log('Post successful:', response2.data);
+        
+                    // Add the ID to the values object
+                    const updatedValues = { 'registration_for': 'Producer' };
+        
+                    // Call updateApplicantDetail with updated values
+                    updateApplicantDetail(updatedValues);
             }
             if (completedSections.includes('licenseDetailConsumer')) {
                     console.log('values:', values)
@@ -517,7 +541,7 @@ const {
                     const formData2 = new FormData();
                     formData2.append('registration_for', 'Consumer');
                     formData2.append('applicant', applicantDetail.id.toString());
-
+                    formData2.append('tracking_number', `LHR-CON-${applicantDetail.id.toString().padStart(3, '0')}`);
                     // Call updateApplicantDetail with updated values
                     // Update Tracking ID
                    
@@ -581,6 +605,7 @@ const {
                     // Update Applicant Details
                     const formData2 = new FormData();
                     formData2.append('registration_for', 'Collector');
+                    formData2.append('tracking_number', `LHR-COL-${applicantDetail.id.toString().padStart(3, '0')}`);
                     formData2.append('applicant', applicantDetail.id.toString());
             
                     const response2 = await AxiosBase.put(
@@ -654,6 +679,7 @@ const {
                 // Set Applicatn level detail
                 const formData2 = new FormData();
                 formData2.append('registration_for', 'Recycler');
+                formData2.append('tracking_number', `LHR-REC-${applicantDetail.id.toString().padStart(3, '0')}`);
                 formData2.append('applicant', applicantDetail.id.toString());
 
                 // Call updateApplicantDetail with updated values

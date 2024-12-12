@@ -86,12 +86,14 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     // Validation for number of vehicles
     number_of_vehicles: z
       .coerce.number()
-      .positive({ message: "Number of vehicles must be a positive number" }),
+      .positive({ message: "Number of vehicles must be a positive number" })
+      .optional(),
   
     // Validation for number of persons
     number_of_persons: z
       .coerce.number()
-      .positive({ message: "Number of persons must be a positive number" }),
+      .positive({ message: "Number of persons must be a positive number" })
+      .optional(),
   });
   
   const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
