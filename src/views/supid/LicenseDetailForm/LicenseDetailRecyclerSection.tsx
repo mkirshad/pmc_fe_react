@@ -3,7 +3,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Checkbox from '@/components/ui/Checkbox';
 import { FormItem } from '@/components/ui/Form';
-import { Controller, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { Divider } from '@mui/material';
 import Radio from '@/components/ui/Radio'
 
@@ -23,88 +23,116 @@ const categories = [
     { value: 'Others', label: 'Others' },
 ];
 
+
+
+
 const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSectionIndividualProps) => {
-    const { fields, append, remove } = useFieldArray({
-        control,
+    const { fields, append, remove } = useFieldArray<{
+        category: string;
+        wasteCollection: number;
+        wasteDisposal: number;
+    }>({
+        control : control || {},
         name: 'selectedCategories',
     });
 
     const handleCheckboxChange = (checked: boolean, category: string) => {
         if (checked) {
-            append({ category, wasteGeneration: '', wasteCollection: '' });
+            append({ category, wasteCollection: 0, wasteDisposal: 0 }); // Default values for numbers
         } else {
             const index = fields.findIndex((field) => field.category === category);
             if (index !== -1) remove(index);
         }
     };
 
+
+    const has_adequate_pollution_control_systems = useWatch({
+        control,
+        name: 'has_adequate_pollution_control_systems',
+        defaultValue: 'No', // Ensure it's an array
+    });
+
     return (
         <Card>
             <h4 className="mb-6">Detail - Recycler</h4>
-            <div className="grid md:grid-cols-1 gap-4">
-                <FormItem
-                    label="Categories of Plastics"
-                    invalid={Boolean(errors.selectedCategories)}
-                    errorMessage={errors.selectedCategories?.message}
-                >
-                    {categories.map((category) => (
-                        <div
-                            key={category.value}
-                            className="flex items-center gap-4 mb-5" // Added mb-5 for spacing
-                        >
-                            <Checkbox
-                                value={category.value}
-                                checked={fields.some((field) => field.category === category.value)}
-                                onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
-                                className="flex-grow" // Checkbox takes more space
+            <div className="w-full">
+    <FormItem
+        label="Categories of Plastics being recycled*"
+        invalid={Boolean(errors.selectedCategories)}
+        errorMessage={errors.selectedCategories?.message}
+        className="w-full" // Ensure FormItem spans full width
+    >
+        {categories.map((category) => (
+            <div
+                                key={category.value}
+                                className="flex items-center gap-4 mb-5 w-full" // Full-width category container
                             >
-                                {category.label}
-                            </Checkbox>
-                            {fields.some((field) => field.category === category.value) && (
-                                <div className="flex gap-2 w-full">
-                                    <Controller
-                                        name={`selectedCategories.${fields.findIndex(
-                                            (field) => field.category === category.value
-                                        )}.wasteGeneration`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Input
-                                                placeholder="Waste Generation Kg per day"
-                                                {...field}
-                                                className="w-1/4" // Reduced width for input
+                                <Checkbox
+                                    value={category.value}
+                                    checked={fields.some((field) => field.category === category.value)}
+                                    onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
+                                    className="flex-grow w-1/2" // Checkbox grows to fill available space
+                                >
+                                    {category.label}
+                                </Checkbox>
+                                {fields.some((field) => field.category === category.value) && (
+                                    <div className="flex gap-2 w-full">
+                                        <div className="flex flex-col w-full">
+                                            <label className="text-sm text-gray-700">
+                                                Waste Collection (Kg/day)
+                                            </label>
+                                            <Controller
+                                                name={`selectedCategories.${fields.findIndex(
+                                                    (field) => field.category === category.value
+                                                )}.wasteCollection`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Waste Collection (Kg per day)"
+                                                        {...field}
+                                                        className="w-1/2" // Full-width input
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
-                                    <Controller
-                                        name={`selectedCategories.${fields.findIndex(
-                                            (field) => field.category === category.value
-                                        )}.wasteCollection`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Input
-                                                placeholder="Waste Collection Kg per"
-                                                {...field}
-                                                className="w-1/4" // Reduced width for input
+                                        </div>
+                                        <div className="flex flex-col w-full">
+                                            <label className="text-sm text-gray-700">
+                                                Waste Disposal (Kg/day)
+                                            </label>
+                                            <Controller
+                                                name={`selectedCategories.${fields.findIndex(
+                                                    (field) => field.category === category.value
+                                                )}.wasteDisposal`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Waste Disposal (Kg per day)"
+                                                        {...field}
+                                                        className="w-1/2" // Full-width input
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </FormItem>
-            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </FormItem>
+                </div>
+
             <div className="mb-4">
                 <Divider textAlign="left" />
             </div>
             <div className="grid md:grid-cols-1 gap-4">
             <FormItem
-                    label="Categories for Other Plastics"
+                    label="Plastic waste acquired through"
                     invalid={Boolean(errors.registration_required_for_other)}
                     errorMessage={errors.registration_required_for_other?.message}
                     >
                     <Controller
-                        name="registration_required_for_other"
+                        name="plastic_waste_acquired_through"
                         control={control}
                         render={({ field }) => (
                         <Checkbox.Group
@@ -112,7 +140,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex  gap-2"
                         >
-                            <Checkbox value="Sale">Sale</Checkbox>
+                            <Checkbox value="Collector">Collector</Checkbox>
                             <Checkbox value="Auction">Auction</Checkbox>
                             <Checkbox value="Contract">Contract</Checkbox>
                             <Checkbox value="Import">Import</Checkbox>
@@ -129,9 +157,9 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                         errorMessage={errors.has_waste_storage_capacity?.message}
                     >
                         <Controller
-                            name="has_waste_storage_capacity"
+                            name="has_adequate_pollution_control_systems"
                             control={control}
-                            rules={{ required: 'Waste storage capacity is required' }}
+                            // rules={{ required: 'Waste storage capacity is required' }}
                             render={({ field }) => (
                                 <div className="flex gap-4">
                                     <Radio
@@ -140,7 +168,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                         value="Yes"
                                         onChange={() => field.onChange('Yes')}
                                     >
-                                        Available
+                                        Yes
                                     </Radio>
                                     <Radio
                                         {...field}
@@ -148,7 +176,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                         value="No"
                                         onChange={() => field.onChange('No')}
                                     >
-                                        Not Available
+                                        No
                                     </Radio>
                                 </div>
                             )}
@@ -156,25 +184,26 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                     </FormItem>
 
                 
-
-                <FormItem
-                    label="Details"
-                    invalid={Boolean(errors.date_of_setting_up)}
-                    errorMessage={errors.date_of_setting_up?.message}
-                >
-                    <Controller
-                        name="details"
-                        control={control}
-                        render={({ field }) => (
-                            <Input
-                                {...field}
-                                type="text"
-                                placeholder="Details"
-                                onChange={(e) => field.onChange(e.target.value)}
-                            />
-                        )}
-                    />
-                </FormItem>
+                {has_adequate_pollution_control_systems === 'Yes' &&
+                    <FormItem
+                        label="Details"
+                        invalid={Boolean(errors.pollution_control_details)}
+                        errorMessage={errors.pollution_control_details?.message}
+                    >
+                        <Controller
+                            name="pollution_control_details"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    type="text"
+                                    placeholder="Details"
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                />
+                            )}
+                        />
+                    </FormItem>
+                }
                 </div>
 
         </Card>

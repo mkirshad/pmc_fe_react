@@ -7,6 +7,7 @@ import { Controller, useFieldArray  } from 'react-hook-form';
 import type { FormSectionBaseProps } from './types';
 import Checkbox from '@/components/ui/Checkbox'
 import { Divider } from '@mui/material';
+import { useEffect } from 'react'
 
 type LicenseDetailSectionProps = FormSectionBaseProps;
 
@@ -40,9 +41,15 @@ const categories = [
 const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSectionProps) => {
 
     const { fields, append, remove } = useFieldArray({
-        control,
+        control: control || {}, // Provide a fallback if control is undefined
         name: 'selectedCategories',
     });
+
+    // useEffect(() => {
+    //     if (control?.defaultValuesRef?.current?.selectedCategories) {
+    //         replace(control.defaultValuesRef.current.selectedCategories);
+    //     }
+    // }, [control, replace]);
 
     const handleCheckboxChange = (checked: boolean, category: string) => {
         if (checked) {
@@ -113,56 +120,16 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
             </div>
 
 
-            <div className="grid md:grid-cols-1 gap-4">
-                <FormItem
-                    label="Source of Disposal"
-                    invalid={Boolean(errors.selectedCategories)}
-                    errorMessage={errors.selectedCategories?.message}
-                >
-                    {categories.map((category) => (
-                        <div
-                            key={category.value}
-                            className="flex items-center gap-4 mb-5" // Added mb-5 for spacing
-                        >
-                            <Checkbox
-                                value={category.value}
-                                checked={fields.some((field) => field.category === category.value)}
-                                onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
-                                className="flex-grow" // Checkbox takes more space
-                            >
-                                {category.label}
-                            </Checkbox>
-                            {fields.some((field) => field.category === category.value) && (
-                                <div className="flex gap-2 w-full">
-                                    <Controller
-                                        name={`selectedCategories.${fields.findIndex(
-                                            (field) => field.category === category.value
-                                        )}.wasteGeneration`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Input
-                                                placeholder="Address"
-                                                {...field}
-                                                className="w-1/4" // Reduced width for input
-                                            />
-                                        )}
-                                    />
-                                   
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </FormItem>
-            </div>
+            
 
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                         label="Collection (Kg per day)*"
-                        invalid={Boolean(errors.total_capacity_value)}
-                        errorMessage={errors.total_capacity_value?.message}
+                        invalid={Boolean(errors.total_capacity_value_collector)}
+                        errorMessage={errors.total_capacity_value_collector?.message}
                     >
                         <Controller
-                            name="total_capacity_value"
+                            name="total_capacity_value_collector"
                             control={control}
                             render={({ field }) => (
                                 <Input
@@ -181,7 +148,7 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
                         errorMessage={errors.total_capacity_value?.message}
                     >
                         <Controller
-                            name="total_capacity_value"
+                            name="number_of_vehicles"
                             control={control}
                             render={({ field }) => (
                                 <Input
@@ -201,7 +168,7 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
                         errorMessage={errors.total_capacity_value?.message}
                     >
                         <Controller
-                            name="total_capacity_value"
+                            name="number_of_persons"
                             control={control}
                             render={({ field }) => (
                                 <Input
@@ -214,50 +181,52 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
                         />
                 </FormItem>
             </div>
-        {/* <div className="grid md:grid-cols-2 gap-4">
-
-            <FormItem
-                    label="Collection (Kg per Day)*"
-                    invalid={Boolean(errors.productsCapacity)}
-                    errorMessage={errors.productsCapacity?.message}
-                >
-                    <Controller
-                        name="productsCapacity"
-                        control={control}
-                        render={({ field }) => (
-                            <Input
-                                type="text"
-                                placeholder="List of Products and Installed Capacity"
-                                {...field}
-                            />
-                        )}
-                    />
-                </FormItem>
-
-
+       
+            <div className="grid md:grid-cols-1 gap-4">
                 <FormItem
-                    label="Collection Methods*"
-                    invalid={Boolean(errors.registration_required_for_other)}
-                    errorMessage={errors.registration_required_for_other?.message}
-                    >
-                    <Controller
-                        name="registration_required_for_other"
-                        control={control}
-                        render={({ field }) => (
-                        <Checkbox.Group
-                            value={field.value || []} // Ensure the value is an array
-                            onChange={(selectedValues) => field.onChange(selectedValues)}
-                             className="flex  gap-2 mt-2"
-                        >
-                            <Checkbox value="Vehicles">Vehicles</Checkbox>
-                            <Checkbox value="Persons">Persons</Checkbox>
-                       
-                        </Checkbox.Group>
-                        )}
-                    />
-                </FormItem>
+                    label="Source of Disposal"
+                    invalid={Boolean(errors.selectedCategoriesCollector)}
+                    errorMessage={errors.selectedCategoriesCollector?.message}
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"> {/* Flex container for horizontal stacking */}
+                        {categories.map((category) => (
+                            <div
+                                key={category.value}
+                                className="flex items-center gap-4" // Individual category container
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Checkbox
+                                        value={category.value}
+                                        checked={fields.some((field) => field.category === category.value)}
+                                        onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
+                                        className="flex-shrink-0" // Ensures checkbox doesn’t grow unnecessarily
+                                    >
+                                        {category.label}
+                                    </Checkbox>
+                                    {fields.some((field) => field.category === category.value) && (
+                                        <Controller
+                                            name={`selectedCategoriesCollector.${fields.findIndex(
+                                                (field) => field.category === category.value
+                                            )}.address`}
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Input
+                                                    placeholder="Address"
+                                                    {...field}
+                                                    className="flex-1 min-w-0" // Ensures proper alignment
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
-            </div> */}
+
+                </FormItem>
+            </div>
+
         </Card>
     );
 };

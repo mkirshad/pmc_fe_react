@@ -23,6 +23,7 @@ import AxiosBase from '../../../services/axios/AxiosBase'
 import { useParams } from 'react-router-dom';
 
 const CustomerEdit = () => {
+    
     const { id } = useParams();
     const navigate = useNavigate();
     const [step, setStep] = useState(0);
@@ -62,6 +63,33 @@ console.log('id is:', id)
 
     const onPrevious = () => onChange(step - 1)
 
+
+    // Destructure the desired state slices and functions
+const {
+    applicantDetail,
+    updateApplicantDetail,
+    resetApplicantDetail,
+    businessDetail,
+    updateBusinessDetail,
+    resetBusinessDetail,
+    businessDetailIndividual,
+    updateBusinessDetailIndividual,
+    resetBusinessDetailIndividual,
+    businessEntity,
+    updateBusinessEntity,
+    resetBusinessEntity,
+    resetAll,
+    completedSections,
+    getValuesFromStateBusinessEntity,
+    getValuesFromLicenseDetail,
+    updateLicenseDetail,
+    updateLicenseDetailCollector,
+    updateLicenseDetailConsumer,
+    updateLicenseDetailProducer,
+    updateLicenseDetailRecycler,
+    resetLicenseDetail,
+    resetLicenseDetailProducer,
+} = useFormStore();
 
     useEffect(() => {
         if (id && id !== '0') {
@@ -401,13 +429,203 @@ console.log('id is:', id)
                 updateLicenseDetailProducer(values as LicenseDetailFieldsProducer);
             }
             if (completedSections.includes('licenseDetailConsumer')) {
+                    console.log('values:', values)
+                    const formData = new FormData();
+        
+                    formData.append(
+                        'registration_required_for',
+                        JSON.stringify(values.registration_required_for || [])
+                    );
+                    formData.append(
+                        'registration_required_for_other',
+                        JSON.stringify(values.registration_required_for_other || [])
+                    );
+                    formData.append(
+                        'plain_plastic_sheets_for_food_wrapping',
+                        JSON.stringify(values.plain_plastic_Sheets_for_food_wrapping || [])
+                    );
+                    formData.append('packaging_items', JSON.stringify(values.PackagingItems || []));
+                    formData.append('consumption', values.consumption || '');
+                    formData.append(
+                        'provision_waste_disposal_bins',
+                        values.provisionwaste_disposal_provision || 'No'
+                    );
+                    if (values.no_of_waste_disposible_bins) {
+                        formData.append('no_of_waste_disposable_bins', values.no_of_waste_disposible_bins);
+                    }
+                    formData.append(
+                        'segregated_plastics_handed_over_to_registered_recyclers',
+                        values.segregated_plastics_handed_over_to_registered_re_cyclers || 'No'
+                    );
+                    formData.append('applicant', applicantDetail.id.toString());
+        
+                    const response = await AxiosBase.post('/pmc/consumers/', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+        
+                    console.log('Consumer POST successful:', response.data);
+                
+                    // Set Applicatn level detail
+                    const formData2 = new FormData();
+                    formData2.append('registration_for', 'Consumer');
+                    formData2.append('applicant', applicantDetail.id.toString());
+
+                    // Call updateApplicantDetail with updated values
+                    // Update Tracking ID
+                   
+                        const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+            
+                        console.log('Post successful:', response2.data);
+            
+                        // Add the ID to the values object
+                        const updatedValues = { 'registration_for': 'Consumer' };
+            
+                        // Call updateApplicantDetail with updated values
+                        updateApplicantDetail(updatedValues);
+
+
                 updateLicenseDetailConsumer(values as LicenseDetailFieldsConsumer);
             }
             if (completedSections.includes('licenseDetailCollector')) {
-                updateLicenseDetailCollector(values as LicenseDetailFieldsCollector);
+                console.log('values:', values);
+                const formData = new FormData();
+            
+                // Add single-use plastics categories
+                formData.append(
+                    'registration_required_for',
+                    JSON.stringify(values.registration_required_for || [])
+                );
+            
+                // Add other plastics categories
+                formData.append(
+                    'registration_required_for_other',
+                    JSON.stringify(values.registration_required_for_other || [])
+                );
+            
+                // Add selected categories with their details
+                formData.append(
+                    'selected_categories',
+                    JSON.stringify(values.selectedCategoriesCollector || [])
+                );
+            
+                // Add collection details
+                formData.append('total_capacity_value', values.total_capacity_value_collector.toString() || '');
+                formData.append('number_of_vehicles', values.number_of_vehicles.toString() || '');
+                formData.append('number_of_persons', values.number_of_persons.toString() || '');
+            
+                // Add applicant details
+                formData.append('applicant', applicantDetail.id.toString());
+            
+                try {
+                    // Post to Collector API
+                    const response = await AxiosBase.post('/pmc/collectors/', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+            
+                    console.log('Collector POST successful:', response.data);
+            
+                    // Update Applicant Details
+                    const formData2 = new FormData();
+                    formData2.append('registration_for', 'Collector');
+                    formData2.append('applicant', applicantDetail.id.toString());
+            
+                    const response2 = await AxiosBase.put(
+                        `/pmc/applicant-detail/${applicantDetail.id}/`,
+                        formData2,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        }
+                    );
+            
+                    console.log('Applicant Detail Update successful:', response2.data);
+            
+                    // Update local store or state with updated values
+                    const updatedValues = { registration_for: 'Collector' };
+                    updateApplicantDetail(updatedValues);
+            
+                    // Update state or local storage with the collector details
+                    updateLicenseDetailCollector(values as LicenseDetailFieldsCollector);
+                } catch (error) {
+                    console.error('Error posting Collector details:', error.response || error.message);
+                }
             }
+            console.log('completedSections', completedSections)
             if (completedSections.includes('licenseDetailRecycler')) {
+                const formData = new FormData();
+    
+                // Add selected categories
+                formData.append(
+                    'selected_categories',
+                    JSON.stringify(values.selectedCategories || [])
+                );
+    
+                // Add plastic waste acquisition methods
+                formData.append(
+                    'plastic_waste_acquired_through',
+                    JSON.stringify(values.plastic_waste_acquired_through || [])
+                );
+    
+                // Add pollution control system details
+                formData.append(
+                    'has_adequate_pollution_control_systems',
+                    values.has_adequate_pollution_control_systems || 'No'
+                );
+    
+                if (values.has_adequate_pollution_control_systems === 'Yes') {
+                    formData.append(
+                        'pollution_control_details',
+                        values.pollution_control_details || ''
+                    );
+                }
+    
+                // Add applicant ID
+                formData.append('applicant', applicantDetail.id.toString());
+    
+                try {
+                    const response = await AxiosBase.post('/pmc/recyclers/', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+    
+                    console.log('Post successful:', response.data);
+                } catch (error) {
+                    console.error('Error in POST request:', error.response || error.message);
+                    setIsSubmiting(false);
+                }
                 updateLicenseDetailRecycler(values as LicenseDetailFieldsRecycler);
+
+                // Set Applicatn level detail
+                const formData2 = new FormData();
+                formData2.append('registration_for', 'Recycler');
+                formData2.append('applicant', applicantDetail.id.toString());
+
+                // Call updateApplicantDetail with updated values
+                // Update Tracking ID
+               
+                    const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+        
+                    console.log('Post successful:', response2.data);
+        
+                    // Add the ID to the values object
+                    const updatedValues = { 'registration_for': 'Consumer' };
+        
+                    // Call updateApplicantDetail with updated values
+                    updateApplicantDetail(updatedValues);
             }
     
             setIsSubmiting(false);
@@ -629,32 +847,7 @@ console.log('id is:', id)
         //     });
     }
 
-// Destructure the desired state slices and functions
-const {
-    applicantDetail,
-    updateApplicantDetail,
-    resetApplicantDetail,
-    businessDetail,
-    updateBusinessDetail,
-    resetBusinessDetail,
-    businessDetailIndividual,
-    updateBusinessDetailIndividual,
-    resetBusinessDetailIndividual,
-    businessEntity,
-    updateBusinessEntity,
-    resetBusinessEntity,
-    resetAll,
-    completedSections,
-    getValuesFromStateBusinessEntity,
-    getValuesFromLicenseDetail,
-    updateLicenseDetail,
-    updateLicenseDetailCollector,
-    updateLicenseDetailConsumer,
-    updateLicenseDetailProducer,
-    updateLicenseDetailRecycler,
-    resetLicenseDetail,
-    resetLicenseDetailProducer,
-} = useFormStore();
+
 
 const BusinessEntityFormData = getValuesFromStateBusinessEntity()
 const LicenseDetailFormData = getValuesFromLicenseDetail()

@@ -49,9 +49,29 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
             defaultValue: [], // Ensure it's an array
         });
 
+        const w_waste_disposal_provision = useWatch({
+            control,
+            name: 'provisionwaste_disposal_provision',
+            defaultValue: '', // Ensure it's an array
+        });
+
+        const handleChangeSP = (event, newValue) => {
+            setSelectedOptions(newValue);
+        
+            // Add new options to the list
+            const newOptions = newValue.filter(
+              (option) => !options.includes(option)
+            );
+            if (newOptions.length > 0) {
+              setOptions((prevOptions) => [...prevOptions, ...newOptions]);
+            }
+        
+          };
+
+        console.log('w_waste_disposal_provision', w_waste_disposal_provision)
     return (
         <Card>
-            <h4 className="mb-6">Detail - Consumer</h4>
+            <h4 className="mb-6">Detail - Stockist/Distributor/Retailer/Supplier</h4>
             <div className="grid md:grid-cols-2 gap-4">
 
             <FormItem
@@ -182,16 +202,16 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                 
                 <FormItem
                     label="Consumption (Kg per Day)*"
-                    invalid={Boolean(errors.productsCapacity)}
-                    errorMessage={errors.productsCapacity?.message}
+                    invalid={Boolean(errors.consumption)}
+                    errorMessage={errors.consumption?.message}
                 >
                     <Controller
-                        name="productsCapacity"
+                        name="consumption"
                         control={control}
                         render={({ field }) => (
                             <Input
-                                type="text"
-                                placeholder="List of Products and Installed Capacity"
+                                type="number"
+                                placeholder="Consumption (Kg per day)"
                                 {...field}
                             />
                         )}
@@ -201,66 +221,14 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
             </div>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                        label="Waste Disposal Bins*"
-                        invalid={Boolean(errors.waste_disposal_provision)}
-                        errorMessage={errors.waste_disposal_provision?.message}
+                        label="Provision of Waste Disposal Bins*"
+                        invalid={Boolean(errors.provisionwaste_disposal_provision)}
+                        errorMessage={errors.provisionwaste_disposal_provision?.message}
                     >
                     <Controller
-                        name="waste_disposal_provision*"
+                        name="provisionwaste_disposal_provision"
                         control={control}
-                        rules={{ required: 'Waste storage capacity is required' }}
-                        render={({ field }) => (
-                            <div className="flex gap-4">
-                                <Radio
-                                    {...field}
-                                    checked={field.value === 'Available'}
-                                    value="Available"
-                                    onChange={() => field.onChange('Available')}
-                                >
-                                    Available
-                                </Radio>
-                                <Radio
-                                    {...field}
-                                    checked={field.value === 'Not Available'}
-                                    value="Not Available"
-                                    onChange={() => field.onChange('Not Available')}
-                                >
-                                    Not Available
-                                </Radio>
-                            </div>
-                        )}
-                    />
-                </FormItem>
-
-
-                <FormItem
-                    label="Waste Disposibal Bins*"
-                    invalid={Boolean(errors.productsCapacity)}
-                    errorMessage={errors.productsCapacity?.message}
-                >
-                    <Controller
-                        name="productsCapacity"
-                        control={control}
-                        render={({ field }) => (
-                            <Input
-                                type="text"
-                                placeholder="List of Products and Installed Capacity"
-                                {...field}
-                            />
-                        )}
-                    />
-                </FormItem>
-
-
-                <FormItem
-                        label="Whether Segregated Plastics are being handed over to registered Re-Cyclers or Collectors?*"
-                        invalid={Boolean(errors.waste_disposal_provision)}
-                        errorMessage={errors.waste_disposal_provision?.message}
-                    >
-                    <Controller
-                        name="waste_disposal_provision"
-                        control={control}
-                        rules={{ required: 'Waste storage capacity is required' }}
+                        // rules={{ required: 'Waste storage capacity is required' }}
                         render={({ field }) => (
                             <div className="flex gap-4">
                                 <Radio
@@ -277,7 +245,60 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     value="No"
                                     onChange={() => field.onChange('No')}
                                 >
-                                    Not Available
+                                    No
+                                </Radio>
+                            </div>
+                        )}
+                    />
+                </FormItem>
+
+                {w_waste_disposal_provision === "Yes" &&
+                <FormItem
+                    label="No. of Waste Disposibal Bins"
+                    invalid={Boolean(errors.no_of_waste_disposible_bins)}
+                    errorMessage={errors.no_of_waste_disposible_bins?.message}
+                >
+                    <Controller
+                        name="no_of_waste_disposible_bins"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                type="number"
+                                placeholder="No. of Waste Disposibal Bins"
+                                {...field}
+                            />
+                        )}
+                    />
+                </FormItem>
+                }
+
+
+                <FormItem
+                        label="Whether Segregated Plastics are being handed over to registered Re-Cyclers or Collectors?*"
+                        invalid={Boolean(errors.waste_disposal_provision)}
+                        errorMessage={errors.waste_disposal_provision?.message}
+                    >
+                    <Controller
+                        name="segregated_plastics_handed_over_to_registered_re_cyclers"
+                        control={control}
+                        // rules={{ required: 'Waste storage capacity is required' }}
+                        render={({ field }) => (
+                            <div className="flex gap-4">
+                                <Radio
+                                    {...field}
+                                    checked={field.value === 'Yes'}
+                                    value="Yes"
+                                    onChange={() => field.onChange('Yes')}
+                                >
+                                    Yes
+                                </Radio>
+                                <Radio
+                                    {...field}
+                                    checked={field.value === 'No'}
+                                    value="No"
+                                    onChange={() => field.onChange('No')}
+                                >
+                                    No
                                 </Radio>
                             </div>
                         )}

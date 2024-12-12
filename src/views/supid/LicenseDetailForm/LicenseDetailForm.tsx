@@ -32,18 +32,66 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   });
   
   // Consumer License Detail Fields
- const validationLicenseDetailFieldsConsumerSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    productsCapacity: z.string().min(1, { message: 'Products Capacity is required' }),
-    wasteGenerated: z.string().optional(),
-    plasticWasteAcquired: z.string().min(1, { message: 'Plastic Waste Acquired is required' }),
+  const validationLicenseDetailFieldsConsumerSchema: ZodType<LicenseDetailFormSchema> = z.object({
+    registration_required_for: z
+        .array(z.string())
+        .min(1, { message: 'At least one registration type is required.' }),
+    registration_required_for_other: z.array(z.string()).optional(),
+    plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
+    packaging_items: z.array(z.string()).optional(),
+    consumption: z.string().optional(),
+
+    provision_waste_disposal_bins: z.enum(['Yes', 'No'], {
+        errorMap: () => ({ message: 'Please specify provision of waste disposal bins.' }),
+    }).optional(),
+    no_of_waste_disposable_bins: z
+        .string()
+        .optional()
+,
+
+    segregated_plastics_handed_over_to_registered_recyclers: z.enum(['Yes', 'No'], {
+        errorMap: () => ({
+            message: 'Please specify if segregated plastics are handed over to recyclers or collectors.',
+        })
+    }).optional(),
   });
-  
+
   // Collector License Detail Fields
- const validationLicenseDetailFieldsCollectorSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    collectorName: z.string().min(1, { message: 'Collector Name is required' }),
-    collectorCapacity: z.coerce.number().positive({ message: 'Collector Capacity must be a positive number' }),
+  const validationLicenseDetailFieldsCollectorSchema: ZodType<LicenseDetailFormSchema> = z.object({
+    licenseType: z.string().min(1, { message: "License Type is required" }),
+  
+    // Validation for registration_required_for
+    registration_required_for: z
+      .array(z.string())
+      .min(1, { message: "At least one category of Single Use Plastics must be selected" }),
+  
+    // Validation for registration_required_for_other
+    registration_required_for_other: z.array(z.string()).optional(),
+  
+    // Validation for selectedCategories
+    selectedCategoriesCollector: z
+      .array(
+        z.object({
+          category: z.string().optional(),
+          address: z.string().optional(),
+        })
+      )
+      .optional(),
+  
+    // Validation for collection capacity
+    total_capacity_value_collector: z
+      .coerce.number()
+      .positive({ message: "Collection (Kg per day) must be a positive number" }),
+  
+    // Validation for number of vehicles
+    number_of_vehicles: z
+      .coerce.number()
+      .positive({ message: "Number of vehicles must be a positive number" }),
+  
+    // Validation for number of persons
+    number_of_persons: z
+      .coerce.number()
+      .positive({ message: "Number of persons must be a positive number" }),
   });
   
   const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -111,13 +159,26 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   
   
   // Recycler License Detail Fields
- const validationLicenseDetailFieldsRecyclerSchema: ZodType<LicenseDetailFormSchema> = z.object({
-    licenseType: z.string().min(1, { message: 'License Type is required' }),
-    registrationNumber: z.string().min(1, { message: 'Registration Number is required' }),
-    totalCapacity: z.coerce.number().positive({ message: 'Total Capacity must be a positive number' }),
-    complianceStatus: z.enum(['compliant', 'non_compliant'], {
-      errorMap: () => ({ message: 'Compliance Status is required' }),
+  const validationLicenseDetailFieldsRecyclerSchema: ZodType<LicenseDetailFormSchema> = z.object({
+    licenseType: z.enum(['Producer', 'Consumer', 'Recycler', 'Collector'], {
+        errorMap: () => ({ message: 'License Type is required' }),
     }),
+    selectedCategories: z
+        .array(
+            z.object({
+                category: z.string().min(1, { message: 'Category is required' }),
+                wasteCollection: z.string().min(1, { message: 'Waste Collection is required' }),
+                wasteDisposal: z.string().min(1, { message: 'Waste Disposal is required' }),
+            })
+        )
+        .min(1, { message: 'At least one category must be selected' }),
+    plastic_waste_acquired_through: z
+        .array(z.string())
+        .min(1, { message: 'At least one method of waste acquisition must be selected' }),
+    has_adequate_pollution_control_systems: z.enum(['Yes', 'No'], {
+        errorMap: () => ({ message: 'Please specify whether pollution control systems are adequate' }),
+    }),
+    pollution_control_details: z.string().optional()
   });
 
 const LicenseDetailForm = (props: CustomerFormProps) => {
@@ -142,7 +203,7 @@ const {
     getValuesFromStateBusinessEntity,
     markSectionAsCompleted,
 } = useFormStore();
-
+console.log(completedSections)
     const {
         onFormSubmit,
         defaultValues = {},
@@ -189,10 +250,10 @@ const {
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
                         <LicenseDetailSection control={control} errors={errors} />
-                        {completedSections.includes('licenseDetailProducer') && <LicenseDetailProducerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailConsumer') &&  <LicenseDetailConsumerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailRecycler') &&  <LicenseDetailRecyclerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailCollector') &&  <LicenseDetailCollectorSection control={control} errors={errors} />}
+                        {completedSections.includes('licenseDetailProducer') &&  <LicenseDetailProducerSection control={control} errors={errors} />}
+                        {completedSections.includes('licenseDetailConsumer') && <LicenseDetailConsumerSection control={control} errors={errors} />}
+                        {completedSections.includes('licenseDetailRecycler') &&   <LicenseDetailRecyclerSection control={control} errors={errors} />}
+                        {completedSections.includes('licenseDetailCollector') &&   <LicenseDetailCollectorSection control={control} errors={errors} />}
                     </div>
                 </div>
             </Container>

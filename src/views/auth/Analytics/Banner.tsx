@@ -69,10 +69,10 @@ const Banner = () => {
         </motion.div>
         <div className="banner-links">
           <Link to="/sign-up?redirectUrl=/spuid-signup" className="nav-link">
-            Apply License
+            Apply New License
           </Link>
           <Link to="/sign-in" className="nav-link">
-            Track Application
+            My Applications
           </Link>
         </div>
       </div>

@@ -7,6 +7,17 @@ import {
 import type { NavigationTree } from '@/@types/navigation'
 
 const navigationConfig: NavigationTree[] = [
+
+    {
+        key: 'SignUp',
+        path: '/spuid-signup',
+        title: 'New Application',
+        translateKey: 'nav.spuid.signup',
+        icon: 'singleMenu',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [],
+        subMenu: [],
+    },
     {
         key: 'home',
         path: '/home',
@@ -121,16 +132,7 @@ const navigationConfig: NavigationTree[] = [
     //     authority: [],
     //     subMenu: [],
     // },
-    {
-        key: 'SignUp',
-        path: '/spuid-signup',
-        title: 'New Application',
-        translateKey: 'nav.spuid.signup',
-        icon: 'singleMenu',
-        type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
-        subMenu: [],
-    },
+
 ]
 
 export default navigationConfig
