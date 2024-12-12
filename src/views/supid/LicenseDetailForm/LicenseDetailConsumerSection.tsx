@@ -201,7 +201,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
             </div>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                        label="Waste Disposal Bins"
+                        label="Waste Disposal Bins*"
                         invalid={Boolean(errors.waste_disposal_provision)}
                         errorMessage={errors.waste_disposal_provision?.message}
                     >
