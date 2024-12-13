@@ -585,9 +585,9 @@ const {
                 );
             
                 // Add collection details
-                formData.append('total_capacity_value', values.total_capacity_value_collector.toString() || '');
-                formData.append('number_of_vehicles', values.number_of_vehicles.toString() || '');
-                formData.append('number_of_persons', values.number_of_persons.toString() || '');
+                formData.append('total_capacity_value', (values.total_capacity_value_collector || '').toString());
+                formData.append('number_of_vehicles', (values.number_of_vehicles || '').toString());
+                formData.append('number_of_persons', (values.number_of_persons || '').toString());
             
                 // Add applicant details
                 formData.append('applicant', applicantDetail.id.toString());
