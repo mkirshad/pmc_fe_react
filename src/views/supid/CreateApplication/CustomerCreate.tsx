@@ -257,7 +257,7 @@ const {
     
     // Add non-file fields
     formData.append('first_name', (values.firstName));
-    // formData.append('last_name', (values.lastName));
+    formData.append('last_name', (values.lastName));
     formData.append('applicant_designation', values.applicantDesignation);
     formData.append('gender', values.gender);
     formData.append('cnic', values.cnic);
@@ -882,7 +882,7 @@ const {
     
         // // Add non-file fields
         // formData.append('first_name', (applicantDetail.firstName));
-        // // formData.append('last_name', (applicantDetail.lastName));
+        formData.append('last_name', (applicantDetail.lastName));
         // formData.append('applicant_designation', applicantDetail.applicantDesignation);
         // formData.append('gender', applicantDetail.gender);
         // formData.append('cnic', applicantDetail.cnic);

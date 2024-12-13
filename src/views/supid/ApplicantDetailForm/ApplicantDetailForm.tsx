@@ -19,7 +19,7 @@ type CustomerFormProps = {
 
 const validationSchema: ZodType<ApplicantDetailFormSchema> = z.object({
     firstName: z.string().min(1, { message: 'First name required' }),
-    // lastName: z.string().min(1, { message: 'Last name required' }),
+    lastName: z.string().optional().nullable(),
     email: z
         .string()
         // .email({ message: 'Invalid email' }) // Ensure valid email format

@@ -35,7 +35,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
             <h4 className="mb-6">Applicant Detail</h4>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                    label="Name*"
+                    label="First Name*"
                     invalid={Boolean(errors.firstName)}
                     errorMessage={errors.firstName?.message}
                 >
@@ -46,7 +46,26 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="Name"
+                                placeholder="First Name"
+                                {...field}
+                            />
+                        )}
+                    />
+                </FormItem>
+
+                <FormItem
+                    label="Last Name"
+                    invalid={Boolean(errors.lastName)}
+                    errorMessage={errors.lastName?.message}
+                >
+                    <Controller
+                        name="lastName"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                type="text"
+                                autoComplete="off"
+                                placeholder="Last Name"
                                 {...field}
                             />
                         )}
