@@ -106,7 +106,7 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup) => {
         const allowedColumns = [
-            'id',
+            
             'first_name',
             'last_name',
             'cnic',
@@ -242,25 +242,25 @@ console.log(selectedRowId)
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        {
-                            accessorKey: 'selected',
-                            header: 'Select',
-                            size: 50,
-                            Cell: ({ row }) => (
-                                <input
-                                    type="radio"
-                                    name="rowSelect"
-                                    onChange={() => {
-                                        setSelectedRowId(row.original.id);
-                                        const groupIndex = groups.indexOf(row.original.assigned_group);
-                                        if (groupIndex !== -1) {
-                                            setStep(groupIndex); // Update the Steps component
-                                        }
-                                    }}
-                                    checked={String(selectedRowId) === String(row.original.id)} // Ensure proper comparison
-                                />
-                            ),
-                        },
+                        // {
+                        //     accessorKey: 'selected',
+                        //     header: 'Select',
+                        //     size: 50,
+                        //     Cell: ({ row }) => (
+                        //         <input
+                        //             type="radio"
+                        //             name="rowSelect"
+                        //             onChange={() => {
+                        //                 setSelectedRowId(row.original.id);
+                        //                 const groupIndex = groups.indexOf(row.original.assigned_group);
+                        //                 if (groupIndex !== -1) {
+                        //                     setStep(groupIndex); // Update the Steps component
+                        //                 }
+                        //             }}
+                        //             checked={String(selectedRowId) === String(row.original.id)} // Ensure proper comparison
+                        //         />
+                        //     ),
+                        // },
                         ...columns,
                     ]}
                     data={flattenedData.map((row) => ({
