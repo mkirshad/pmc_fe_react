@@ -103,7 +103,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       registration_required_for_other: z
       .array(z.string()),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()),
-    PackagingItems: z.array(z.string()),
+    PackagingItems: z.array(z.string()).optional(),
     single_use_plastic_items: z.array(z.string()).optional(),
     total_capacity_value: z
       .string()

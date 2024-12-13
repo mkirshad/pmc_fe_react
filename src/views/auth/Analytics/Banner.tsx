@@ -76,7 +76,18 @@ const Banner = () => {
           </Link>
         </div>
       </div>
+
+      <footer className="footer-container">
+        <span className="footer-text">
+          Copyright &copy; {new Date().getFullYear()}{' '}
+          <span className="font-semibold">PLMIS</span> All
+          rights reserved. <br />
+          Plastic Management Cell, Strategic Planning & Implementation Unit, Environmental Protection Agency, and Environment Protection & Climate Change Department, Government of the Punjab.
+        </span>
+      </footer>
     </motion.div>
+
+    
   );
 };
 

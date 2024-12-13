@@ -12,13 +12,14 @@ type FooterProps = {
 
 const FooterContent = () => {
     return (
-        <div className="flex items-center justify-between flex-auto w-full">
-            <span>
+        <div className="footer-container">
+            <span className="footer-text">
                 Copyright &copy; {`${new Date().getFullYear()}`}{' '}
                 <span className="font-semibold">{`${APP_NAME}`}</span> All
-                rights reserved.
-            </span>
-            <div className="">
+                rights reserved.<br />
+          Plastic Management Cell, Strategic Planning & Implementation Unit, Environmental Protection Agency, and Environment Protection & Climate Change Department, Government of the Punjab.
+             </span>
+            {/* <div className="">
                 <a
                     className="text-gray"
                     href="/#"
@@ -34,7 +35,7 @@ const FooterContent = () => {
                 >
                     Privacy & Policy
                 </a>
-            </div>
+            </div> */}
         </div>
     )
 }
