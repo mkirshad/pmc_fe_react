@@ -9,7 +9,7 @@ type BusinessDetailSectionProps = FormSectionBaseProps;
 
 const licenseTypes = [
     { value: 'Producer', label: 'Producer' },
-    { value: 'Consumer', label: 'Stockist/Distributor/Retailer/Supplier' },
+    { value: 'Consumer', label: 'Stockist/Distributor/Supplier' },
     { value: 'Collector', label: 'Collector' },    
     { value: 'Recycler', label: 'Recycler' },
 ];

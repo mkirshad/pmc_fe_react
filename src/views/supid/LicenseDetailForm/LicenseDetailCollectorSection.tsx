@@ -3,7 +3,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import { FormItem } from '@/components/ui/Form';
 import NumericInput from '@/components/shared/NumericInput';
-import { Controller, useFieldArray  } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch  } from 'react-hook-form';
 import type { FormSectionBaseProps } from './types';
 import Checkbox from '@/components/ui/Checkbox'
 import { Divider } from '@mui/material';
@@ -60,6 +60,12 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
         }
     };
 
+    const registration_required_for_other = useWatch({
+        control,
+        name: 'registration_required_for_other',
+        defaultValue: [], // Ensure it's an array
+    });
+    
     return (
         <Card>
             <h4 className="mb-6">Detail - Collector</h4>
@@ -80,9 +86,9 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness 75 micron and not less than 12 x 16inch in size)</Checkbox>
+                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
                             <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk)</Checkbox>
+                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
@@ -109,6 +115,22 @@ const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSection
                         <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
                         <Checkbox value="Others">Others</Checkbox>
                     
+                        {registration_required_for_other.includes('Others')&& (
+
+                            
+                            <Controller
+                            name="registration_required_for_other_other_text"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    type="text"
+                                    placeholder="Enter other categories"
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                />
+                            )}
+                            />
+                            )}
                     </Checkbox.Group>
                     )}
                 />

@@ -105,12 +105,24 @@ const Home = () => {
 
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup) => {
+        const allowedColumns = [
+            'id',
+            'first_name',
+            'last_name',
+            'cnic',
+            'mobile_no',
+            'application_status',
+            'tracking_number',
+            'assigned_group',
+            'registration_for',
+        ]; // List of allowed columns
+    
         const flattenedData = sanitizeData(data); // Ensure sanitized data
         const firstRecord = flattenedData[0];
-
+    
         const columns = [
             ...Object.keys(firstRecord)
-                .filter((key) => key !== 'applicationassignment') // Exclude applicationassignment
+                .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
                 .map((key) => ({
                     accessorKey: key,
                     header: key
@@ -118,18 +130,26 @@ const Home = () => {
                         .replace(/\b\w/g, (char) => char.toUpperCase()),
                     size: 200,
                     Cell: ({ cell, row }) => {
-                        if (key === 'id') {
-                            return (
-                                <Link to={hasUserGroup ? `/spuid-review/${row.original.id}` : `/spuid-signup/${row.original.id}`}>
-                                    {cell.getValue()}
-                                </Link>
-                            );
-                        }
-                        return cell.getValue() || '-'; // Display a dash for null/undefined values
+                        return (
+                            <span
+                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                onClick={() => {
+                                    const id = row.original.id;
+                                    console.log(`Clicked ${key}:`, cell.getValue());
+                                    console.log(`Navigating with ID: ${id}`);
+                                    // Perform navigation or other action
+                                    window.location.href = hasUserGroup
+                                        ? `/spuid-review/${id}`
+                                        : `/spuid-signup/${id}`;
+                                }}
+                            >
+                                {cell.getValue() || '-'}
+                            </span>
+                        );
                     },
                 })),
         ];
-
+    
         return { flattenedData, columns };
     };
 
@@ -249,7 +269,7 @@ console.log(selectedRowId)
                     }))} // Include updated data
                     getRowId={(row) => row.id} // Explicitly set the row ID using the `id` field from your original data
                     initialState={{
-                        showColumnFilters: true,
+                        showColumnFilters: false,
                     }}
                     defaultColumn={{
                         maxSize: 420,

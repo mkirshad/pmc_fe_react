@@ -88,7 +88,12 @@ const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSection
         defaultValue: [], // Ensure it's an array
     });
 
-
+    const registration_required_for_other = useWatch({
+        control,
+        name: 'registration_required_for_other',
+        defaultValue: [], // Ensure it's an array
+    });
+    
 
     // Watch the value of 'registration_required_for'
     const PackagingItems = useWatch({
@@ -156,9 +161,9 @@ const parseDate = (dateString) => {
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness 75 micron and not less than 12 x 16inch in size)</Checkbox>
+                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
                             <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk)</Checkbox>
+                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
@@ -184,8 +189,26 @@ const parseDate = (dateString) => {
                             <Checkbox value="Plastic Furniture">Plastic Furnitures (Chair, Table etc.)</Checkbox>
                             <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
                             <Checkbox value="Others">Others</Checkbox>
-                       
+                            {registration_required_for_other.includes('Others')&& (
+
+                                
+                                <Controller
+                                name="registration_required_for_other_other_text"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Enter other categories"
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                    />
+                                )}
+                                />
+                   
+                                )}
                         </Checkbox.Group>
+
+                                
                         )}
                     />
                 </FormItem>
@@ -400,7 +423,7 @@ const parseDate = (dateString) => {
                 </FormItem>
 
                 <FormItem
-                    label="Waste Disposal ProvisionI*"
+                    label="Waste Disposal Provision*"
                     invalid={Boolean(errors.waste_disposal_provision)}
                     errorMessage={errors.waste_disposal_provision?.message}
                 >

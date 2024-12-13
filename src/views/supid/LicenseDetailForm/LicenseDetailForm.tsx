@@ -54,6 +54,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
             message: 'Please specify if segregated plastics are handed over to recyclers or collectors.',
         })
     }).optional(),
+  registration_required_for_other_other_text: z.string().optional()
   });
 
   // Collector License Detail Fields
@@ -94,6 +95,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .coerce.number()
       .positive({ message: "Number of persons must be a positive number" })
       .optional(),
+    registration_required_for_other_other_text: z.string().optional()
   });
   
   const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -142,7 +144,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .optional(),
     // total_waste_generated_unit: z.string().min(1, { message: 'Total Waste Generated Unit is required.' }).optional(),
     has_waste_storage_capacity: z.string().min(1, { message: 'Waste Storage Capacity is required' }),
-    waste_disposal_provision: z.string().min(1, { message: 'Waste Disposal ProvisionI is required' }),
+    waste_disposal_provision: z.string().min(1, { message: 'Waste Disposal Provision is required' }),
 
 
     action_plan: z
@@ -156,7 +158,8 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       }).optional(),
     // applicant: z.string().min(1, { message: 'Applicant is required.' }),
     products_list: z.array(z.string()).optional(),
-    by_products_list: z.array(z.string()).optional()
+    by_products_list: z.array(z.string()).optional(),
+    registration_required_for_other_other_text: z.string().optional()
   });
   
   

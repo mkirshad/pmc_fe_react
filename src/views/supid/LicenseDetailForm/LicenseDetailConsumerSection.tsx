@@ -48,6 +48,12 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
             name: 'registration_required_for',
             defaultValue: [], // Ensure it's an array
         });
+        
+        const registration_required_for_other = useWatch({
+            control,
+            name: 'registration_required_for_other',
+            defaultValue: [], // Ensure it's an array
+        });
 
         const w_waste_disposal_provision = useWatch({
             control,
@@ -71,7 +77,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
         console.log('w_waste_disposal_provision', w_waste_disposal_provision)
     return (
         <Card>
-            <h4 className="mb-6">Detail - Stockist/Distributor/Retailer/Supplier</h4>
+            <h4 className="mb-6">Detail - Stockist/Distributor/Supplier</h4>
             <div className="grid md:grid-cols-2 gap-4">
 
             <FormItem
@@ -88,9 +94,9 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness 75 micron and not less than 12 x 16inch in size)</Checkbox>
+                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
                             <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk)</Checkbox>
+                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
@@ -116,6 +122,23 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             <Checkbox value="Plastic Furniture">Plastic Furnitures (Chair, Table etc.)</Checkbox>
                             <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
                             <Checkbox value="Others">Others</Checkbox>
+
+                            {registration_required_for_other.includes('Others')&& (
+
+                                
+                                <Controller
+                                name="registration_required_for_other_other_text"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Enter other categories"
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                    />
+                                )}
+                                />
+                                )}
                        
                         </Checkbox.Group>
                         )}
@@ -201,7 +224,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
             <div className="grid md:grid-cols-2 gap-4">
                 
                 <FormItem
-                    label="Consumption (Kg per Day)*"
+                    label="Sale*"
                     invalid={Boolean(errors.consumption)}
                     errorMessage={errors.consumption?.message}
                 >

@@ -204,11 +204,12 @@ const downloadFileReceipt = async () =>
 }
 
     return (
+        <>
         <Card>
-            <h4 className="mb-6">Payment & Submit Application</h4>
-            <div className="grid md:grid-cols-1 gap-4 mb-10">
+            <h4 className="mb-4">Payment</h4>
+            <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
-                        Please have a look at your application detail prior to generation of fee challan. Once your fee challan is generated, this application will not be ammended.
+                        Please have a look at your application detail prior to generation of fee challan. Once your fee challan is generated, this application will not be amended.
                 </div>
             
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
@@ -216,7 +217,7 @@ const downloadFileReceipt = async () =>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-2 mb-10 gap-4">
+            <div className="grid md:grid-cols-2 mb-1 gap-4">
                 {/* Business Name and Registration Type */}
 
 
@@ -226,7 +227,7 @@ const downloadFileReceipt = async () =>
                     onClick={()=>{downloadFile()}}
                     className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 >
-                    Download Fee Challan and Lock Application
+                    Download Fee Challan
                 </a>
                 </div>
                 <div>
@@ -234,17 +235,23 @@ const downloadFileReceipt = async () =>
                 <div>
                 </div>
             </div>
-                
-                <div className="grid md:grid-cols-1 gap-4 mb-10">
+            </Card>
+
+            <Card>                
+         
+            <h4 className="mb-4">Submission of Application</h4>
+
+
+                <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'red', fontWeight: 'bold', margin: '10px 0' }}>
-                    Warning: If any document other than the generated and paid challan is uploaded, it would lead to registration of FIR & arrest of Applicant.
+                    Warning: If any document other than the generated and paid challan is uploaded, it would lead to registration of FIR & arrest of applicant.
                 </div>
                 <div style={{ color: 'red', fontWeight: 'bold', margin: '10px 0' }}>
                 انتباہ: آپ کو آگاہ کیا جاتا ہے کہ برائے مہربانی اپنی فیس کا ادا شدہ چالان ہی یہاں پر جمع کروائیں۔ بصورت دیگر آپ کے خلاف ایف آئی آر درج کی جائے گی اور درخواست گزار کو گرفتار کیا جائے گا۔
                 </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-2">
                 <div>
                 <FormItem
                     label="Upload Paid Fee Challan and Submit Application*"
@@ -270,7 +277,7 @@ const downloadFileReceipt = async () =>
             </div>
            
 
-                <div className="grid md:grid-cols-2 mb-10 gap-4">
+                <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {/* Business Name and Registration Type */}
 
 
@@ -289,6 +296,8 @@ const downloadFileReceipt = async () =>
 
             </div>
         </Card>
+
+    </>
     );
 };
 

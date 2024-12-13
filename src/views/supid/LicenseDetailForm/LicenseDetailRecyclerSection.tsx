@@ -57,7 +57,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
             <h4 className="mb-6">Detail - Recycler</h4>
             <div className="w-full">
     <FormItem
-        label="Categories of Plastics being recycled*"
+        label="Categories of plastic collected for recycling*"
         invalid={Boolean(errors.selectedCategories)}
         errorMessage={errors.selectedCategories?.message}
         className="w-full" // Ensure FormItem spans full width

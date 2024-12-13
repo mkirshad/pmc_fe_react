@@ -174,6 +174,7 @@ const {
                     tracking_number: response.data.producer.tracking_number || '',
                     registration_required_for: (response.data.producer.registration_required_for || []),
                     registration_required_for_other: (response.data.producer.registration_required_for_other || []),
+                    registration_required_for_other_other_text: (response.data.producer.registration_required_for_other_other_text || ''),
                     plain_plastic_Sheets_for_food_wrapping: (response.data.producer.plain_plastic_sheets_for_food_wrapping || []),
                     PackagingItems: (response.data.producer.packaging_items || []),
                     number_of_machines: response.data.producer.number_of_machines || '',
@@ -194,6 +195,7 @@ const {
                 const dataConsumer = {
                     registration_required_for: response.data.consumer.registration_required_for || [],
                     registration_required_for_other: response.data.consumer.registration_required_for_other || [],
+                    registration_required_for_other_other_text: response.data.consumer.registration_required_for_other_other_text || '',
                     plain_plastic_Sheets_for_food_wrapping: response.data.consumer.plain_plastic_sheets_for_food_wrapping || [],
                     PackagingItems: response.data.consumer.packaging_items || [],
                     consumption: response.data.consumer.consumption || '',
@@ -224,6 +226,7 @@ const {
                 const dataCollector = {
                     registration_required_for: response.data.collector.registration_required_for || [],
                     registration_required_for_other: response.data.collector.registration_required_for_other || [],
+                    registration_required_for_other_other_text: response.data.collector.registration_required_for_other_other_text || '',
                     selectedCategoriesCollector: response.data.collector.selected_categories || [],
                     total_capacity_value_collector: response.data.collector.total_capacity_value || '',
                     number_of_vehicles: response.data.collector.number_of_vehicles || '',
@@ -457,6 +460,8 @@ const {
                 formData.append('has_waste_storage_capacity', values.has_waste_storage_capacity || '');
                 formData.append('waste_disposal_provision', values.waste_disposal_provision || '');
 
+                formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
+
             
                 // Applicant field (assumed to be provided)
                 formData.append('applicant', applicantDetail.id.toString());
@@ -528,7 +533,9 @@ const {
                         values.segregated_plastics_handed_over_to_registered_re_cyclers || 'No'
                     );
                     formData.append('applicant', applicantDetail.id.toString());
-        
+                    
+                    formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
+
                     const response = await AxiosBase.post('/pmc/consumers/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
@@ -591,7 +598,7 @@ const {
             
                 // Add applicant details
                 formData.append('applicant', applicantDetail.id.toString());
-            
+                formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
                 try {
                     // Post to Collector API
                     const response = await AxiosBase.post('/pmc/collectors/', formData, {
@@ -935,7 +942,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
             <Steps.Item title="Business Detail" />
             <Steps.Item title="License Detail" />
             <Steps.Item title="Documents" />
-            <Steps.Item title="Payment & Submit Application" />
+            <Steps.Item title="Payment & Submission of Application" />
             {/* <Steps.Item title="Review & Submit" /> */}
         </Steps>
           {step === 0 && <ApplicantDetailForm
