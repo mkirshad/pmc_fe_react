@@ -156,12 +156,12 @@ const Home = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response2 = await AxiosBase.get(`/pmc/user-groups/`, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setUserGroup(response2.data);
+                // const response2 = await AxiosBase.get(`/pmc/user-groups/`, {
+                //     headers: {
+                //         'Content-Type': 'multipart/form-data',
+                //     },
+                // });
+                // setUserGroup(response2.data);
     
                 const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
                     headers: {
@@ -172,7 +172,7 @@ const Home = () => {
                 const dataApplicants = response.data;
     
                 if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                    const extracted = extractColumns(dataApplicants, response2.data.length > 0);
+                    const extracted = extractColumns(dataApplicants, false);
                     setFlattenedData(extracted.flattenedData);
                     setColumns(extracted.columns);
     
