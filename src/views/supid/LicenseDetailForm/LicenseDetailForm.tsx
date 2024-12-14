@@ -39,7 +39,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for_other: z.array(z.string()).optional(),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
     packaging_items: z.array(z.string()).optional(),
-    consumption: z.string().optional(),
+    consumption: z.string(),
 
     provision_waste_disposal_bins: z.enum(['Yes', 'No'], {
         errorMap: () => ({ message: 'Please specify provision of waste disposal bins.' }),

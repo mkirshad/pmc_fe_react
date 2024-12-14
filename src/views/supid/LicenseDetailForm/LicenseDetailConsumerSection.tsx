@@ -234,7 +234,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                         render={({ field }) => (
                             <Input
                                 type="number"
-                                placeholder="Consumption (Kg per day)"
+                                placeholder="Sale (Kg per day)"
                                 {...field}
                             />
                         )}
