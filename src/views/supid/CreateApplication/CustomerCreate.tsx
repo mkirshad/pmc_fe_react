@@ -37,6 +37,7 @@ console.log('id is:', id)
 
     const [thankYouPopupOpen, setThankYouPopupOpen] = useState(false); // New state for Thank You popup
     const [thankYouPopupMessage, setThankYouPopupMessage] = useState(''); // Holds the dynamic message
+    const [thankYouPopupType, setTankYouPopupType ] = useState("success");
 
     const onChange = (nextStep: number) => {
         
@@ -853,6 +854,7 @@ const {
                 setThankYouPopupMessage(
                     verifyResponse.data.message || 'Challan verification failed. Please try again.'
                 );
+                setTankYouPopupType("danger")
                 
                 setIsSubmiting(false);
                 return; // Exit the function if verification fails
@@ -863,11 +865,12 @@ const {
                         // Show popup for error
                 setThankYouPopupOpen(true);
                 setThankYouPopupMessage(error.response.data.message || 'Invalid Challan. Please try again.');
+                setTankYouPopupType("danger")
             } else {
                 console.error('Unexpected error during challan verification:', error);
                 setThankYouPopupOpen(true);
                 setThankYouPopupMessage('An unexpected error occurred during challan verification. Please try again.');
-
+                setTankYouPopupType("danger")
             }
             setIsSubmiting(false);
             return; // Exit the function if verification fails
@@ -925,6 +928,7 @@ const {
         setIsSubmiting(false);
         setThankYouPopupOpen(true); 
         setThankYouPopupMessage("Application is submitted successfully!")
+        setTankYouPopupType("success")
         // const formData = new FormData();
     
         // // Add non-file fields
@@ -1268,7 +1272,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
         {/* Thank You Popup */}
         <ConfirmDialog
             isOpen={thankYouPopupOpen}
-            type="success"
+            type={thankYouPopupType}
             title="Notification"
             onClose={closeThankYouPopup}
             onRequestClose={closeThankYouPopup}

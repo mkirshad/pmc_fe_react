@@ -103,15 +103,15 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .array(z.string())
       .min(1, { message: 'At least one registration type is required.' }),
       registration_required_for_other: z
-      .array(z.string()),
-    plain_plastic_Sheets_for_food_wrapping: z.array(z.string()),
+      .array(z.string()).optional(),
+    plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
     PackagingItems: z.array(z.string()).optional(),
     single_use_plastic_items: z.array(z.string()).optional(),
     total_capacity_value: z
       .string()
       .refine(value => !isNaN(parseFloat(value)) && parseFloat(value) > 0, {
         message: 'Total Capacity Value must be a positive number.',
-      }).optional(),
+      }),
     number_of_machines: z.string().min(1, { message: 'Number of Machines are required.' }),
     total_capacity_unit: z.string().optional(),
     registration_number: z.string().optional(),

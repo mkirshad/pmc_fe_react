@@ -56,7 +56,7 @@ const BusinessDetailSectionIndividual = ({ control, errors }: BusinessDetailSect
                 console.error('Error fetching districts:', error);
             });
 
-        const response2 = AxiosBase.get(`/pmc/tehsils?district_id=${businessDetailIndividual.district}`, {
+        const response2 = AxiosBase.get(`/pmc/tehsils?district_id=${businessDetailIndividual.district||0}`, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
