@@ -179,7 +179,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
         .min(1, { message: 'At least one category must be selected' }),
     plastic_waste_acquired_through: z
         .array(z.string())
-        .min(1, { message: 'At least one method of waste acquisition must be selected' }),
+        .optional(),
     has_adequate_pollution_control_systems: z.enum(['Yes', 'No'], {
         errorMap: () => ({ message: 'Please specify whether pollution control systems are adequate' }),
     }),
