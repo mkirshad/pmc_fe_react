@@ -153,8 +153,8 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                         label="Has adequate pollution control systems or equipment to meet the standards of emission or effluent?*"
-                        invalid={Boolean(errors.has_waste_storage_capacity)}
-                        errorMessage={errors.has_waste_storage_capacity?.message}
+                        invalid={Boolean(errors.has_adequate_pollution_control_systems)}
+                        errorMessage={errors.has_adequate_pollution_control_systems?.message}
                     >
                         <Controller
                             name="has_adequate_pollution_control_systems"

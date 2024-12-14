@@ -54,7 +54,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                 </FormItem>
 
                 <FormItem
-                    label="Last Name"
+                    label="Last Name*"
                     invalid={Boolean(errors.lastName)}
                     errorMessage={errors.lastName?.message}
                 >
