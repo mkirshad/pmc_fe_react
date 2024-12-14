@@ -36,6 +36,7 @@ console.log('id is:', id)
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const [thankYouPopupOpen, setThankYouPopupOpen] = useState(false); // New state for Thank You popup
+    const [thankYouPopupMessage, setThankYouPopupMessage] = useState(''); // Holds the dynamic message
 
     const onChange = (nextStep: number) => {
         
@@ -833,6 +834,44 @@ const {
     }
 
     const submitApplication = async (values: LicenseDetailFormSchema) =>{
+        setIsSubmiting(true);
+        // Step 1: Verify Challan
+        const verifyChallanFormData = new FormData();
+        verifyChallanFormData.append('chalan_image', values.flow_diagram); // Assuming 'flow_diagram' is the challan image
+        verifyChallanFormData.append('ApplicantId', applicantDetail.id.toString()); // Assuming 'flow_diagram' is the challan image
+
+        try {
+            const verifyResponse = await AxiosBase.post('/pmc/verify-chalan/', verifyChallanFormData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (verifyResponse.data.status !== 'verified') {
+                console.error('Challan verification failed:', verifyResponse.data.message);
+                setThankYouPopupOpen(true); // Show popup for failure
+                setThankYouPopupMessage(
+                    verifyResponse.data.message || 'Challan verification failed. Please try again.'
+                );
+                
+                setIsSubmiting(false);
+                return; // Exit the function if verification fails
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 400) {
+                console.error('Challan verification error:', error.response.data);
+                        // Show popup for error
+                setThankYouPopupOpen(true);
+                setThankYouPopupMessage(error.response.data.message || 'Invalid Challan. Please try again.');
+            } else {
+                console.error('Unexpected error during challan verification:', error);
+                setThankYouPopupOpen(true);
+                setThankYouPopupMessage('An unexpected error occurred during challan verification. Please try again.');
+
+            }
+            setIsSubmiting(false);
+            return; // Exit the function if verification fails
+        }
 
         const formData = new FormData();
 
@@ -883,13 +922,14 @@ const {
         link.click();
         // Clean up
         document.body.removeChild(link);
-
+        setIsSubmiting(false);
         setThankYouPopupOpen(true); 
+        setThankYouPopupMessage("Application is submitted successfully!")
         // const formData = new FormData();
     
         // // Add non-file fields
         // formData.append('first_name', (applicantDetail.firstName));
-        formData.append('last_name', (applicantDetail.lastName));
+        // formData.append('last_name', (applicantDetail.lastName));
         // formData.append('applicant_designation', applicantDetail.applicantDesignation);
         // formData.append('gender', applicantDetail.gender);
         // formData.append('cnic', applicantDetail.cnic);
@@ -932,7 +972,9 @@ const BusinessEntityFormData = getValuesFromStateBusinessEntity()
 const LicenseDetailFormData = getValuesFromLicenseDetail()
         const closeThankYouPopup = () => {
             setThankYouPopupOpen(false);
-            navigate("/home"); // Redirect to home after closing the popup
+            if (applicantDetail.applicationStatus === 'Submitted'){
+                navigate("/home"); // Redirect to home after closing the popup
+            }
         };
     return (
         <>
@@ -1225,15 +1267,16 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
 
         {/* Thank You Popup */}
         <ConfirmDialog
-                        isOpen={thankYouPopupOpen}
-                        type="success"
-                        title="Thank You!"
-                        onClose={closeThankYouPopup}
-                        onRequestClose={closeThankYouPopup}
-                        onConfirm={closeThankYouPopup}
-            >
-                <p>Your application has been successfully submitted.</p>
-            </ConfirmDialog>
+            isOpen={thankYouPopupOpen}
+            type="success"
+            title="Notification"
+            onClose={closeThankYouPopup}
+            onRequestClose={closeThankYouPopup}
+            onConfirm={closeThankYouPopup}
+            onCancel={closeThankYouPopup}
+        >
+            <p>{thankYouPopupMessage}</p>
+        </ConfirmDialog>
 
             <ConfirmDialog
                 isOpen={discardConfirmationOpen}

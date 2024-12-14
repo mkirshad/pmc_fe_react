@@ -246,10 +246,15 @@ const downloadFileReceipt = async () =>
                 <div style={{ color: 'red', fontWeight: 'bold', margin: '10px 0' }}>
                     Warning: If any document other than the generated and paid challan is uploaded, it would lead to registration of FIR & arrest of applicant.
                 </div>
-                <div style={{ color: 'red', fontWeight: 'bold', margin: '10px 0' }}>
-                انتباہ: آپ کو آگاہ کیا جاتا ہے کہ برائے مہربانی اپنی فیس کا ادا شدہ چالان ہی یہاں پر جمع کروائیں۔ بصورت دیگر آپ کے خلاف ایف آئی آر درج کی جائے گی اور درخواست گزار کو گرفتار کیا جائے گا۔
+                {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> */}
+
+                <img 
+                    src="/img/others/warning-urdu3.png" 
+                    alt="Warning Icon" 
+                    
+                    />
                 </div>
-                </div>
+                {/* </div> */}
 
                 <div className="grid md:grid-cols-2 gap-2">
                 <div>
