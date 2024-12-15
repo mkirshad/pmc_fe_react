@@ -11,7 +11,9 @@ import { Autocomplete, TextField, Chip, Hidden, List } from '@mui/material';
 import { Controller, useWatch } from 'react-hook-form';
 import Radio from '@/components/ui/Radio'
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 
 const registrationTypes = [
@@ -37,7 +39,7 @@ const mobileOperators = [
     { value: 'Warid', label: 'Warid' },
 ];
 
-const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     
     const [options, setOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
@@ -94,9 +96,9 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
-                            <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
+                            <Checkbox value="Carry bags" readOnly={readOnly}>Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
+                            <Checkbox value="Packaging except food" readOnly={readOnly}>Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
+                            <Checkbox value="Hospital Products" readOnly={readOnly}>Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
@@ -116,12 +118,12 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Plastic Utensils">Plastic Utensils (Box, Bottle, Bin, Bowel, Tray etc.)</Checkbox>
-                            <Checkbox value="Plastic Pipes & Fittings">Plastic Pipes (Flexible, Rigid, etc.) & Fittings</Checkbox>
-                            <Checkbox value="PET Bottles">PET Bottles</Checkbox>
-                            <Checkbox value="Plastic Furniture">Plastic Furnitures (Chair, Table etc.)</Checkbox>
-                            <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
-                            <Checkbox value="Others">Others</Checkbox>
+                            <Checkbox value="Plastic Utensils" readOnly={readOnly}>Plastic Utensils (Box, Bottle, Bin, Bowel, Tray etc.)</Checkbox>
+                            <Checkbox value="Plastic Pipes & Fittings" readOnly={readOnly}>Plastic Pipes (Flexible, Rigid, etc.) & Fittings</Checkbox>
+                            <Checkbox value="PET Bottles" readOnly={readOnly}>PET Bottles</Checkbox>
+                            <Checkbox value="Plastic Furniture" readOnly={readOnly}>Plastic Furnitures (Chair, Table etc.)</Checkbox>
+                            <Checkbox value="Plastic Sheet" readOnly={readOnly}>Plastic Sheets & Films</Checkbox>
+                            <Checkbox value="Others" readOnly={readOnly}>Others</Checkbox>
 
                             {registration_required_for_other.includes('Others')&& (
 
@@ -134,6 +136,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                         {...field}
                                         type="text"
                                         placeholder="Enter other categories"
+                                        readOnly={readOnly}
                                         onChange={(e) => field.onChange(e.target.value)}
                                     />
                                 )}
@@ -164,8 +167,8 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     value={field.value || []}
                                     onChange={(selectedValues) => field.onChange(selectedValues)}
                                 >
-                                    <Checkbox value="Plain Plastic Sheets for food wrapping">Plain Plastic Sheets for food wrapping</Checkbox>
-                                    <Checkbox value="Other">Any Others</Checkbox>
+                                    <Checkbox value="Plain Plastic Sheets for food wrapping" readOnly={readOnly}>Plain Plastic Sheets for food wrapping</Checkbox>
+                                    <Checkbox value="Other" readOnly={readOnly}>Any Others</Checkbox>
                                 </Checkbox.Group>
                             )}
                         />
@@ -185,6 +188,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                 freeSolo
                                 options={options}
                                 value={selectedOptions}
+                                readOnly={readOnly}
                                 onChange={(event, newValue) => {
                                     field.onChange(newValue);
                                     handleChangeSP(event, newValue);
@@ -235,6 +239,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             <Input
                                 type="number"
                                 placeholder="Sale (Kg per day)"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -258,6 +263,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     {...field}
                                     checked={field.value === 'Yes'}
                                     value="Yes"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Yes')}
                                 >
                                     Yes
@@ -266,6 +272,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     {...field}
                                     checked={field.value === 'No'}
                                     value="No"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('No')}
                                 >
                                     No
@@ -288,6 +295,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                             <Input
                                 type="number"
                                 placeholder="No. of Waste Disposibal Bins"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -311,6 +319,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     {...field}
                                     checked={field.value === 'Yes'}
                                     value="Yes"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Yes')}
                                 >
                                     Yes
@@ -319,6 +328,7 @@ const LicenseDetailConsumerSection = ({ control, errors }: BusinessDetailSection
                                     {...field}
                                     checked={field.value === 'No'}
                                     value="No"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('No')}
                                 >
                                     No

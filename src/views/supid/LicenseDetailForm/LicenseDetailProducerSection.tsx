@@ -14,7 +14,9 @@ import Group from '@/components/ui/Checkbox/Group';
 import Radio from '@/components/ui/Radio'
 import { Divider } from '@mui/material';
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 let colourOptions = [
     { value: 'ocean', label: 'Ocean', color: '#00B8D9' },
@@ -52,7 +54,7 @@ const mobileOperators = [
     { value: 'Warid', label: 'Warid' },
 ];
 
-const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const LicenseDetailProducerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     const [entityType, setEntityType] = useState('');
 
     const [checkboxList, setCheckboxList] = useState<(string)[]>([
@@ -161,9 +163,9 @@ const parseDate = (dateString) => {
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
-                            <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
+                            <Checkbox value="Carry bags" readOnly={readOnly}>Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
+                            <Checkbox value="Packaging except food" readOnly={readOnly}>Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
+                            <Checkbox value="Hospital Products" readOnly={readOnly}>Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
@@ -183,12 +185,12 @@ const parseDate = (dateString) => {
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Plastic Utensils">Plastic Utensils (Box, Bottle, Bin, Bowel, Tray etc.)</Checkbox>
-                            <Checkbox value="Plastic Pipes & Fittings">Plastic Pipes (Flexible, Rigid, etc.) & Fittings</Checkbox>
-                            <Checkbox value="PET Bottles">PET Bottles</Checkbox>
-                            <Checkbox value="Plastic Furniture">Plastic Furnitures (Chair, Table etc.)</Checkbox>
-                            <Checkbox value="Plastic Sheet">Plastic Sheets & Films</Checkbox>
-                            <Checkbox value="Others">Others</Checkbox>
+                            <Checkbox value="Plastic Utensils" readOnly={readOnly}>Plastic Utensils (Box, Bottle, Bin, Bowel, Tray etc.)</Checkbox>
+                            <Checkbox value="Plastic Pipes & Fittings" readOnly={readOnly}>Plastic Pipes (Flexible, Rigid, etc.) & Fittings</Checkbox>
+                            <Checkbox value="PET Bottles" readOnly={readOnly}>PET Bottles</Checkbox>
+                            <Checkbox value="Plastic Furniture" readOnly={readOnly}>Plastic Furnitures (Chair, Table etc.)</Checkbox>
+                            <Checkbox value="Plastic Sheet" readOnly={readOnly}>Plastic Sheets & Films</Checkbox>
+                            <Checkbox value="Others" readOnly={readOnly}>Others</Checkbox>
                             {registration_required_for_other.includes('Others')&& (
 
                                 
@@ -200,6 +202,7 @@ const parseDate = (dateString) => {
                                         {...field}
                                         type="text"
                                         placeholder="Enter other categories"
+                                        readOnly={readOnly}
                                         onChange={(e) => field.onChange(e.target.value)}
                                     />
                                 )}
@@ -232,8 +235,8 @@ const parseDate = (dateString) => {
                                     value={field.value || []}
                                     onChange={(selectedValues) => field.onChange(selectedValues)}
                                 >
-                                    <Checkbox value="Plain Plastic Sheets for food wrapping">Plain Plastic Sheets for food wrapping</Checkbox>
-                                    <Checkbox value="Other">Any Others</Checkbox>
+                                    <Checkbox value="Plain Plastic Sheets for food wrapping" readOnly={readOnly}>Plain Plastic Sheets for food wrapping</Checkbox>
+                                    <Checkbox value="Other" readOnly={readOnly}>Any Others</Checkbox>
                                 </Checkbox.Group>
                             )}
                         />
@@ -253,6 +256,7 @@ const parseDate = (dateString) => {
                                 freeSolo
                                 options={options}
                                 value={selectedOptions}
+                                readOnly={readOnly}
                                 onChange={(event, newValue) => {
                                     field.onChange(newValue);
                                     handleChangeSP(event, newValue);
@@ -302,6 +306,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     value="5"
                                     checked={field.value === "5"}
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange("5")}
                                 >
                                     Upto 5 machines
@@ -310,6 +315,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     value="10"
                                     checked={field.value === "10"}
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange("10")}
                                 >
                                     From 6 to 10 machines
@@ -318,6 +324,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     value="11"
                                     checked={field.value === "11"}
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange("11")}
                                 >
                                     More than 10 machines
@@ -339,6 +346,7 @@ const parseDate = (dateString) => {
                                 {...field}
                                 type="number"
                                 placeholder="Enter Production Capacity in numbers"
+                                readOnly={readOnly}
                                 onChange={(e) => field.onChange(e.target.value)}
                             />
                         )}
@@ -359,6 +367,7 @@ const parseDate = (dateString) => {
                                 {...field}
                                 type="date"
                                 value={field.value ? parseDate(formatDate(field.value)) : ''}
+                                readOnly={readOnly}
                                 onChange={(e) => field.onChange(e.target.value)}
                                 placeholder="DD/MM/YYYY"
                             />
@@ -381,6 +390,7 @@ const parseDate = (dateString) => {
                                 {...field}
                                 type="number"
                                 placeholder="Enter Waste Generated in numbers"
+                                readOnly={readOnly}
                                 onChange={(e) => field.onChange(e.target.value)}
                             />
                         )}
@@ -405,6 +415,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     checked={field.value === 'Available'}
                                     value="Available"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Available')}
                                 >
                                     Available
@@ -413,6 +424,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     checked={field.value === 'Not Available'}
                                     value="Not Available"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Not Available')}
                                 >
                                     Not Available
@@ -437,6 +449,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     checked={field.value === 'Available'}
                                     value="Available"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Available')}
                                 >
                                     Available
@@ -445,6 +458,7 @@ const parseDate = (dateString) => {
                                     {...field}
                                     checked={field.value === 'Not Available'}
                                     value="Not Available"
+                                    readOnly={readOnly}
                                     onChange={() => field.onChange('Not Available')}
                                 >
                                     Not Available

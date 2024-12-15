@@ -6,10 +6,10 @@ import { FormItem } from '@/components/ui/Form';
 import { Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { Divider } from '@mui/material';
 import Radio from '@/components/ui/Radio'
+import type { FormSectionBaseProps } from './types';
 
-type BusinessDetailSectionIndividualProps = {
-    control: any;
-    errors: any;
+type BusinessDetailSectionIndividualProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
 };
 
 const categories = [
@@ -26,7 +26,7 @@ const categories = [
 
 
 
-const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSectionIndividualProps) => {
+const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionIndividualProps) => {
     const { fields, append, remove } = useFieldArray<{
         category: string;
         wasteCollection: number;
@@ -70,6 +70,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                 <Checkbox
                                     value={category.value}
                                     checked={fields.some((field) => field.category === category.value)}
+                                    readOnly={readOnly}
                                     onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
                                     className="flex-grow w-1/2" // Checkbox grows to fill available space
                                 >
@@ -90,6 +91,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                                     <Input
                                                         type="number"
                                                         placeholder="Waste Collection (Kg per day)"
+                                                        readOnly={readOnly}
                                                         {...field}
                                                         className="w-1/2" // Full-width input
                                                     />
@@ -109,6 +111,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                                     <Input
                                                         type="number"
                                                         placeholder="Waste Disposal (Kg per day)"
+                                                        readOnly={readOnly}
                                                         {...field}
                                                         className="w-1/2" // Full-width input
                                                     />
@@ -140,10 +143,10 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex  gap-2"
                         >
-                            <Checkbox value="Collector">Collector</Checkbox>
-                            <Checkbox value="Auction">Auction</Checkbox>
-                            <Checkbox value="Contract">Contract</Checkbox>
-                            <Checkbox value="Import">Import</Checkbox>
+                            <Checkbox value="Collector" readOnly={readOnly}>Collector</Checkbox>
+                            <Checkbox value="Auction" readOnly={readOnly}>Auction</Checkbox>
+                            <Checkbox value="Contract" readOnly={readOnly}>Contract</Checkbox>
+                            <Checkbox value="Import" readOnly={readOnly}>Import</Checkbox>
                        
                         </Checkbox.Group>
                         )}
@@ -166,6 +169,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                         {...field}
                                         checked={field.value === 'Yes'}
                                         value="Yes"
+                                        readOnly={readOnly}
                                         onChange={() => field.onChange('Yes')}
                                     >
                                         Yes
@@ -174,6 +178,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                         {...field}
                                         checked={field.value === 'No'}
                                         value="No"
+                                        readOnly={readOnly}
                                         onChange={() => field.onChange('No')}
                                     >
                                         No
@@ -198,6 +203,7 @@ const LicenseDetailRecyclerSection = ({ control, errors }: BusinessDetailSection
                                     {...field}
                                     type="text"
                                     placeholder="Details"
+                                    readOnly={readOnly}
                                     onChange={(e) => field.onChange(e.target.value)}
                                 />
                             )}

@@ -6,7 +6,9 @@ import { Controller } from 'react-hook-form'
 import type { FormSectionBaseProps } from './types'
 import InputMask from 'react-input-mask'; 
 
-type OverviewSectionProps = FormSectionBaseProps
+type OverviewSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};
 
 type Options = {
     label: string
@@ -28,7 +30,7 @@ const mobileOperatorList : Options = [
         ]
 
 
-const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
+const ApplicantDetailSection = ({ control, errors, readOnly = false  }: OverviewSectionProps) => {
 
     return (
         <Card>
@@ -47,6 +49,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                 type="text"
                                 autoComplete="off"
                                 placeholder="First Name"
+                                readOnly={readOnly} // Apply the read-only prop
                                 {...field}
                             />
                         )}
@@ -66,6 +69,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Last Name"
+                                readOnly={readOnly} // Apply the read-only prop
                                 {...field}
                             />
                         )}
@@ -85,6 +89,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Designation"
+                                readOnly={readOnly} // Apply the read-only prop
                                 {...field}
                             />
                         )}
@@ -105,6 +110,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                             value={genderList.filter(
                                 (gender) => gender.value === field.value,
                             )}
+                            isDisabled={readOnly} // Disable the select when readOnly is true
                             onChange={(option) => field.onChange(option?.value)}
                         />
                     )}
@@ -124,7 +130,8 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                             <InputMask
                             mask="99999-9999999-9" // CNIC mask
                             placeholder="99999-9999999-9"
-                            value={field.value} // Bind value to form state                            
+                            value={field.value} // Bind value to form state 
+                            readOnly={readOnly} // Apply the read-only prop                           
                             onChange={(e) => field.onChange(e.target.value)} // Update form state on change
                             >
                                {(inputProps) => (
@@ -132,6 +139,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                         type="text"
                                         autoComplete="off"
                                         placeholder="CNIC"
+                                        readOnly={readOnly} // Apply the read-only prop
                                         {...inputProps} // Pass InputMask props here
                                     />
                                 )}
@@ -153,6 +161,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                 type="email"
                                 autoComplete="off"
                                 placeholder="Email"
+                                readOnly={readOnly} // Apply the read-only prop
                                 {...field}
                             />
                         )}
@@ -174,7 +183,8 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                             <InputMask
                                 mask="3999999999" // Apply mobile number mask
                                 placeholder="3999999999"
-                                value={field.value} // Bind value to form state                            
+                                value={field.value} // Bind value to form state
+                                readOnly={readOnly} // Apply the read-only prop                            
                                 onChange={(e) => field.onChange(e.target.value)} // Update form state on change    
                             >
                             {(inputProps) => (
@@ -182,6 +192,7 @@ const ApplicantDetailSection = ({ control, errors }: OverviewSectionProps) => {
                                         type="text"
                                         autoComplete="off"
                                         placeholder="Mobile Number"
+                                        readOnly={readOnly} // Apply the read-only prop
                                         {...inputProps} // Pass InputMask props here
                                     />
                                 )}

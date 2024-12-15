@@ -20,6 +20,7 @@ type CustomerFormProps = {
     onFormSubmit: (values: LicenseDetailFormSchema) => void
     defaultValues?: LicenseDetailFormSchema
     newCustomer?: boolean
+    readOnly?: boolean// Add this prop
 } & CommonProps
 
 const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -38,7 +39,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
         .min(1, { message: 'At least one registration type is required.' }),
     registration_required_for_other: z.array(z.string()).optional(),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
-    packaging_items: z.array(z.string()).optional(),
+    PackagingItems: z.array(z.string()).optional(),
     consumption: z.string(),
 
     provision_waste_disposal_bins: z.enum(['Yes', 'No'], {
@@ -46,8 +47,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     }).optional(),
     no_of_waste_disposable_bins: z
         .string()
-        .optional()
-,
+        .optional(),
 
     segregated_plastics_handed_over_to_registered_recyclers: z.enum(['Yes', 'No'], {
         errorMap: () => ({
@@ -214,6 +214,7 @@ console.log(completedSections)
         defaultValues = {},
         newCustomer = false,
         children,
+        readOnly,
     } = props
 
     const {
@@ -254,11 +255,11 @@ console.log(completedSections)
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <LicenseDetailSection control={control} errors={errors} />
-                        {completedSections.includes('licenseDetailProducer') &&  <LicenseDetailProducerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailConsumer') && <LicenseDetailConsumerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailRecycler') &&   <LicenseDetailRecyclerSection control={control} errors={errors} />}
-                        {completedSections.includes('licenseDetailCollector') &&   <LicenseDetailCollectorSection control={control} errors={errors} />}
+                        <LicenseDetailSection control={control} errors={errors} readOnly={readOnly}/>
+                        {completedSections.includes('licenseDetailProducer') &&  <LicenseDetailProducerSection control={control} errors={errors} readOnly={readOnly}/>}
+                        {completedSections.includes('licenseDetailConsumer') && <LicenseDetailConsumerSection control={control} errors={errors} readOnly={readOnly}/>}
+                        {completedSections.includes('licenseDetailRecycler') &&   <LicenseDetailRecyclerSection control={control} errors={errors} readOnly={readOnly}/>}
+                        {completedSections.includes('licenseDetailCollector') &&   <LicenseDetailCollectorSection control={control} errors={errors} readOnly={readOnly}/>}
                     </div>
                 </div>
             </Container>

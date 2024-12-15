@@ -16,6 +16,7 @@ type CustomerFormProps = {
     onFormSubmit: (values: LicenseDetailFormSchema) => void
     defaultValues?: LicenseDetailFormSchema
     newCustomer?: boolean
+    readOnly?: boolean; // Add this prop
 } & CommonProps
 
 
@@ -45,6 +46,7 @@ const DocumentForm = (props: CustomerFormProps) => {
         defaultValues = {},
         newCustomer = false,
         children,
+        readOnly,
     } = props
 
     const {
@@ -85,7 +87,7 @@ const DocumentForm = (props: CustomerFormProps) => {
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <LicenseDetailSection control={control} errors={errors} />
+                        <LicenseDetailSection control={control} errors={errors} readOnly={readOnly}/>
                     </div>
                 </div>
             </Container>

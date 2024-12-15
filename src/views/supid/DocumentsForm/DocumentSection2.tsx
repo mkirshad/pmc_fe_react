@@ -15,7 +15,9 @@ import AxiosBase from '../../../services/axios/AxiosBase';
 import { ApplicantDetailForm } from '../ApplicantDetailForm';
 import useFormStore from '../../../store/supid/supidStore'
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 let colourOptions = [
     { value: 'ocean', label: 'Ocean', color: '#00B8D9' },
@@ -53,7 +55,7 @@ const mobileOperators = [
     { value: 'Warid', label: 'Warid' },
 ];
 
-const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const LicenseDetailProducerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     const [entityType, setEntityType] = useState('');
 
     const [checkboxList, setCheckboxList] = useState<(string)[]>([
@@ -224,8 +226,9 @@ const downloadFileReceipt = async () =>
                 <div>
                 <a
                 href='#'
-                    onClick={()=>{downloadFile()}}
+                    
                     className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    onClick={()=>{downloadFile()}}
                 >
                     Download Fee Challan
                 </a>
@@ -259,7 +262,7 @@ const downloadFileReceipt = async () =>
                 <div className="grid md:grid-cols-2 gap-2">
                 <div>
                 <FormItem
-                    label="Upload Paid Fee Challan and Submit Application*"
+                    label="Upload Paid Fee Challan Image and Submit Application*"
                     invalid={Boolean(errors.flow_diagram)}
                     errorMessage={errors.flow_diagram?.message}
                 >
@@ -269,11 +272,26 @@ const downloadFileReceipt = async () =>
                         render={({ field }) => (
                             <Input
                                 type="file"
-                                onChange={(e) => field.onChange(e.target.files[0] || null)} // Correctly set the file without using 'value'
+                                accept="image/*" // Restrict file picker to image types only
+                                disabled={readOnly} // Apply the read-only prop
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        if (file.type.startsWith("image/")) {
+                                            field.onChange(file); // Update form state if valid image
+                                        } else {
+                                            alert("Please upload a valid image file (e.g., .jpg, .png)");
+                                            e.target.value = ""; // Reset input value
+                                        }
+                                    } else {
+                                        field.onChange(null); // Clear value if no file selected
+                                    }
+                                }}
                             />
                         )}
                     />
                 </FormItem>
+
                 </div>
             </div>
             

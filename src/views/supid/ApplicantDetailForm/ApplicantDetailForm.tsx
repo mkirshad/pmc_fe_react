@@ -15,6 +15,7 @@ type CustomerFormProps = {
     onFormSubmit: (values: ApplicantDetailFormSchema) => void
     defaultValues?: ApplicantDetailFormSchema
     newCustomer?: boolean
+    readOnly?: boolean; // Add this prop
 } & CommonProps
 
 const validationSchema: ZodType<ApplicantDetailFormSchema> = z.object({
@@ -45,6 +46,7 @@ const ApplicantDetailForm = (props: CustomerFormProps) => {
         defaultValues = {},
         newCustomer = false,
         children,
+        readOnly
     } = props
 
     const {
@@ -85,7 +87,7 @@ const ApplicantDetailForm = (props: CustomerFormProps) => {
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <ApplicantDetailSection control={control} errors={errors} />
+                        <ApplicantDetailSection control={control} errors={errors} readOnly={readOnly} />
                     </div>
                 </div>
             </Container>

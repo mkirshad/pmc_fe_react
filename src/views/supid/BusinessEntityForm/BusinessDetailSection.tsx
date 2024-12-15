@@ -9,7 +9,9 @@ import InputMask from 'react-input-mask';
 import React, { useEffect, useState } from 'react';
 import AxiosBase from '../../../services/axios/AxiosBase'
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 
 const registrationTypes = [
@@ -26,7 +28,7 @@ const registrationTypes = [
 //     { value: 'Warid', label: 'Warid' },
 // ];
 
-const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const BusinessDetailSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     const [entityType, setEntityType] = useState('');
     
     const [districts, setDistricts] = useState([]);
@@ -84,6 +86,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Business Name"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -183,6 +186,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                                 options={districts}
                                 placeholder="Select District"
                                 value={districts.find((option) => option.value === field.value)}
+                                isDisabled={readOnly}
                                 onChange={(option) => {
                                     field.onChange(option?.value);
                                     setSelectedDistrict(option?.value); // Update selected district
@@ -204,6 +208,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                             <Select
                                 options={tehsils}
                                 placeholder="Select Tehsil"
+                                isDisabled={readOnly}
                                 value={tehsils.find(option => option.value === field.value)}
                                 onChange={(option) => field.onChange(option?.value)}
                             />
@@ -224,6 +229,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                                 type="text"
                                 autoComplete="off"
                                 placeholder="City/Town/Village"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -243,6 +249,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Postal Address"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}

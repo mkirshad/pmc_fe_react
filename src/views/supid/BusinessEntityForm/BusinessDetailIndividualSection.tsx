@@ -10,7 +10,9 @@ import AxiosBase from '../../../services/axios/AxiosBase'
 import InputMask from 'react-input-mask'; 
 import useFormStore from '../../../store/supid/supidStore'
 
-type BusinessDetailSectionIndividualProps = FormSectionBaseProps;
+type BusinessDetailSectionIndividualProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 // const mobileOperators = [
 //     { value: 'Mobilink', label: 'Mobilink' },
@@ -23,7 +25,7 @@ const entityTypes = [
     { value: 'Company', label: 'Company / Corporation / Partnership' },
 ];
 
-const BusinessDetailSectionIndividual = ({ control, errors }: BusinessDetailSectionIndividualProps) => {
+const BusinessDetailSectionIndividual = ({ control, errors, readOnly = false }: BusinessDetailSectionIndividualProps) => {
     const [districts, setDistricts] = useState([]);
     const [tehsils, setTehsils] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -114,6 +116,7 @@ console.log(districts)
                                             type="radio"
                                             value={option.value}
                                             checked={field.value === option.value  }
+                                            readOnly={readOnly}
                                             onChange={() => {
                                                 field.onChange(option.value); // Update form state
                                                 updateBusinessEntity({ businessEntityType: option.value }); // Update Zustand state
@@ -149,6 +152,7 @@ console.log(districts)
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Name"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -188,6 +192,7 @@ console.log(districts)
                                 options={districts}
                                 placeholder="Select District"
                                 value={districts.find((option) => option.value === field.value)}
+                                isDisabled={readOnly}
                                 onChange={(option) => {
                                     field.onChange(option?.value);
                                     setSelectedDistrict(option?.value); // Update selected district
@@ -210,6 +215,7 @@ console.log(districts)
                                 options={tehsils}
                                 placeholder="Select Tehsil"
                                 value={tehsils.find(option => option.value === field.value)}
+                                isDisabled={readOnly}
                                 onChange={(option) => field.onChange(option?.value)}
                             />
                         )}
@@ -230,6 +236,7 @@ console.log(districts)
                                 type="text"
                                 autoComplete="off"
                                 placeholder="City/Town/Village"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}
@@ -249,6 +256,7 @@ console.log(districts)
                                 type="text"
                                 autoComplete="off"
                                 placeholder="Postal Address"
+                                readOnly={readOnly}
                                 {...field}
                             />
                         )}

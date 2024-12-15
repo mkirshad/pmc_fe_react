@@ -13,7 +13,9 @@ import { Autocomplete, TextField, Chip, Hidden, List } from '@mui/material';
 import Group from '@/components/ui/Checkbox/Group';
 import useFormStore from '../../../store/supid/supidStore'
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 let colourOptions = [
     { value: 'ocean', label: 'Ocean', color: '#00B8D9' },
@@ -53,7 +55,7 @@ const mobileOperators = [
     { value: 'Warid', label: 'Warid' },
 ];
 
-const LicenseDetailProducerSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const LicenseDetailProducerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     const [entityType, setEntityType] = useState('');
 
     const [checkboxList, setCheckboxList] = useState<(string)[]>([
@@ -157,6 +159,7 @@ console.log('has_identity_document',applicantDetail.has_identity_document)
                             <Input
                                 type="file"
                                 accept=".pdf,.png,.jpg,.jpeg" // Allow only specific file types
+                                disabled={readOnly} // Apply the read-only prop
                                 onChange={(e) => field.onChange(e.target.files[0] || null)} // Correctly set the file without using 'value'
                             />
                         )}

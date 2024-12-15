@@ -9,7 +9,9 @@ import Checkbox from '@/components/ui/Checkbox'
 import { Divider } from '@mui/material';
 import { useEffect } from 'react'
 
-type LicenseDetailSectionProps = FormSectionBaseProps;
+type LicenseDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 const districts = [
     { value: 'Gujranwala', label: 'Gujranwala' },
@@ -38,7 +40,7 @@ const categories = [
 
 
 
-const LicenseDetailCollectorSection = ({ control, errors }: LicenseDetailSectionProps) => {
+const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: LicenseDetailSectionProps) => {
 
     const { fields, append, remove } = useFieldArray({
         control: control || {}, // Provide a fallback if control is undefined

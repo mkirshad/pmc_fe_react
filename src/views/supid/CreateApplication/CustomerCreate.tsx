@@ -92,6 +92,7 @@ const {
     resetLicenseDetail,
     resetLicenseDetailProducer,
 } = useFormStore();
+    const isReadOnly = applicantDetail.applicationStatus !== 'Created';
 
     useEffect(() => {
         if (id && id !== '0') {
@@ -273,7 +274,7 @@ const {
 
     if (applicantDetail.id > 0 && applicantDetail.id !== 0) {
         try {
-            const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+            const response = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -397,7 +398,7 @@ const {
         if(businessDetail.id > 0 || businessDetailIndividual.id > 0){
             const id = businessDetail.id || businessDetailIndividual.id
             try {
-                const response = await AxiosBase.put(`/pmc/business-profiles/${id}/`, formData, {
+                const response = await AxiosBase.patch(`/pmc/business-profiles/${id}/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -491,7 +492,7 @@ const {
                 // Call updateApplicantDetail with updated values
                 // Update Tracking ID
                 
-                    const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                    const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -522,13 +523,13 @@ const {
                         JSON.stringify(values.plain_plastic_Sheets_for_food_wrapping || [])
                     );
                     formData.append('packaging_items', JSON.stringify(values.PackagingItems || []));
-                    formData.append('consumption', values.consumption || '');
+                    formData.append('consumption', (values.consumption || '').toString());
                     formData.append(
                         'provision_waste_disposal_bins',
                         values.provisionwaste_disposal_provision || 'No'
                     );
                     if (values.no_of_waste_disposible_bins) {
-                        formData.append('no_of_waste_disposable_bins', values.no_of_waste_disposible_bins);
+                        formData.append('no_of_waste_disposable_bins', values.no_of_waste_disposible_bins.toString());
                     }
                     formData.append(
                         'segregated_plastics_handed_over_to_registered_recyclers',
@@ -554,7 +555,7 @@ const {
                     // Call updateApplicantDetail with updated values
                     // Update Tracking ID
                    
-                        const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                        const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
                             },
@@ -617,7 +618,7 @@ const {
                     // formData2.append('tracking_number', `LHR-COL-${applicantDetail.id.toString().padStart(3, '0')}`);
                     formData2.append('applicant', applicantDetail.id.toString());
             
-                    const response2 = await AxiosBase.put(
+                    const response2 = await AxiosBase.patch(
                         `/pmc/applicant-detail/${applicantDetail.id}/`,
                         formData2,
                         {
@@ -694,7 +695,7 @@ const {
                 // Call updateApplicantDetail with updated values
                 // Update Tracking ID
                
-                    const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                    const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -901,7 +902,7 @@ const {
         // Add non-file fields
         formData2.append('application_status', 'Submitted');
 
-        const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+        const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -995,6 +996,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={applicantDetail}
                 onFormSubmit={handleApplicantDetailFormSubmit}
+                readOnly={isReadOnly}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1042,6 +1044,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={BusinessEntityFormData}
                 onFormSubmit={handleBusinessEntityFormSubmit}
+                readOnly={isReadOnly}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1089,6 +1092,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={LicenseDetailFormData}
                 onFormSubmit={handleLicenseDetailFormSubmit}
+                readOnly={isReadOnly}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1136,6 +1140,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={LicenseDetailFormData}
                 onFormSubmit={handleDocumentFormSubmit}
+                readOnly={isReadOnly}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1183,6 +1188,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={LicenseDetailFormData}
                 onFormSubmit={submitApplication}
+                readOnly={applicantDetail.applicationStatus === 'Submitted'}
             >
                 <Container>
                         <div className="flex items-center justify-between px-8">

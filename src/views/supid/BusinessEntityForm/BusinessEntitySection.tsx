@@ -5,14 +5,16 @@ import { Controller } from 'react-hook-form';
 import type { FormSectionBaseProps } from './types';
 import useFormStore from '../../../store/supid/supidStore'
 
-type BusinessDetailSectionProps = FormSectionBaseProps;
+type BusinessDetailSectionProps = FormSectionBaseProps & {
+    readOnly?: boolean; // Add this prop
+};;
 
 const entityTypes = [
     { value: 'Individual', label: 'Individual' },
     { value: 'Company', label: 'Company / Corporation / Partnership' },
 ];
 
-const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) => {
+const BusinessDetailSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
     // const [entityType, setEntityType] = useState('');
     const {
         updateBusinessEntity,
@@ -42,6 +44,7 @@ const BusinessDetailSection = ({ control, errors }: BusinessDetailSectionProps) 
                                             type="radio"
                                             value={option.value}
                                             checked={field.value === option.value  }
+                                            disabled={readOnly}
                                             onChange={() => {
                                                 field.onChange(option.value); // Update form state
                                                 updateBusinessEntity({ businessEntityType: option.value }); // Update Zustand state
