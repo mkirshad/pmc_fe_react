@@ -189,7 +189,8 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     has_adequate_pollution_control_systems: z.enum(['Yes', 'No'], {
         errorMap: () => ({ message: 'Please specify whether pollution control systems are adequate' }),
     }),
-    pollution_control_details: z.string().optional()
+    pollution_control_details: z.string().optional(),
+    registration_required_for_other_other_text: z.string().optional(),
   });
 
 const LicenseDetailForm = (props: CustomerFormProps) => {

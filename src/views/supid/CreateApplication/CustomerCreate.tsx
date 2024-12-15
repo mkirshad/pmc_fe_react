@@ -227,6 +227,7 @@ const {
                         response.data.recycler.has_adequate_pollution_control_systems || 'No',
                     pollution_control_details: response.data.recycler.pollution_control_details || '',
                     applicant: response.data.recycler.applicant || '',
+                    registration_required_for_other_other_text: (response.data.recycler.registration_required_for_other_other_text || ''),
                 };
                 updateLicenseDetailRecycler(dataRecycler);
             }
@@ -678,7 +679,8 @@ const {
     
                 // Add applicant ID
                 formData.append('applicant', applicantDetail.id.toString());
-    
+                formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
+
                 try {
                     const response = await AxiosBase.post('/pmc/recyclers/', formData, {
                         headers: {

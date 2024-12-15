@@ -52,6 +52,13 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
         defaultValue: 'No', // Ensure it's an array
     });
 
+
+    const selectedCategories = useWatch({
+        control,
+        name: 'selectedCategories',
+        defaultValue: [], // Ensure it's an array
+    });
+
     return (
         <Card>
             <h4 className="mb-6">Detail - Recycler</h4>
@@ -120,8 +127,25 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
                                         </div>
                                     </div>
                                 )}
+                                 
                             </div>
                         ))}
+                        {selectedCategories.some(item => item.category === 'Others')&& (
+                                        <Controller
+                                        name="registration_required_for_other_other_text"
+                                        control={control}
+                                        
+                                        render={({ field }) => (
+                                            <Input
+                                                {...field}
+                                                type="text"
+                                                className="flex flex-col w-1/2"
+                                                placeholder="Enter other categories"
+                                                onChange={(e) => field.onChange(e.target.value)}
+                                            />
+                                        )}
+                                        />
+                                        )}
                     </FormItem>
                 </div>
 
