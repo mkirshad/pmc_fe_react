@@ -4,7 +4,7 @@ import Select from '@/components/ui/Select';
 import { FormItem } from '@/components/ui/Form';
 import NumericInput from '@/components/shared/NumericInput';
 import type { FormSectionBaseProps } from './types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Divider } from '@mui/material';
 import Checkbox from '@/components/ui/Checkbox'
 import { Autocomplete, TextField, Chip, Hidden, List } from '@mui/material';
@@ -59,7 +59,7 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
 
         const w_waste_disposal_provision = useWatch({
             control,
-            name: 'provisionwaste_disposal_provision',
+            name: 'provision_waste_disposal_bins',
             defaultValue: '', // Ensure it's an array
         });
 
@@ -76,6 +76,23 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
         
           };
 
+              // Watch the value of 'registration_required_for'
+    const PackagingItems = useWatch({
+        control,
+        name: 'PackagingItems',
+        defaultValue: [], // Ensure it's an array
+    });
+
+            // Automatically update options when PackagingItems changes
+          useEffect(() => {
+              if (Array.isArray(PackagingItems)) {
+                  setOptions(PackagingItems);
+                  setSelectedOptions(PackagingItems)
+              } else {
+                  console.warn('PackagingItems is not an array:', PackagingItems);
+              }
+          }, [PackagingItems]);
+          
         console.log('w_waste_disposal_provision', w_waste_disposal_provision)
     return (
         <Card>
@@ -250,11 +267,11 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                         label="Provision of Waste Disposal Bins*"
-                        invalid={Boolean(errors.provisionwaste_disposal_provision)}
-                        errorMessage={errors.provisionwaste_disposal_provision?.message}
+                        invalid={Boolean(errors.provision_waste_disposal_bins)}
+                        errorMessage={errors.provision_waste_disposal_bins?.message}
                     >
                     <Controller
-                        name="provisionwaste_disposal_provision"
+                        name="provision_waste_disposal_bins"
                         control={control}
                         // rules={{ required: 'Waste storage capacity is required' }}
                         render={({ field }) => (
@@ -306,11 +323,11 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
 
                 <FormItem
                         label="Whether Segregated Plastics are being handed over to registered Re-Cyclers or Collectors?*"
-                        invalid={Boolean(errors.waste_disposal_provision)}
-                        errorMessage={errors.waste_disposal_provision?.message}
+                        invalid={Boolean(errors.segregated_plastics_handed_over_to_registered_recyclers)}
+                        errorMessage={errors.segregated_plastics_handed_over_to_registered_recyclers?.message}
                     >
                     <Controller
-                        name="segregated_plastics_handed_over_to_registered_re_cyclers"
+                        name="segregated_plastics_handed_over_to_registered_recyclers"
                         control={control}
                         // rules={{ required: 'Waste storage capacity is required' }}
                         render={({ field }) => (

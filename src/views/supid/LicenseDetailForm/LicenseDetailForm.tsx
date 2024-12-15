@@ -44,7 +44,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
 
     provision_waste_disposal_bins: z.enum(['Yes', 'No'], {
         errorMap: () => ({ message: 'Please specify provision of waste disposal bins.' }),
-    }).optional(),
+    }),
     no_of_waste_disposable_bins: z
         .string()
         .optional(),
@@ -53,9 +53,15 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
         errorMap: () => ({
             message: 'Please specify if segregated plastics are handed over to recyclers or collectors.',
         })
-    }).optional(),
-  registration_required_for_other_other_text: z.string().optional()
+    }),
+  registration_required_for_other_other_text: z.string().optional(),
+  no_of_waste_disposible_bins : z
+      .coerce.number()
+      .positive({ message: "No. of Waste Disposibal Bin must be a positive number" })
+      .optional(),
   });
+
+  
 
   // Collector License Detail Fields
   const validationLicenseDetailFieldsCollectorSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -71,13 +77,13 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   
     // Validation for selectedCategories
     selectedCategoriesCollector: z
-      .array(
-        z.object({
+    .array(
+      z.object({
           category: z.string().optional(),
           address: z.string().optional(),
-        })
-      )
-      .optional(),
+      }).optional()
+  ).optional()
+,
   
     // Validation for collection capacity
     total_capacity_value_collector: z

@@ -44,7 +44,7 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
 
     const { fields, append, remove } = useFieldArray({
         control: control || {}, // Provide a fallback if control is undefined
-        name: 'selectedCategories',
+        name: 'selectedCategoriesCollector',
     });
 
     // useEffect(() => {
@@ -55,12 +55,13 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
 
     const handleCheckboxChange = (checked: boolean, category: string) => {
         if (checked) {
-            append({ category, wasteGeneration: '', wasteCollection: '' });
+            append({ category, address: '' });
         } else {
             const index = fields.findIndex((field) => field.category === category);
             if (index !== -1) remove(index);
         }
     };
+    
 
     const registration_required_for_other = useWatch({
         control,
@@ -205,50 +206,55 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
                         />
                 </FormItem>
             </div>
-       
             <div className="grid md:grid-cols-1 gap-4">
-                <FormItem
+            <FormItem
                     label="Source of Disposal"
                     invalid={Boolean(errors.selectedCategoriesCollector)}
                     errorMessage={errors.selectedCategoriesCollector?.message}
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"> {/* Flex container for horizontal stacking */}
-                        {categories.map((category) => (
-                            <div
-                                key={category.value}
-                                className="flex items-center gap-4" // Individual category container
-                            >
-                                <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                        {categories.map((category) => {
+                            const fieldIndex = fields.findIndex((field) => field.category === category.value);
+                            const isSelected = fieldIndex !== -1;
+
+                            return (
+                                <div
+                                    key={category.value}
+                                    className="flex items-center gap-4"
+                                >
+                                    {/* Checkbox for selecting categories */}
                                     <Checkbox
                                         value={category.value}
-                                        checked={fields.some((field) => field.category === category.value)}
+                                        checked={isSelected}
                                         onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
-                                        className="flex-shrink-0" // Ensures checkbox doesn’t grow unnecessarily
+                                        className="flex-shrink-0"
                                     >
                                         {category.label}
                                     </Checkbox>
-                                    {fields.some((field) => field.category === category.value) && (
-                                        <Controller
-                                            name={`selectedCategoriesCollector.${fields.findIndex(
-                                                (field) => field.category === category.value
-                                            )}.address`}
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Input
-                                                    placeholder="Address"
-                                                    {...field}
-                                                    className="flex-1 min-w-0" // Ensures proper alignment
-                                                />
-                                            )}
-                                        />
+
+                                    {/* Input field for address if the category is selected */}
+                                    {isSelected && (
+                                        <div className="flex-1">
+                                            <Controller
+                                                name={`selectedCategoriesCollector.${fieldIndex}.address`}
+                                                control={control}
+                                                defaultValue={fields[fieldIndex]?.address || ''}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        placeholder="Address"
+                                                        className="flex-1 min-w-0"
+                                                    />
+                                                )}
+                                            />
+                                        </div>
                                     )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
-
-
                 </FormItem>
+
             </div>
 
         </Card>

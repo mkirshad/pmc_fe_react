@@ -526,14 +526,14 @@ const {
                     formData.append('consumption', (values.consumption || '').toString());
                     formData.append(
                         'provision_waste_disposal_bins',
-                        values.provisionwaste_disposal_provision || 'No'
+                        values.provision_waste_disposal_bins || 'No'
                     );
                     if (values.no_of_waste_disposible_bins) {
                         formData.append('no_of_waste_disposable_bins', values.no_of_waste_disposible_bins.toString());
                     }
                     formData.append(
                         'segregated_plastics_handed_over_to_registered_recyclers',
-                        values.segregated_plastics_handed_over_to_registered_re_cyclers || 'No'
+                        values.segregated_plastics_handed_over_to_registered_recyclers || 'No'
                     );
                     formData.append('applicant', applicantDetail.id.toString());
                     
