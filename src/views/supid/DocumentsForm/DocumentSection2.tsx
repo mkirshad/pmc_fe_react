@@ -177,7 +177,7 @@ const formData = new FormData();
 // Add non-file fields
 formData.append('application_status', 'Fee Challan');
 
-const response2 = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
     headers: {
         'Content-Type': 'multipart/form-data',
     },
