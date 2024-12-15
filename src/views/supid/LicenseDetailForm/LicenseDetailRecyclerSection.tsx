@@ -38,7 +38,7 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
 
     const handleCheckboxChange = (checked: boolean, category: string) => {
         if (checked) {
-            append({ category, address: '' });
+            append({ category, wasteCollection: 0, wasteDisposal: 0 }); // Default values for numbers
         } else {
             const index = fields.findIndex((field) => field.category === category);
             if (index !== -1) remove(index);
@@ -56,54 +56,73 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
         <Card>
             <h4 className="mb-6">Detail - Recycler</h4>
             <div className="w-full">
-            <FormItem
-                label="Source of Disposal*"
-                invalid={Boolean(errors.selectedCategoriesCollector)}
-                errorMessage={errors.selectedCategoriesCollector?.message}
-                className="w-full" // Ensure FormItem spans full width
-            >
-                {categories.map((category) => (
-                    <div
-                        key={category.value}
-                        className="flex items-center gap-4 mb-5 w-full" // Full-width category container
-                    >
-                        <Checkbox
-                            value={category.value}
-                            checked={fields.some((field) => field.category === category.value)}
-                            readOnly={readOnly}
-                            onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
-                            className="flex-grow w-1/2" // Checkbox grows to fill available space
-                        >
-                            {category.label}
-                        </Checkbox>
-                        {fields.some((field) => field.category === category.value) && (
-                            <div className="flex gap-2 w-full">
-                                <div className="flex flex-col w-full">
-                                    <label className="text-sm text-gray-700">
-                                        Address
-                                    </label>
-                                    <Controller
-                                        name={`selectedCategoriesCollector.${fields.findIndex(
-                                            (field) => field.category === category.value
-                                        )}.address`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Input
-                                                type="text"
-                                                placeholder="Enter address"
-                                                readOnly={readOnly}
-                                                {...field}
-                                                className="w-full" // Full-width input
+    <FormItem
+        label="Categories of plastic collected for recycling*"
+        invalid={Boolean(errors.selectedCategories)}
+        errorMessage={errors.selectedCategories?.message}
+        className="w-full" // Ensure FormItem spans full width
+    >
+        {categories.map((category) => (
+            <div
+                                key={category.value}
+                                className="flex items-center gap-4 mb-5 w-full" // Full-width category container
+                            >
+                                <Checkbox
+                                    value={category.value}
+                                    checked={fields.some((field) => field.category === category.value)}
+                                    readOnly={readOnly}
+                                    onChange={(e: boolean) => handleCheckboxChange(e, category.value)}
+                                    className="flex-grow w-1/2" // Checkbox grows to fill available space
+                                >
+                                    {category.label}
+                                </Checkbox>
+                                {fields.some((field) => field.category === category.value) && (
+                                    <div className="flex gap-2 w-full">
+                                        <div className="flex flex-col w-full">
+                                            <label className="text-sm text-gray-700">
+                                                Waste Collection (Kg/day)
+                                            </label>
+                                            <Controller
+                                                name={`selectedCategories.${fields.findIndex(
+                                                    (field) => field.category === category.value
+                                                )}.wasteCollection`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Waste Collection (Kg per day)"
+                                                        readOnly={readOnly}
+                                                        {...field}
+                                                        className="w-1/2" // Full-width input
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
-                                </div>
+                                        </div>
+                                        <div className="flex flex-col w-full">
+                                            <label className="text-sm text-gray-700">
+                                                Waste Disposal (Kg/day)
+                                            </label>
+                                            <Controller
+                                                name={`selectedCategories.${fields.findIndex(
+                                                    (field) => field.category === category.value
+                                                )}.wasteDisposal`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Waste Disposal (Kg per day)"
+                                                        readOnly={readOnly}
+                                                        {...field}
+                                                        className="w-1/2" // Full-width input
+                                                    />
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                ))}
-            </FormItem>
-
+                        ))}
+                    </FormItem>
                 </div>
 
             <div className="mb-4">
