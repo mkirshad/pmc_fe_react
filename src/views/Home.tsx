@@ -278,6 +278,10 @@ console.log(selectedRowId)
                     }}
                     enableColumnResizing
                     columnResizeMode="onChange" // default
+                    enableTopToolbar={false} // Disables the top-right controls entirely
+                    // enableGlobalFilter={false} // Disables the global search/filter box
+                    enablePagination={false} // Optionally disable pagination controls
+                    // enableSorting={false} // Optionally disable column sorting
                 />
 
         </div>

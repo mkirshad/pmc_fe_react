@@ -257,6 +257,52 @@ const useFormStore = create<FormStore>((set, get) => ({
                 },
                 completedSections: state.completedSections.filter((section) => section !== 'licenseDetailProducer'),
             })),
+    resetLicenseDetailConsumer: () =>
+        set((state) => ({
+            ...state,
+            licenseDetailConsumer: {
+                registration_required_for: [], // Reset to empty array
+                registration_required_for_other: [], // Reset to empty array
+                plain_plastic_Sheets_for_food_wrapping: [], // Reset to empty array
+                PackagingItems: [], // Reset to empty array
+                consumption: 0, // Reset to default number
+                provisionwaste_disposal_provision: 'No', // Reset to default option
+                no_of_waste_disposible_bins: undefined, // Optional field reset to undefined
+                segregated_plastics_handed_over_to_registered_re_cyclers: 'No', // Reset to default option
+            },
+            completedSections: state.completedSections.filter(
+                (section) => section !== 'licenseDetailConsumer'
+            ),
+        })),
+    resetLicenseDetailCollector: () =>
+        set((state) => ({
+            ...state,
+            licenseDetailCollector: {
+                registration_required_for: [], // Reset to empty array
+                registration_required_for_other: [], // Reset to empty array
+                selectedCategoriesCollector: [], // Reset to empty array
+                total_capacity_value_collector: 0, // Reset to default number
+                number_of_vehicles: 0, // Reset to default number
+                number_of_persons: 0, // Reset to default number
+            },
+            completedSections: state.completedSections.filter(
+                (section) => section !== 'licenseDetailCollector'
+            ),
+        })),
+    resetLicenseDetailRecycler: () =>
+        set((state) => ({
+            ...state,
+            licenseDetailRecycler: {
+                selectedCategories: [], // Reset to empty array
+                plastic_waste_acquired_through: [], // Reset to empty array
+                has_adequate_pollution_control_systems: '', // Reset to empty string
+                pollution_control_details: '', // Reset to empty string (optional field)
+            },
+            completedSections: state.completedSections.filter(
+                (section) => section !== 'licenseDetailRecycler'
+            ),
+        })),
+        
     updateLicenseDetailConsumer: (data) =>
         set((state) => ({
             licenseDetailConsumer: { ...state.licenseDetailConsumer, ...data },

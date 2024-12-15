@@ -91,6 +91,9 @@ const {
     updateLicenseDetailRecycler,
     resetLicenseDetail,
     resetLicenseDetailProducer,
+    resetLicenseDetailConsumer,
+    resetLicenseDetailCollector,
+    resetLicenseDetailRecycler,
 } = useFormStore();
     const isReadOnly = applicantDetail.applicationStatus !== 'Created';
 
@@ -104,6 +107,10 @@ const {
             resetBusinessEntity();
             resetLicenseDetail();
             resetLicenseDetailProducer();
+            resetLicenseDetailConsumer();
+            resetLicenseDetailRecycler();
+            resetLicenseDetailCollector();
+            setStep(0)
         }
     }, [id]);
     // get application data
