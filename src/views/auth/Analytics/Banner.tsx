@@ -84,7 +84,7 @@ const Banner = () => {
             ))}
           </ul>
         </div>
-        <span>In case of any violation found any where, please kindly report at <a style={{fontSize:20}} href="tel:1374"> <b>1373</b> </a></span>
+        <span>In case of any violation found any where, please report at <a style={{fontSize:20}} href="tel:1374"> <b>1373</b> </a></span>
       </div>
       <div className="mb-0">
                 <Divider textAlign="left">
