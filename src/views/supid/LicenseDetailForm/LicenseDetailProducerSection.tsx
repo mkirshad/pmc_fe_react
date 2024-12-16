@@ -334,7 +334,7 @@ const parseDate = (dateString) => {
                     />
                 </FormItem>
                 <FormItem
-                    label="Production Capacity (Kg per day)*"
+                    label="Average Production Capacity (Kg per day)*"
                     invalid={Boolean(errors.total_capacity_value)}
                     errorMessage={errors.total_capacity_value?.message}
                 >
@@ -345,7 +345,7 @@ const parseDate = (dateString) => {
                             <Input
                                 {...field}
                                 type="number"
-                                placeholder="Enter Production Capacity in numbers"
+                                placeholder="Enter Average Production Capacity in numbers (Kg per day)"
                                 readOnly={readOnly}
                                 onChange={(e) => field.onChange(e.target.value)}
                             />
@@ -378,7 +378,7 @@ const parseDate = (dateString) => {
 
                 {/* Total Waste Generated Value */}
                 <FormItem
-                    label="Waste Generated (Kg per day)"
+                    label="Averrage Waste Generated (Kg per day)"
                     invalid={Boolean(errors.total_waste_generated_value)}
                     errorMessage={errors.total_waste_generated_value?.message}
                 >

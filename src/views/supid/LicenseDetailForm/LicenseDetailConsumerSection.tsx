@@ -245,7 +245,7 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
             <div className="grid md:grid-cols-2 gap-4">
                 
                 <FormItem
-                    label="Sale*"
+                    label="Average Sale (Kg per day)*"
                     invalid={Boolean(errors.consumption)}
                     errorMessage={errors.consumption?.message}
                 >
@@ -255,7 +255,7 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
                         render={({ field }) => (
                             <Input
                                 type="number"
-                                placeholder="Sale (Kg per day)"
+                                placeholder="Average Sale in numbers (Kg per day)"
                                 readOnly={readOnly}
                                 {...field}
                             />

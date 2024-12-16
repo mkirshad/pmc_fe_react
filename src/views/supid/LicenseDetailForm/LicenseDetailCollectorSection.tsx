@@ -149,7 +149,7 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
 
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                        label="Collection (Kg per day)*"
+                        label="Average Collection (Kg per day)*"
                         invalid={Boolean(errors.total_capacity_value_collector)}
                         errorMessage={errors.total_capacity_value_collector?.message}
                     >
@@ -160,7 +160,7 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
                                 <Input
                                     {...field}
                                     type="number"
-                                    placeholder="Enter Collection in numbers"
+                                    placeholder="Enter Average Collection in numbers (Kg per day)"
                                     onChange={(e) => field.onChange(e.target.value)}
                                 />
                             )}

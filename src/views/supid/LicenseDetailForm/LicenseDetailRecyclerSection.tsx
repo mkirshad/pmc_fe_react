@@ -87,7 +87,7 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
                                     <div className="flex gap-2 w-full">
                                         <div className="flex flex-col w-full">
                                             <label className="text-sm text-gray-700">
-                                                Waste Collection (Kg/day)
+                                                Average Waste Collection (Kg per day)
                                             </label>
                                             <Controller
                                                 name={`selectedCategories.${fields.findIndex(
@@ -97,7 +97,7 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
                                                 render={({ field }) => (
                                                     <Input
                                                         type="number"
-                                                        placeholder="Waste Collection (Kg per day)"
+                                                        placeholder="Enter Average Waste Collection in numbers (Kg per day)"
                                                         readOnly={readOnly}
                                                         {...field}
                                                         className="w-1/2" // Full-width input
@@ -107,7 +107,7 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
                                         </div>
                                         <div className="flex flex-col w-full">
                                             <label className="text-sm text-gray-700">
-                                                Waste Disposal (Kg/day)
+                                                Average Waste Disposal (Kg per day)
                                             </label>
                                             <Controller
                                                 name={`selectedCategories.${fields.findIndex(
@@ -117,7 +117,7 @@ const LicenseDetailRecyclerSection = ({ control, errors, readOnly = false }: Bus
                                                 render={({ field }) => (
                                                     <Input
                                                         type="number"
-                                                        placeholder="Waste Disposal (Kg per day)"
+                                                        placeholder="Enter Average Waste Disposal in numbers (Kg per day)"
                                                         readOnly={readOnly}
                                                         {...field}
                                                         className="w-1/2" // Full-width input
