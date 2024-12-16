@@ -41,7 +41,7 @@
   align-items: center;    /* Horizontally center items */
   justify-content: center; /* Vertically center items */
   text-align: center;      /* Center-align text */
-  padding: 20px;           /* Add padding for spacing */
+  padding: 0,20px;           /* Add padding for spacing */
   background-color: transparent; /* Make the background transparent */
   font-size: 14px;         /* Adjust font size */
   border-top: 1px solid #ddd; /* Optional border for visual separation */

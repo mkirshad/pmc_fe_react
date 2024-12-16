@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Divider } from '@mui/material';
 
 const Banner = () => {
   const containerVariants = {
@@ -85,8 +86,13 @@ const Banner = () => {
         </div>
         <span>In case of any violation found any where, please kindly report at <a style={{fontSize:20}} href="tel:1374"> <b>1373</b> </a></span>
       </div>
-
+      <div className="mb-0">
+                <Divider textAlign="left">
+                </Divider>
+      </div>
       <footer className="footer-container">
+
+
         <span className="footer-text">
           Copyright &copy; {new Date().getFullYear()}{" "}
           <span className="font-semibold">PLMIS</span> All rights reserved. <br />
