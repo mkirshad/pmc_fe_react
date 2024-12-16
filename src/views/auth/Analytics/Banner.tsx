@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FaRecycle, FaLeaf } from "react-icons/fa";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const Banner = () => {
   const containerVariants = {
@@ -14,28 +13,23 @@ const Banner = () => {
     visible: { x: 0, opacity: 1, transition: { duration: 1 } },
   };
 
-  const linkVariants = {
-    hidden: { y: 50, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 1, delay: 0.5 } },
-  };
+  const bannedItems = [
+    "Ear buds with plastic sticks",
+    "Plastic sticks for balloons",
+    "Plastic flags",
+    "Candy sticks",
+    "Ice-cream sticks",
+    "Cigarette Packets",
+    "Plates",
+"Plastic or PVC banners less than 80 microns",
+    "Wrapping or Packing Films around sweet boxes",
+    "Disposal Food Boxes made from polystyrene (Styrofoam)",
 
-  const movingLinksVariants = {
-    initial: { opacity: 0, y: 50 },
-    animate: {
-      opacity: [0, 1, 1, 0],
-      y: [50, 0, 0, 50],
-      transition: { duration: 4, repeat: Infinity },
-    },
-  };
+    "Disposable Cups & Glasses made from polystyrene (Styrofoam)",
 
-  const iconAnimationVariants = {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: {
-      opacity: [0, 1, 1, 0],
-      scale: [0.8, 1, 1, 0.8],
-      transition: { duration: 4, repeat: Infinity },
-    },
-  };
+    "Cutlery such as Forks, Spoons, Knives, Straw, Trays, Stirrers, etc.",
+    "Invitation Cards",   
+  ];
 
   return (
     <motion.div
@@ -46,26 +40,26 @@ const Banner = () => {
     >
       <header className="banner-header">
         <div className="logo-section">
-          <img src="/img/logo/epa_logo-removebg-preview.png" alt="GOP Logo" className="header-logo" />
+          <img
+            src="/img/logo/epa_logo-removebg-preview.png"
+            alt="GOP Logo"
+            className="header-logo"
+          />
           <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
           <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
-          
+
           <span className="header-text">PLMIS</span>
         </div>
         <nav className="banner-nav">
-          <Link to="/sign-in" className="nav-link">Staff Login</Link>
+          <Link to="/sign-in" className="nav-link">
+            Staff Login
+          </Link>
         </nav>
       </header>
 
       <div className="banner-content">
-        <motion.div className="banner-icons" variants={iconAnimationVariants} initial="initial" animate="animate">
-          {/* <FaRecycle className="banner-icon" /> */}
-          {/* <FaLeaf className="banner-icon" /> */}
-        </motion.div>
         <motion.div className="banner-text" variants={textVariants}>
-          <h1>
-           Plastic License Management Information System
-          </h1>
+          <h1>Plastic License Management Information System</h1>
         </motion.div>
         <div className="banner-links">
           <Link to="/sign-up?redirectUrl=/spuid-signup" className="nav-link">
@@ -75,19 +69,33 @@ const Banner = () => {
             My Applications
           </Link>
         </div>
+
+        {/* Banned Items Section */}
+        <div className="banned-items mb-4">
+          <h5 className="mb-4">Banned Single-Use Plastic Products under the Punjab Environmental Protection (Production and Consumption of Single-Use Plastic Product) Regulations 2023
+
+          </h5>
+          <ul className="banned-items-list">
+            {bannedItems.map((item, index) => (
+              <li key={index} className="banned-item">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <span>In case of any violation found any where, please kindly report at <a style={{fontSize:20}} href="tel:1374"> <b>1373</b> </a></span>
       </div>
 
       <footer className="footer-container">
         <span className="footer-text">
-          Copyright &copy; {new Date().getFullYear()}{' '}
-          <span className="font-semibold">PLMIS</span> All
-          rights reserved. <br />
-          Plastic Management Cell, Strategic Planning & Implementation Unit, Environmental Protection Agency, and Environment Protection & Climate Change Department, Government of the Punjab.
+          Copyright &copy; {new Date().getFullYear()}{" "}
+          <span className="font-semibold">PLMIS</span> All rights reserved. <br />
+          Plastic Management Cell, Strategic Planning & Implementation Unit,
+          Environmental Protection Agency, and Environment Protection & Climate
+          Change Department, Government of the Punjab.
         </span>
       </footer>
     </motion.div>
-
-    
   );
 };
 
