@@ -89,7 +89,7 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 15 micron and not less than 12 x 16 inch in size)</Checkbox>
+                            <Checkbox value="Carry bags">Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
                             <Checkbox value="Packaging except food">Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
                             <Checkbox value="Hospital Products">Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 15 micron)</Checkbox>
                         </Checkbox.Group>
