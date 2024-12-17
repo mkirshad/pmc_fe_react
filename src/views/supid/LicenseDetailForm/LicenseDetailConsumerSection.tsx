@@ -113,9 +113,9 @@ const LicenseDetailConsumerSection = ({ control, errors, readOnly = false }: Bus
                             onChange={(selectedValues) => field.onChange(selectedValues)}
                             className="flex flex-col gap-2"
                         >
-                            <Checkbox value="Carry bags" readOnly={readOnly}>Carry Bags (having thickness not less than 75 micron and not less than 12 x 16 inch in size)</Checkbox>
+                            <Checkbox value="Carry bags" readOnly={readOnly}>Carry Bags (having thickness not less than 15 micron and not less than 12 x 16 inch in size)</Checkbox>
                             <Checkbox value="Packaging except food" readOnly={readOnly}>Packaging (Multilayered and others) except food and pharmaceutical products</Checkbox>
-                            <Checkbox value="Hospital Products" readOnly={readOnly}>Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 75 micron)</Checkbox>
+                            <Checkbox value="Hospital Products" readOnly={readOnly}>Hospital Products & Waste Disposal Bags (Non-Risk) (having thickness not less than 15 micron)</Checkbox>
                         </Checkbox.Group>
                         )}
                     />
