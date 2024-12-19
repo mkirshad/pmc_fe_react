@@ -75,7 +75,7 @@ const CustomerEdit = () => {
     const formatJsonToJsx = (data) => {
         return (
           <div>
-            <h3>Application Assignments</h3>
+            <h5>Application Assignments</h5>
             {data.map((item) => (
               <div key={item.id} style={{ marginBottom: "20px" }}>
                 <div><strong>Assigned Group:</strong> {item.assigned_group}</div>
@@ -90,13 +90,13 @@ const CustomerEdit = () => {
         );
       };
 
-    const loadData = (id) =>{
+      const loadData = (id) =>{
         const response = AxiosBase.get(`/pmc/applicant-detail/${id}/`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         }).then((response) => {
-            //console.log('Data:', response.data);
+            console.log('Data:', response.data);
             const data_applicantDetail = {
                 firstName:response.data.first_name,
                 lastName:response.data.last_name,
@@ -104,11 +104,15 @@ const CustomerEdit = () => {
                 gender:response.data.gender,
                 cnic:response.data.cnic,
                 email:response.data.email,
-                mobileOperator:response.data.mobile_operator,
+                // mobileOperator:response.data.mobile_operator,
                 phoneNumber:response.data.mobile_no,
                 id:response.data.id,
+                has_identity_document:response.data.has_identity_document,
+                has_fee_challan:response.data.has_fee_challan,
+                applicationStatus:response.data.application_status,
                 assignedGroup:response.data.assigned_group,
-                applicationassignment:formatJsonToJsx((response.data.applicationassignment))
+                applicationassignment:formatJsonToJsx((response.data.applicationassignment)),
+                applicationdocument:response.data.applicationdocument,
             }
              updateApplicantDetail(data_applicantDetail);
 
@@ -118,51 +122,112 @@ const CustomerEdit = () => {
                     const dataBusinessProfile = {
                         applicant: response.data.id,
                         businessName: response.data.businessprofile.business_name,
-                        ntn: response.data.businessprofile.ntn_strn_pra_no_company,
-                        email: response.data.businessprofile.email,
+                        //ntn: response.data.businessprofile.ntn_strn_pra_no_company,
+                        // email: response.data.businessprofile.email,
+                        district:response.data.businessprofile.district,
+                        tehsil:response.data.businessprofile.tehsil,
+                        city:response.data.businessprofile.city_town_village,
+                        postalAddress:response.data.businessprofile.postal_address,
+                        mobileNumber:response.data.businessprofile.mobile_no,
+                        
                         id:response.data.businessprofile.id,
                     };
                     updateBusinessDetail(dataBusinessProfile);
                 }
-                if(response.data.businessprofile.entity_type === 'Individual'){
+                if('Individual' === 'Individual'){
                     const dataBusinessProfile = {
                         applicant: response.data.id,
                         name: response.data.businessprofile.name,
-                        ntn: response.data.businessprofile.ntn_strn_pra_no_individual,
-                        email: response.data.businessprofile.email,
+                        //ntn: response.data.businessprofile.ntn_strn_pra_no_individual,
+                        // email: response.data.businessprofile.email,
+                        district:response.data.businessprofile.district,
+                        tehsil:response.data.businessprofile.tehsil,
+                        city:response.data.businessprofile.city_town_village,
+                        postalAddress:response.data.businessprofile.postal_address,
+                        mobileNumber:response.data.businessprofile.mobile_no,
+
                         id:response.data.businessprofile.id,
                     };
                     updateBusinessDetailIndividual(dataBusinessProfile);
                 }
-                    updateBusinessEntity({businessEntityType:response.data.businessprofile.entity_type});
+                    updateBusinessEntity({businessEntityType: 'Individual'//response.data.businessprofile.entity_type
+
+                    });
             }
 
+            // Handle Producer Data
             updateLicenseDetail({licenseType: response.data.registration_for})
             if (response.data.producer && response.data.registration_for === 'Producer') {
-
-                const registration_required_for = [];
-                    if (response.data.producer.is_carry_bags) {
-                        registration_required_for.push('Carry bags');
-                    }
-                    if (response.data.producer.is_single_use_plastics) {
-                        registration_required_for.push('Single-use Plastics');
-                    }
-                    if (response.data.producer.is_plastic_packing) {
-                        registration_required_for.push('Plastic Packing');
-                    }
-
                 const dataProducer = {
-                        applicant: response.data.producer.id,
-                        is_carry_bags: response.data.producer.is_carry_bags,
-                        is_single_use_plastics: response.data.producer.is_single_use_plastics,
-                        is_plastic_packing: response.data.producer.is_plastic_packing,
-                        registration_required_for,
-                    };
+                    tracking_number: response.data.producer.tracking_number || '',
+                    registration_required_for: (response.data.producer.registration_required_for || []),
+                    registration_required_for_other: (response.data.producer.registration_required_for_other || []),
+                    registration_required_for_other_other_text: (response.data.producer.registration_required_for_other_other_text || ''),
+                    plain_plastic_Sheets_for_food_wrapping: (response.data.producer.plain_plastic_sheets_for_food_wrapping || []),
+                    PackagingItems: (response.data.producer.packaging_items || []),
+                    number_of_machines: response.data.producer.number_of_machines || '',
+                    total_capacity_value: response.data.producer.total_capacity_value?.toString() || '',
+                    date_of_setting_up: response.data.producer.date_of_setting_up || '',
+                    total_waste_generated_value: response.data.producer.total_waste_generated_value?.toString() || '',
+                    has_waste_storage_capacity: response.data.producer.has_waste_storage_capacity || '',
+                    waste_disposal_provision: response.data.producer.waste_disposal_provision || '',
+                    applicant: response.data.producer.applicant || '',
+                };
+            
                 updateLicenseDetailProducer(dataProducer);
             }
+
+
+            // Handle Consumer Data
+            if (response.data.consumer && response.data.registration_for === 'Consumer') {
+                const dataConsumer = {
+                    registration_required_for: response.data.consumer.registration_required_for || [],
+                    registration_required_for_other: response.data.consumer.registration_required_for_other || [],
+                    registration_required_for_other_other_text: response.data.consumer.registration_required_for_other_other_text || '',
+                    plain_plastic_Sheets_for_food_wrapping: response.data.consumer.plain_plastic_sheets_for_food_wrapping || [],
+                    PackagingItems: response.data.consumer.packaging_items || [],
+                    consumption: response.data.consumer.consumption || '',
+                    provision_waste_disposal_bins: response.data.consumer.provision_waste_disposal_bins || 'No',
+                    no_of_waste_disposible_bins: response.data.consumer.no_of_waste_disposable_bins || '',
+                    segregated_plastics_handed_over_to_registered_recyclers:
+                        response.data.consumer.segregated_plastics_handed_over_to_registered_recyclers || 'No',
+                    applicant: response.data.consumer.applicant || '',
+                };
+                updateLicenseDetailConsumer(dataConsumer);
+            }
+
+            // Handle Recycler Data
+            if (response.data.recycler && response.data.registration_for === 'Recycler') {
+                const dataRecycler = {
+                    selectedCategories: response.data.recycler.selected_categories || [],
+                    plastic_waste_acquired_through: response.data.recycler.plastic_waste_acquired_through || [],
+                    has_adequate_pollution_control_systems:
+                        response.data.recycler.has_adequate_pollution_control_systems || 'No',
+                    pollution_control_details: response.data.recycler.pollution_control_details || '',
+                    applicant: response.data.recycler.applicant || '',
+                    registration_required_for_other_other_text: (response.data.recycler.registration_required_for_other_other_text || ''),
+                };
+                updateLicenseDetailRecycler(dataRecycler);
+            }
+
+            // Handle Collector Data
+            if (response.data.collector && response.data.registration_for === 'Collector') {
+                const dataCollector = {
+                    registration_required_for: response.data.collector.registration_required_for || [],
+                    registration_required_for_other: response.data.collector.registration_required_for_other || [],
+                    registration_required_for_other_other_text: response.data.collector.registration_required_for_other_other_text || '',
+                    selectedCategoriesCollector: response.data.collector.selected_categories || [],
+                    total_capacity_value_collector: response.data.collector.total_capacity_value || '',
+                    number_of_vehicles: response.data.collector.number_of_vehicles || '',
+                    number_of_persons: response.data.collector.number_of_persons || '',
+                    applicant: response.data.collector.applicant || '',
+                };
+                updateLicenseDetailCollector(dataCollector);
+            }
              
-             
-             
+             if(response.data.application_status === 'Fee Challan'){
+                setStep(4)
+             }
 
             // Handle the response data
         })
@@ -449,7 +514,7 @@ const CustomerEdit = () => {
             formData.append('id', applicantDetail.id.toString())
             if (applicantDetail.id > 0) {
                 try {
-                    const response = await AxiosBase.post(`/pmc/applicant-detail/`, formData, {
+                    const response = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -518,10 +583,12 @@ const groups = [
     ]
 
 const groupList = fnGroupList(applicantDetail.assignedGroup)
+console.log('assignedGroup:',applicantDetail.assignedGroup)
 console.log('groupList', groupList)
 
 
 function fnGroupList(group) {
+    console.log(group)
     const index = groups.indexOf(group);
     if (index === -1) {
         // throw new Error(`Group "${group}" not found in the list.`);

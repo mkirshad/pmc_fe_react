@@ -40,7 +40,7 @@ const sanitizeData = (data) => {
 const Home = () => {
     const [flattenedData, setFlattenedData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [userGroup, setUserGroup] = useState([]);
+    const [userGroups, setUserGroups] = useState([]);
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
@@ -104,7 +104,7 @@ const Home = () => {
     };
 
     // Extract columns and flattened data
-    const extractColumns = (data, hasUserGroup) => {
+    const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
             
             'first_name',
@@ -139,7 +139,7 @@ const Home = () => {
                                     console.log(`Navigating with ID: ${id}`);
                                     // Perform navigation or other action
                                     window.location.href = hasUserGroup
-                                        ? `/spuid-review/${id}`
+                                        ? `/spuid-review/${id}?group=${group}`
                                         : `/spuid-signup/${id}`;
                                 }}
                             >
@@ -154,14 +154,27 @@ const Home = () => {
     };
 
     useEffect(() => {
+
+
+
+                       
         const fetchData = async () => {
             try {
-                // const response2 = await AxiosBase.get(`/pmc/user-groups/`, {
-                //     headers: {
-                //         'Content-Type': 'multipart/form-data',
-                //     },
-                // });
-                // setUserGroup(response2.data);
+                let groupsResponse = [];
+                try {
+                    const response = await AxiosBase.get(`/pmc/user-groups/`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    groupsResponse = response.data || [];
+                    setUserGroups(groupsResponse.map(group => group.name));
+                } catch (error) {
+                    console.error('Error fetching user groups:', error);
+                    // Set user groups to an empty array if an error occurs
+                    setUserGroups([]);
+                }
+                console.log('groupsResponse', groupsResponse)
     
                 const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
                     headers: {
@@ -172,7 +185,7 @@ const Home = () => {
                 const dataApplicants = response.data;
     
                 if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                    const extracted = extractColumns(dataApplicants, false);
+                    const extracted = extractColumns(dataApplicants, (groupsResponse.length>0), (groupsResponse.map(group => group.name))[0]);
                     setFlattenedData(extracted.flattenedData);
                     setColumns(extracted.columns);
     
@@ -206,6 +219,13 @@ const Home = () => {
           };
     
         fetchData();
+
+        setSelectedRowId(25);
+        const groupIndex = groups.indexOf('LSO');
+        if (groupIndex !== -1) {
+            setStep(groupIndex); // Update the Steps component
+        }
+
     }, []); // Run only once on component load
     
 console.log('selectedRowId:', selectedRowId)
