@@ -12,6 +12,14 @@ export const protectedRoutes: Routes = [
         component: lazy(() => import('@/views/Home')),
         authority: [],
     },
+    {
+        key: 'error',
+        path: '/error',
+        component: lazy(() => import('@/views/ErrorPage')), // ErrorPage component
+        authority: [], // Accessible by all users
+    },
+
+
     /** Example purpose only, please remove */
     {
         key: 'singleMenuItem',

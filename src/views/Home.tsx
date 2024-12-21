@@ -3,6 +3,7 @@ import { MaterialReactTable } from 'material-react-table';
 import AxiosBase from '../services/axios/AxiosBase';
 import { Link } from 'react-router-dom'; // For navigation
 import Steps from '@/components/ui/Steps';
+import { useNavigate } from 'react-router-dom';
 
 // Utility function to flatten nested objects and handle null values
 const flattenObject = (obj, parentKey = '', result = {}, excludedKeys = []) => {
@@ -152,13 +153,25 @@ const Home = () => {
     
         return { flattenedData, columns };
     };
-
+    const navigate = useNavigate();
     useEffect(() => {
+        
 
-
+ 
 
                        
         const fetchData = async () => {
+
+            try {
+                const response = await AxiosBase.get(`/pmc/ping/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } catch (error) {
+                navigate('/error');
+            }
+            
             try {
                 let groupsResponse = [];
                 try {
@@ -258,7 +271,9 @@ console.log(selectedRowId)
                 ))}
             </Steps> 
 */}
-
+            <div className='mb-4'>
+                <h3>{userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
+            </div>
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[

@@ -62,8 +62,14 @@ const SignInForm = (props: SignInFormProps) => {
 
             const result = await signIn({ username: email, password: password })
 
+            
             if (result?.status === 'failed') {
-                setMessage?.('Invalid Credentials!')
+                if (result.message.includes('400')){
+                    setMessage?.('Invalid Credentials!')
+                }else{
+                    setMessage?.('Technical Error! please try again after sometime or email at fmd@epd.punjab.gov.pk')
+                }
+                
                 // setMessage?.(result.message)
             }else{
                 setUser({"email":email, "userName":email.split('@')[0]})

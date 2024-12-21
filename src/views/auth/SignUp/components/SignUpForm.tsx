@@ -71,10 +71,14 @@ const SignUpForm = (props: SignUpFormProps) => {
             setSubmitting(true);
             try {
                 const result = await signUp({ username: email, password, email: '' });
-                
+                console.log(result)
                 // Simulate successful signup
                 if (result?.status === 'failed') {
-                    throw new Error('Username Already Exist')
+                    if (result.message.includes('400')){
+                        throw new Error('Username Already Exist')
+                    }else{
+                        throw new Error('Technical Error! please try again after sometime or email at fmd@epd.punjab.gov.pk')
+                    }
                     // throw new Error(result.message);
                 } else {
                     setSessionSignedIn(false);
@@ -89,6 +93,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                     }
                 }
             } catch (error) {
+                
                 console.log('its in error', error.response)
                 setMessage?.('test')
                 if (error.response) {

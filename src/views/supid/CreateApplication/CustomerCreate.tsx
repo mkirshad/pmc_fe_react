@@ -98,6 +98,19 @@ const {
     const isReadOnly = applicantDetail.applicationStatus !== 'Created';
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await AxiosBase.get(`/pmc/ping/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } catch (error) {
+                navigate('/error');
+            }
+    }
+    fetchData()
+
         if (id && id !== '0') {
             loadData(id);
         }else{
