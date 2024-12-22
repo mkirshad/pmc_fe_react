@@ -15,6 +15,15 @@ import { FormItem } from "@/components/ui/Form";
 import { useForm, Controller } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 
+const keyToTitleMapping = {
+  firstName: "First Name",
+  lastName: "Last Name",
+  businessEntityType: "Business Entity Type",
+  district: "District",
+  tehsil: "Tehsil",
+  // Add more mappings as needed
+};
+
 const ReviewAndSavePage = ({ groupList, children }) => {
   const [selectedGroup, setSelectedGroup] = useState(
     groupList !== undefined && groupList.length > 1 ? groupList[1].value : ""
@@ -80,6 +89,56 @@ const ReviewAndSavePage = ({ groupList, children }) => {
     updateApplicantDetail(data_applicantDetail);
   };
 
+  const keyToTitleMapping = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    applicantDesignation:"Designation",
+    gender:"Gender",
+    cnic:"CNIC",
+    email:"Email",
+    phoneNumber: "Mobile Number",
+    trackingNumber:"Tracking Number",
+
+    businessEntityType: "Business Entity Type",
+    name: "Business Name",
+    district: "District",
+    tehsil: "Tehsil",
+    city: "City",
+    postalAddress: "Postal Address",
+
+    // Producer
+    registration_required_for: "Categories of Single Use Plastics",
+    registration_required_for_other: "Categories for Other Plastics",
+    registration_required_for_other_other_text: "Other",
+    plain_plastic_Sheets_for_food_wrapping: "Additional Options for Packaging",
+    PackagingItems: "Packging Item Other List",
+    number_of_machines: "Number of machines",
+    total_capacity_value: "Average Production Capacity (Kg per day)",
+    date_of_setting_up: "Date of Business Setting Up",
+    total_waste_generated_value: "Averrage Waste Generated (Kg per day)",
+    has_waste_storage_capacity: "Has Waste Storage Capacity?",
+    waste_disposal_provision: "Waste Disposal Provision",
+
+    // Consumer
+    consumption: "Average Sale (Kg per day)",
+    provision_waste_disposal_bins: "Provision of Waste Disposal Bins",
+    no_of_waste_disposible_bins: "No. of Waste Disposibal Bins",
+    segregated_plastics_handed_over_to_registered_recyclers: "Whether Segregated Plastics are being handed over to registered Re-Cyclers or Collectors?",
+    
+    // Collector
+    selectedCategoriesCollector: "Source of Disposal",
+    total_capacity_value_collector: "Average Collection (Kg per day)",
+    number_of_vehicles: "Number of vehicles",
+    number_of_persons: "Number of persons",
+    // Recycler
+    selectedCategories: "Categories of plastic collected for recycling (Waste Disposal and Waste Collection in Kg per day)",
+    plastic_waste_acquired_through: "Plastic waste acquired through",
+    has_adequate_pollution_control_systems: "Has adequate pollution control systems or equipment to meet the standards of emission or effluent?",
+    pollution_control_details: "Polution control details",
+    
+    licenseType:"License Type"
+  };
+
   const renderSection = (title, data) => (
     <Card sx={{ marginBottom: "20px" }}>
       <CardContent>
@@ -87,7 +146,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
           {title}
         </Typography>
         {Object.entries(data || {}).map(([key, value]) =>
-          value !== "" && key !== "applicationassignment" && key !== "applicationdocument" ? (
+          value !== "" && key !== "applicationassignment" && key !== "applicationdocument" && (key in keyToTitleMapping)? (
             <div
               key={key}
               style={{
@@ -97,7 +156,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
               }}
             >
               <div style={{ flex: "1", marginRight: "10px" }}>
-                <strong>{key}:</strong>{" "}
+                <strong>{keyToTitleMapping[key] || key}:</strong>{" "}
                 {typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value}
               </div>
               <div style={{ marginRight: "10px" }}>
@@ -173,7 +232,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
     <Card sx={manualFieldStyles}>
       <CardContent>
         <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
-          Manual Fields
+          Information to be provided by District Incharge
         </Typography>
 
       {/* Global Fields */}
@@ -204,7 +263,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
             )}
           />
         </FormItem>
-
+      {licenseDetail.licenseType === 'Producer' && (<>
        {/* Producer Fields  */}
         <FormItem
           label="Annual Procurement (Kg per day)"
@@ -336,10 +395,10 @@ const ReviewAndSavePage = ({ groupList, children }) => {
                 )}
               />
             </FormItem>
-
+          </>)}
 
       {/* Recycler Fields */}
-
+      {licenseDetail.licenseType === 'Recycler' && (<>
       <FormItem
               label="No. of workers (including  contract labour)"
               invalid={Boolean(errors.firstName)}
@@ -469,7 +528,7 @@ environment. "
                 )}
               />
             </FormItem>
-            
+          </>)}
             
       </CardContent>
     </Card>

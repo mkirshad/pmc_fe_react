@@ -7,23 +7,35 @@ import { useNavigate } from 'react-router-dom';
 
 // Utility function to flatten nested objects and handle null values
 const flattenObject = (obj, parentKey = '', result = {}, excludedKeys = []) => {
-    for (const [key, value] of Object.entries(obj || {})) {
-        const newKey = parentKey ? `${parentKey}.${key}` : key;
+    // for (const [key, value] of Object.entries(obj || {})) {
+    //     const newKey = parentKey ? `${parentKey}.${key}` : key;
 
-        // Check if the key matches any excluded keys
-        if (excludedKeys.some((excludedKey) => newKey.startsWith(excludedKey))) {
-            continue; // Skip this key
-        }
+    //     // Check if the key matches any excluded keys
+    //     if (excludedKeys.some((excludedKey) => newKey.startsWith(excludedKey))) {
+    //         continue; // Skip this key
+    //     }
 
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-            // Recursively flatten nested objects
-            //flattenObject(value, newKey, result, excludedKeys);
-        } else {
-            // Assign value, defaulting to 'N/A' if undefined or null
-            result[newKey] = value !== undefined && value !== null ? value : 'N/A';
-        }
-    }
-    return result;
+    //     if (value && typeof value === 'object' && !Array.isArray(value)) {
+    //         // Recursively flatten nested objects
+    //         //flattenObject(value, newKey, result, excludedKeys);
+    //     } else {
+    //         // Assign value, defaulting to 'N/A' if undefined or null
+    //         result[newKey] = value !== undefined && value !== null ? value : 'N/A';
+    //     }
+    // }
+    // return result;
+    return {
+        tracking_number: obj.tracking_number,
+        first_name: obj.first_name,
+        last_name: obj.last_name,
+        cnic: obj.cnic,
+        mobile_no: obj.mobile_no,
+        application_status: obj.application_status,
+        assigned_group: obj.assigned_group,
+        registration_for: obj.registration_for,
+        application_Start_Time: obj.created_at.substring(0, 16),
+        application_Submission_Time: obj.submittedapplication?.created_at.substring(0, 16) || null,
+    };
 };
 
 const sanitizeData = (data) => {
@@ -107,7 +119,6 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
-            
             'first_name',
             'last_name',
             'cnic',
@@ -116,11 +127,13 @@ const Home = () => {
             'tracking_number',
             'assigned_group',
             'registration_for',
+            'application_Start_Time',
+            'application_Submission_Time',
         ]; // List of allowed columns
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data
         const firstRecord = flattenedData[0];
-    
+        console.log(data)
         const columns = [
             ...Object.keys(firstRecord)
                 .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
@@ -171,7 +184,7 @@ const Home = () => {
             } catch (error) {
                 navigate('/error');
             }
-            
+
             try {
                 let groupsResponse = [];
                 try {
@@ -313,7 +326,7 @@ console.log(selectedRowId)
                     }}
                     enableColumnResizing
                     columnResizeMode="onChange" // default
-                    enableTopToolbar={false} // Disables the top-right controls entirely
+                    enableTopToolbar={userGroups.length>0} // Disables the top-right controls entirely
                     // enableGlobalFilter={false} // Disables the global search/filter box
                     enablePagination={false} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting

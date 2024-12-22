@@ -98,6 +98,7 @@ const CustomerEdit = () => {
         }).then((response) => {
             console.log('Data:', response.data);
             const data_applicantDetail = {
+                trackingNumber:response.data.tracking_number,
                 firstName:response.data.first_name,
                 lastName:response.data.last_name,
                 applicantDesignation:response.data.applicant_designation,
