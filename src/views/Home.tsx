@@ -25,6 +25,7 @@ const flattenObject = (obj, parentKey = '', result = {}, excludedKeys = []) => {
     // }
     // return result;
     return {
+        id:obj.id,
         tracking_number: obj.tracking_number,
         first_name: obj.first_name,
         last_name: obj.last_name,
@@ -119,6 +120,7 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
+            
             'first_name',
             'last_name',
             'cnic',
