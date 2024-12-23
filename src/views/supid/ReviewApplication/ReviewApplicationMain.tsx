@@ -114,6 +114,7 @@ const CustomerEdit = () => {
                 assignedGroup:response.data.assigned_group,
                 applicationassignment:formatJsonToJsx((response.data.applicationassignment)),
                 applicationdocument:response.data.applicationdocument,
+                field_responses:response.data.field_responses,
             }
              updateApplicantDetail(data_applicantDetail);
 
@@ -507,8 +508,31 @@ const CustomerEdit = () => {
         onPrevious()
     }
 
+    const handleSubmitResponses = async () => {
+        if(!applicantDetail.readOnly){       
+            // console.log('fieldResponses', applicantDetail.fieldResponses)
+            console.log('readOnly', applicantDetail.readOnly)
+            const payload = Object.entries(applicantDetail.fieldResponses).map(([key, value]) => ({
+            field_key: key,
+            response: value.response,
+            comment: value.comment,
+            applicant: applicantDetail.id, // Use the applicant ID
+            }));
+        
+            try {
+            const response = await AxiosBase.post("/pmc/field-responses/", payload, {
+                headers: { "Content-Type": "application/json" },
+            });
+            console.log("Responses submitted:", response.data);
+            } catch (error) {
+            console.error("Error submitting responses:", error);
+            }
+        }
+      };
     const submitApplication = async () =>{
-        if(applicantDetail.assignedGroup2 !== '' ){
+        // console.log(formData)
+        setIsSubmiting(true)
+        if(applicantDetail.assignedGroup2 !== '' && applicantDetail.assignedGroup2 !== undefined ){
             // Add non-file fields
             const formData = new FormData();
             formData.append('assigned_group', (applicantDetail.assignedGroup2));
@@ -520,13 +544,13 @@ const CustomerEdit = () => {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                    setIsSubmiting(false);
+                    // setIsSubmiting(false);
                     navigate('/home');
                 } catch (error) {
                     console.error('Error in POST request:', error.response || error.message);
-                    setIsSubmiting(false);
+                    // setIsSubmiting(false);
                 }
-                    onNext()
+                    // onNext()
                 }
 
                 const formData2 = new FormData();
@@ -540,6 +564,9 @@ const CustomerEdit = () => {
                     },
                 });
         }
+
+        handleSubmitResponses()
+        setIsSubmiting(false)
     }
 
 // Destructure the desired state slices and functions

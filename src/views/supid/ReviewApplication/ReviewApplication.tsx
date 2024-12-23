@@ -14,13 +14,15 @@ import Input from "@/components/ui/Input";
 import { FormItem } from "@/components/ui/Form";
 import { useForm, Controller } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
-
+import AxiosBase from '../../../services/axios/AxiosBase';
+import { Divider } from '@mui/material';
 
 const ReviewAndSavePage = ({ groupList, children }) => {
   const [selectedGroup, setSelectedGroup] = useState(
     groupList !== undefined && groupList.length > 1 ? groupList[1].value : ""
   );
   const [checkboxState, setCheckboxState] = useState({ previousStage: false, nextStage: false });
+  const [fieldResponses, setFieldResponses] = useState({});
 
   const {
     applicantDetail,
@@ -54,6 +56,58 @@ const ReviewAndSavePage = ({ groupList, children }) => {
       groupList !== undefined && groupList.length > 1 ? groupList[1].value : ""
     );
   }, [groupList]);
+
+  useEffect(() => {
+    console.log('its in effect of review application ')
+    console.log(applicantDetail)
+
+    if (applicantDetail.id) {
+        loadApplicantResponses(applicantDetail.id);
+    }
+  }, [applicantDetail.id]);
+
+  useEffect(() => {
+    console.log('fieldResponses', fieldResponses)
+    updateApplicantDetail({"fieldResponses":fieldResponses, "readOnly":disabled});
+
+  }, [fieldResponses])
+console.log('fieldResponses', fieldResponses)
+
+const loadApplicantResponses = async (applicantId) => {
+  try {
+      const transformedResponses = applicantDetail.field_responses.reduce((acc, item) => {
+        acc[item.field_key] = { response: item.response, comment: item.comment };
+        return acc;
+      }, {});
+      setFieldResponses(transformedResponses); // Update the state with the transformed format
+      // setError(err);
+  } finally {
+      // setLoading(false);
+  }
+};
+
+  const handleCheckboxChangeYesNo = (key, response) => {
+    setFieldResponses((prev) => ({
+        ...prev,
+        [key]: {
+            ...prev[key],
+            response,
+            comment: response === 'No' ? prev[key]?.comment || '' : null, // Clear comment for "Yes"
+        },
+    }));
+};
+
+const handleCommentChange = (key, comment) => {
+  setFieldResponses((prev) => ({
+    ...prev,
+    [key]: {
+      ...prev[key],
+      comment, // Update the comment for the specific field
+    },
+  }));
+};
+
+  console.log(applicantDetail)
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
@@ -132,66 +186,85 @@ const ReviewAndSavePage = ({ groupList, children }) => {
   };
 
   const renderSection = (title, data) => (
-    <Card sx={{ marginBottom: "20px" }}>
+    <Card className="mb-4">
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: "10px" }}>
+        <Typography variant="h6" className="font-bold mb-4">
           {title}
         </Typography>
         {Object.entries(data || {}).map(([key, value]) =>
-          value !== "" && key !== "applicationassignment" && key !== "applicationdocument" && (key in keyToTitleMapping)? (
+          value !== "" &&
+          key !== "applicationassignment" &&
+          key !== "applicationdocument" &&
+          key in keyToTitleMapping ? (
             <div
               key={key}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
+              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4"
             >
-              <div style={{ flex: "1", marginRight: "10px" }}>
-                <strong>{keyToTitleMapping[key] || key}:</strong>{" "}
-                {typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value}
+              {/* Field Label and Value in the same row */}
+              <div className="w-full md:flex-[5] flex flex-col md:flex-row items-start md:items-center mb-2 md:mb-0">
+                <span className="font-bold mr-2">
+                  {keyToTitleMapping[key] || key}:
+                </span>
+                <span className="text-normal break-words">
+                  {typeof value === "object" && value !== null
+                    ? JSON.stringify(value, null, 2)
+                    : value}
+                </span>
               </div>
-              <div style={{ marginRight: "10px" }}>
-                <label>
+  
+     
+  
+              {/* Yes/No Radio Buttons */}
+              <div className="w-full md:flex-[3] flex items-center justify-center space-x-4 mt-2 md:mt-0">
+                <label className="flex items-center space-x-2">
                   <input
                     type="radio"
                     name={`response-${key}`}
                     value="Yes"
-                    style={{ marginRight: "5px" }}
+                    checked={fieldResponses[key]?.response === "Yes"}
+                    onChange={() => handleCheckboxChangeYesNo(key, "Yes")}
                     disabled={disabled}
                   />
-                  Yes
+                  <span>Yes</span>
                 </label>
-                <label style={{ marginLeft: "10px" }}>
+                <label className="flex items-center space-x-2">
                   <input
                     type="radio"
                     name={`response-${key}`}
                     value="No"
-                    style={{ marginRight: "5px" }}
+                    checked={fieldResponses[key]?.response === "No"}
+                    onChange={() => handleCheckboxChangeYesNo(key, "No")}
                     disabled={disabled}
                   />
-                  No
+                  <span>No</span>
                 </label>
               </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Add comment"
-                  style={{
-                    width: "200px",
-                    padding: "5px",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                  }}
-                  readOnly={disabled}
-                />
+
+                       {/* Comment Input */}
+                <div className="w-full md:flex-[5]">
+                  {fieldResponses[key]?.response === "No" && (
+                    <Input
+                      type="textarea"
+                      placeholder="Add comment"
+                      value={fieldResponses[key]?.comment || ""}
+                      onChange={(e) => handleCommentChange(key, e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg p-2"
+                      readOnly={disabled}
+                    />
+                  )}
               </div>
+
             </div>
           ) : null
         )}
       </CardContent>
     </Card>
   );
+  
+  
+  
+  
+  
 
   const renderDocumentSection = (documents) => (
     <Card sx={{ marginBottom: "20px" }}>
@@ -226,10 +299,11 @@ const ReviewAndSavePage = ({ groupList, children }) => {
         <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
           Information to be provided by District Incharge
         </Typography>
+      <div className="grid md:grid-cols-2 gap-4">
 
       {/* Global Fields */}
         <FormItem
-            label="Latidue"
+            label="Latitudue"
             invalid={Boolean(errors.annualProcurement)}
             errorMessage={errors.annualProcurement?.message}
           >
@@ -237,7 +311,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
             name="annualProcurement"
             control={control}
             render={({ field }) => (
-              <Input type="text" placeholder="Enter procurement" {...field} />
+              <Input type="text" placeholder="Enter Latitudue" {...field} readOnly={disabled}/>
             )}
           />
         </FormItem>
@@ -251,79 +325,38 @@ const ReviewAndSavePage = ({ groupList, children }) => {
             name="annualProcurement"
             control={control}
             render={({ field }) => (
-              <Input type="text" placeholder="Enter procurement" {...field} />
+              <Input type="text" placeholder="Enter Longitude" {...field} readOnly={disabled}/>
             )}
           />
         </FormItem>
       {licenseDetail.licenseType === 'Producer' && (<>
        {/* Producer Fields  */}
-        <FormItem
-          label="Annual Procurement (Kg per day)"
-          invalid={Boolean(errors.annualProcurement)}
-          errorMessage={errors.annualProcurement?.message}
-        >
-          <Controller
-            name="annualProcurement"
-            control={control}
-            render={({ field }) => (
-              <Input type="text" placeholder="Enter procurement" {...field} />
-            )}
-          />
-        </FormItem>
 
-        <FormItem
-            label="Whether there is availability of Segregation at Source"
-            invalid={Boolean(errors.firstName)}
-            errorMessage={errors.firstName?.message}
-          >
-              <Controller
-                name="firstName"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    type="text"
-                    autoComplete="off"
-                    placeholder="Whether there is availability of Segregation at Source"
-                    // readOnly={readOnly} // Apply the read-only prop
-                    {...field}
-                  />
-                )}
-              />
-            </FormItem>
+      
 
-        <FormItem
-          label="Flow Diagram"
-          invalid={Boolean(errors.flowDiagram)}
-          errorMessage={errors.flowDiagram?.message}
-        >
-          <Controller
-            name="flowDiagram"
-            control={control}
-            render={({ field }) => (
-              <Input type="file" accept=".pdf,.png,.jpg" {...field} />
-            )}
-          />
-        </FormItem>
+        
+
         
         <FormItem
               label="List of Products"
               invalid={Boolean(errors.flow_diagram)}
               errorMessage={errors.flow_diagram?.message}
             >
-              <Controller
-                name="flow_diagram"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    type="text"
-                    autoComplete="off"
-                    placeholder="List of Products"
-                    // readOnly={readOnly} // Apply the read-only prop
-                    {...field}
-                  />
-                )}
-              />
-            </FormItem>
+            <Controller
+              name="flow_diagram"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  autoComplete="off"
+                  placeholder="List of Products"
+                  // readOnly={readOnly} // Apply the read-only prop
+                  {...field}
+                  readOnly={disabled}
+                />
+              )}
+            />
+          </FormItem>
 
 
             <FormItem
@@ -341,6 +374,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
                     placeholder="List of By Products"
                     // readOnly={readOnly} // Apply the read-only prop
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
@@ -362,6 +396,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
                     placeholder="List and Quanity of Raw Material Imported"
                     // readOnly={readOnly} // Apply the read-only prop
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
@@ -369,7 +404,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
 
 
             <FormItem
-              label="Name of seller/Importer"
+              label="If raw material is bought then Name of seller"
               invalid={Boolean(errors.flow_diagram)}
               errorMessage={errors.flow_diagram?.message}
             >
@@ -380,14 +415,224 @@ const ReviewAndSavePage = ({ groupList, children }) => {
                   <Input
                     type="text"
                     autoComplete="off"
-                    placeholder="Name of seller/Importer"
+                    placeholder="If raw material is bought then Name of seller"
                     // readOnly={readOnly} // Apply the read-only prop
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
             </FormItem>
+
+            <FormItem
+              label="If self import, provide details"
+              invalid={Boolean(errors.flow_diagram)}
+              errorMessage={errors.flow_diagram?.message}
+            >
+              <Controller
+                name="flow_diagram"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    placeholder="If self import, provide details"
+                    // readOnly={readOnly} // Apply the read-only prop
+                    {...field}
+                    readOnly={disabled}
+                  />
+                )}
+              />
+            </FormItem>
+
+            <FormItem
+              label="Quantity of raw material utilized"
+              invalid={Boolean(errors.flow_diagram)}
+              errorMessage={errors.flow_diagram?.message}
+            >
+              <Controller
+                name="flow_diagram"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Quantity of raw material utilized"
+                    // readOnly={readOnly} // Apply the read-only prop
+                    {...field}
+                    readOnly={disabled}
+                  />
+                )}
+              />
+            </FormItem>
+            </>)}
+            </div>
+
+          {licenseDetail.licenseType === 'Producer' && (
+            <div className="grid md:grid-cols-1 gap-4">
+            <div className="mb-4">
+                <Divider textAlign="left">
+                </Divider>
+            </div>
+            </div>
+          )}
+
+      <div className="grid md:grid-cols-2 gap-4">
+          {licenseDetail.licenseType === 'Producer' && (<>
+
+            <FormItem
+              label="Status of compliance with - Thickness 75 micron"
+              invalid={Boolean(errors.flow_diagram)}
+              errorMessage={errors.flow_diagram?.message}
+            >
+              <Controller
+                name="flow_diagram"
+                control={control}
+                render={({ field }) => (
+                  <>
+                  <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-1`}
+                    value="Yes"
+                    
+                    disabled={disabled}
+                  />
+                  <span>Yes</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-2`}
+                    value="No"
+                    
+                    disabled={disabled}
+                  />
+                  <span>No</span>
+                </label>
+                </>
+                )}
+              />
+            </FormItem>
+
+            <FormItem
+              label="Does the unit have a valid consent/permit under the building and construction by-laws?"
+              invalid={Boolean(errors.flow_diagram)}
+              errorMessage={errors.flow_diagram?.message}
+            >
+              <Controller
+                name="flow_diagram"
+                control={control}
+                render={({ field }) => (
+                  <>
+                  <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-1`}
+                    value="Yes"
+                    
+                    disabled={disabled}
+                  />
+                  <span>Yes, please attach a copy</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-2`}
+                    value="No"
+                    
+                    disabled={disabled}
+                  />
+                  <span>No</span>
+                </label>
+                </>
+                )}
+              />
+            </FormItem>
+
+        <FormItem
+          label="Copy of consent/permit under the building and construciton by-laws"
+          invalid={Boolean(errors.flowDiagram)}
+          errorMessage={errors.flowDiagram?.message}
+        >
+          <Controller
+            name="flowDiagram"
+            control={control}
+            render={({ field }) => (
+              <Input type="file" accept=".pdf,.png,.jpg" {...field} disabled={disabled}/>
+            )}
+          />
+        </FormItem>
+
+        <FormItem
+          label="Flow Diagram"
+          invalid={Boolean(errors.flowDiagram)}
+          errorMessage={errors.flowDiagram?.message}
+        >
+          <Controller
+            name="flowDiagram"
+            control={control}
+            render={({ field }) => (
+              <Input type="file" accept=".pdf,.png,.jpg" {...field} disabled={disabled}/>
+            )}
+          />
+        </FormItem>
+
+
+        <FormItem
+          label="Action Plan"
+          invalid={Boolean(errors.actionPlan)}
+          errorMessage={errors.actionPlan?.message}
+        >
+          <Controller
+            name="actionPlan"
+            control={control}
+            render={({ field }) => (
+              <Input type="file" accept=".pdf,.png,.jpg" {...field} disabled={disabled}/>
+            )}
+          />
+        </FormItem>
+
+        <FormItem
+            label="List of Stockist/Distributor/Supplier to whom the products will be supplied"
+            invalid={Boolean(errors.firstName)}
+            errorMessage={errors.firstName?.message}
+          >
+              <Controller
+                name="firstName"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    placeholder="List of Stockist/Distributor/Supplier to whom the products will be supplied"
+                    // readOnly={readOnly} // Apply the read-only prop
+                    {...field}
+                    readOnly={disabled}
+                  />
+                )}
+              />
+            </FormItem>
+
           </>)}
+
+
+          {licenseDetail.licenseType === 'Consumer' && (<>
+          <FormItem
+          label="Procurement (Kg per day)"
+          invalid={Boolean(errors.annualProcurement)}
+          errorMessage={errors.annualProcurement?.message}
+        >
+          <Controller
+            name="annualProcurement"
+            control={control}
+            render={({ field }) => (
+              <Input type="text" placeholder="Enter procurement" {...field} readOnly={disabled}/>
+            )}
+          />
+        </FormItem>
+
+</>)}
 
       {/* Recycler Fields */}
       {licenseDetail.licenseType === 'Recycler' && (<>
@@ -413,38 +658,47 @@ const ReviewAndSavePage = ({ groupList, children }) => {
                       backgroundColor: '#f9f9f9', // Optional: To match the background
                     }}
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
             </FormItem>
-
 
             <FormItem
-              label="Whether registerd with Labor Dept.? If Yes, provide details"
-              invalid={Boolean(errors.firstName)}
-              errorMessage={errors.firstName?.message}
+              label="Whether registerd with Labor Dept.? If Yes, provide details?"
+              invalid={Boolean(errors.flow_diagram)}
+              errorMessage={errors.flow_diagram?.message}
             >
               <Controller
-                name="firstName"
+                name="flow_diagram"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    type="text"
-                    autoComplete="off"
-                    placeholder="Whether registerd with Labor Dept.? If Yes, provide details"
-                    // readOnly={readOnly} // Apply the read-only prop
-                    style={{
-                      // width: '200px', // Match width of the comment input
-                      padding: '5px', // Same padding as the comment input
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      backgroundColor: '#f9f9f9', // Optional: To match the background
-                    }}
-                    {...field}
+                  <>
+                  <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-1`}
+                    value="Yes"
+                    
+                    disabled={disabled}
                   />
+                  <span>Yes, please provide details</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name={`response-2`}
+                    value="No"
+                    
+                    disabled={disabled}
+                  />
+                  <span>No</span>
+                </label>
+                </>
                 )}
               />
             </FormItem>
+            
 
             <FormItem
               label="Occupational safety and health 
@@ -471,6 +725,7 @@ facilities)"
                       backgroundColor: '#f9f9f9', // Optional: To match the background
                     }}
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
@@ -516,12 +771,13 @@ environment. "
                       backgroundColor: '#f9f9f9', // Optional: To match the background
                     }}
                     {...field}
+                    readOnly={disabled}
                   />
                 )}
               />
             </FormItem>
           </>)}
-            
+          </div>
       </CardContent>
     </Card>
   );
@@ -535,6 +791,24 @@ environment. "
         <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
           Review Information
         </Typography>
+        {
+        !disabled && <Card className="mb-4" >
+          <CardContent>
+          <Typography variant="h7" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
+          If the provided information is correct, please click "Yes". If it is incorrect, then please click "No" and add comments
+        </Typography>
+        </CardContent>
+        </Card>
+        }
+        {
+        disabled && <Card className="mb-4" >
+          <CardContent>
+          <Typography variant="h7" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
+          Please review the information provided by the District Incharge. This information is not editable and for your review only.
+        </Typography>
+        </CardContent>
+        </Card>
+        }
         {completedSections.includes("applicantDetail") &&
           renderSection("Applicant Details", applicantDetail)}
         {completedSections.includes("businessEntity") &&
