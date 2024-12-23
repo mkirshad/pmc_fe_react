@@ -15,14 +15,6 @@ import { FormItem } from "@/components/ui/Form";
 import { useForm, Controller } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 
-const keyToTitleMapping = {
-  firstName: "First Name",
-  lastName: "Last Name",
-  businessEntityType: "Business Entity Type",
-  district: "District",
-  tehsil: "Tehsil",
-  // Add more mappings as needed
-};
 
 const ReviewAndSavePage = ({ groupList, children }) => {
   const [selectedGroup, setSelectedGroup] = useState(

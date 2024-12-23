@@ -153,22 +153,22 @@ const {
 
              
             if (response.data.businessprofile) {
-                if(response.data.businessprofile.entity_type === 'Company'){
-                    const dataBusinessProfile = {
-                        applicant: response.data.id,
-                        businessName: response.data.businessprofile.business_name,
-                        //ntn: response.data.businessprofile.ntn_strn_pra_no_company,
-                        // email: response.data.businessprofile.email,
-                        district:response.data.businessprofile.district,
-                        tehsil:response.data.businessprofile.tehsil,
-                        city:response.data.businessprofile.city_town_village,
-                        postalAddress:response.data.businessprofile.postal_address,
-                        mobileNumber:response.data.businessprofile.mobile_no,
+                // if(response.data.businessprofile.entity_type === 'Company'){
+                //     const dataBusinessProfile = {
+                //         applicant: response.data.id,
+                //         businessName: response.data.businessprofile.business_name,
+                //         //ntn: response.data.businessprofile.ntn_strn_pra_no_company,
+                //         // email: response.data.businessprofile.email,
+                //         district:response.data.businessprofile.district,
+                //         tehsil:response.data.businessprofile.tehsil,
+                //         city:response.data.businessprofile.city_town_village,
+                //         postalAddress:response.data.businessprofile.postal_address,
+                //         mobileNumber:response.data.businessprofile.mobile_no,
                         
-                        id:response.data.businessprofile.id,
-                    };
-                    updateBusinessDetail(dataBusinessProfile);
-                }
+                //         id:response.data.businessprofile.id,
+                //     };
+                //     updateBusinessDetail(dataBusinessProfile);
+                // }
                 if('Individual' === 'Individual'){
                     const dataBusinessProfile = {
                         applicant: response.data.id,
@@ -180,12 +180,12 @@ const {
                         city:response.data.businessprofile.city_town_village,
                         postalAddress:response.data.businessprofile.postal_address,
                         mobileNumber:response.data.businessprofile.mobile_no,
-
+                        
                         id:response.data.businessprofile.id,
                     };
                     updateBusinessDetailIndividual(dataBusinessProfile);
                 }
-                    updateBusinessEntity({businessEntityType: 'Individual'//response.data.businessprofile.entity_type
+                    updateBusinessEntity({businessEntityType: response.data.businessprofile.entity_type
 
                     });
             }
