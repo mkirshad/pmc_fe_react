@@ -315,6 +315,7 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
+            navigate('/error');
         }
             onNext()
         }
@@ -370,6 +371,7 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
+            navigate('/error');
         }
     }
             onNext()
@@ -431,6 +433,7 @@ const {
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                 setIsSubmiting(false);
+                navigate('/error');
             }
         }
         else{
@@ -447,6 +450,7 @@ const {
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                 setIsSubmiting(false);
+                navigate('/error');
             }
         }
         setIsSubmiting(false)
@@ -500,6 +504,7 @@ const {
                 } catch (error) {
                     console.error('Error in POST request:', error.response || error.message);
                     setIsSubmiting(false);
+                    navigate('/error');
                 }
                 updateLicenseDetailProducer(values as LicenseDetailFieldsProducer);
 
@@ -512,13 +517,17 @@ const {
                 // formData2.append('tracking_number', `LHR-PRO-${applicantDetail.id.toString().padStart(3, '0')}`);
                 // Call updateApplicantDetail with updated values
                 // Update Tracking ID
-                
+                try {
                     const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-        
+                } catch (error) {
+                    console.error('Error in POST request:', error.response || error.message);
+                    setIsSubmiting(false);
+                    navigate('/error');
+                }
                     console.log('Post successful:', response2.data);
         
                     // Add the ID to the values object
@@ -559,12 +568,17 @@ const {
                     formData.append('applicant', applicantDetail.id.toString());
                     
                     formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
-
-                    const response = await AxiosBase.post('/pmc/consumers/', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
+                    try{
+                        const response = await AxiosBase.post('/pmc/consumers/', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                    } catch (error) {
+                        console.error('Error in POST request:', error.response || error.message);
+                        setIsSubmiting(false);
+                        navigate('/error');
+                    }
         
                     console.log('Consumer POST successful:', response.data);
                 
@@ -575,13 +589,17 @@ const {
                     // formData2.append('tracking_number', `LHR-CON-${applicantDetail.id.toString().padStart(3, '0')}`);
                     // Call updateApplicantDetail with updated values
                     // Update Tracking ID
-                   
+                    try{
                         const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
                             },
                         });
-            
+                    } catch (error) {
+                        console.error('Error in POST request:', error.response || error.message);
+                        setIsSubmiting(false);
+                        navigate('/error');
+                    }
                         console.log('Post successful:', response2.data);
             
                         // Add the ID to the values object
@@ -659,6 +677,8 @@ const {
                     updateLicenseDetailCollector(values as LicenseDetailFieldsCollector);
                 } catch (error) {
                     console.error('Error posting Collector details:', error.response || error.message);
+                    setIsSubmiting(false);
+                    navigate('/error');
                 }
             }
             console.log('completedSections', completedSections)
@@ -705,6 +725,7 @@ const {
                 } catch (error) {
                     console.error('Error in POST request:', error.response || error.message);
                     setIsSubmiting(false);
+                    navigate('/error');
                 }
                 updateLicenseDetailRecycler(values as LicenseDetailFieldsRecycler);
 
@@ -736,6 +757,7 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
+            navigate('/error');
         }
     };
     
@@ -762,6 +784,7 @@ const {
                 console.log('Post successful:', response.data);
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
+                navigate('/error');
             }
             onNext();
         } else if(applicantDetail.has_identity_document){
@@ -916,6 +939,7 @@ const {
             console.log('Post successful:', response.data);
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
+            navigate('/error');
         }
 
 
@@ -923,21 +947,29 @@ const {
         const formData2 = new FormData();
         // Add non-file fields
         formData2.append('application_status', 'Submitted');
+        try{
+            const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        } catch (error) {
+            console.error('Error in POST request:', error.response || error.message);
+            navigate('/error');
+        }
 
-        const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
 
         updateApplicantDetail({applicationStatus: "Submitted"})
 
 
             
-        // Download Fee Challan            
-        const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
-            responseType: 'blob', // Important to get the data as a Blob
-        });        
+        // Download Fee Challan
+        try{            
+            const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+                responseType: 'blob', // Important to get the data as a Blob
+            }); 
+        
+   
         // Create a blob URL for the downloaded file
         const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -954,43 +986,10 @@ const {
         setTankYouPopupType("success")
         // const formData = new FormData();
     
-        // // Add non-file fields
-        // formData.append('first_name', (applicantDetail.firstName));
-        // formData.append('last_name', (applicantDetail.lastName));
-        // formData.append('applicant_designation', applicantDetail.applicantDesignation);
-        // formData.append('gender', applicantDetail.gender);
-        // formData.append('cnic', applicantDetail.cnic);
-        // formData.append('email', applicantDetail.email);
-        // // formData.append('mobile_operator', applicantDetail.mobileOperator);
-        // formData.append('mobile_no', applicantDetail.phoneNumber);
-        // formData.append('application_status', ('Submitted'));
-        // formData.append('assigned_group', ('LSO'));
-
-        // if (applicantDetail.id > 0) {
-        //     try {
-        //         const response = await AxiosBase.put(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
-        //             headers: {
-        //                 'Content-Type': 'multipart/form-data',
-        //             },
-        //         });
-        //         setIsSubmiting(false);
-        //         navigate('/home');
-        //     } catch (error) {
-        //         console.error('Error in POST request:', error.response || error.message);
-        //         setIsSubmiting(false);
-        //     }
-        //         onNext()
-        //     }
-
-        //     const formData2 = new FormData();
-        //     formData2.append('applicant', applicantDetail.id.toString())
-        //     formData2.append('assigned_group', 'LSO')
-        //     formData2.append('remarks', '')
-        //     await AxiosBase.post(`/pmc/application-assignment/`, formData2, {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
+    } catch (error) {
+        console.error('Error in POST request:', error.response || error.message);
+        navigate('/error');
+    }
     }
 
 
