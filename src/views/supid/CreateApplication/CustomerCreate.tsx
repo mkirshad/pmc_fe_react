@@ -21,6 +21,10 @@ import useFormStore from '../../../store/supid/supidStore'
 import { LicenseDetailFields, LicenseDetailFieldsConsumer, LicenseDetailFieldsCollector, LicenseDetailFieldsProducer, LicenseDetailFieldsRecycler } from '../LicenseDetailForm/types'
 import AxiosBase from '../../../services/axios/AxiosBase' 
 import { useParams } from 'react-router-dom';
+import LicenseDetailProducerSection from '../LicenseDetailForm/LicenseDetailProducerSection'
+import LicenseDetailConsumerSection from '../LicenseDetailForm/LicenseDetailConsumerSection'
+import LicenseDetailCollectorSection from '../LicenseDetailForm/LicenseDetailCollectorSection'
+import LicenseDetailRecyclerSection from '../LicenseDetailForm/LicenseDetailRecyclerSection'
 
 const CustomerEdit = () => {
     
@@ -94,6 +98,10 @@ const {
     resetLicenseDetailConsumer,
     resetLicenseDetailCollector,
     resetLicenseDetailRecycler,
+    licenseDetailProducer,
+    licenseDetailConsumer,
+    licenseDetailCollector,
+    licenseDetailRecycler
 } = useFormStore();
     const isReadOnly = applicantDetail.applicationStatus !== 'Created';
 
@@ -207,6 +215,7 @@ const {
                     has_waste_storage_capacity: response.data.producer.has_waste_storage_capacity || '',
                     waste_disposal_provision: response.data.producer.waste_disposal_provision || '',
                     applicant: response.data.producer.applicant || '',
+                    id: response.data.producer.id || null
                 };
             
                 updateLicenseDetailProducer(dataProducer);
@@ -227,6 +236,7 @@ const {
                     segregated_plastics_handed_over_to_registered_recyclers:
                         response.data.consumer.segregated_plastics_handed_over_to_registered_recyclers || 'No',
                     applicant: response.data.consumer.applicant || '',
+                    id: response.data.consumer.id || null
                 };
                 updateLicenseDetailConsumer(dataConsumer);
             }
@@ -241,6 +251,7 @@ const {
                     pollution_control_details: response.data.recycler.pollution_control_details || '',
                     applicant: response.data.recycler.applicant || '',
                     registration_required_for_other_other_text: (response.data.recycler.registration_required_for_other_other_text || ''),
+                    id: response.data.consumer.id || null
                 };
                 updateLicenseDetailRecycler(dataRecycler);
             }
@@ -256,6 +267,7 @@ const {
                     number_of_vehicles: response.data.collector.number_of_vehicles || '',
                     number_of_persons: response.data.collector.number_of_persons || '',
                     applicant: response.data.collector.applicant || '',
+                    id: response.data.collector.id || null
                 };
                 updateLicenseDetailCollector(dataCollector);
             }
@@ -458,8 +470,7 @@ const {
     }
 
     const handleLicenseDetailFormSubmit = async (values: LicenseDetailFormSchema) => {
-        console.log('Submitted values LicenseDetail:', values);
-        onNext(); // Move to the next step
+
     
         try {
 
@@ -493,21 +504,23 @@ const {
             
                 // Applicant field (assumed to be provided)
                 formData.append('applicant', applicantDetail.id.toString());
-                try {
+                if(licenseDetailProducer.id){
+                    const response = await AxiosBase.patch(`/pmc/producers/${licenseDetailProducer.id}/`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    console.log('Post successful:', response.data);
+                    updateLicenseDetailProducer(({...values, 'id':response.data.id}) as LicenseDetailFieldsProducer);
+                }else{
                     const response = await AxiosBase.post('/pmc/producers/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-            
                     console.log('Post successful:', response.data);
-                } catch (error) {
-                    console.error('Error in POST request:', error.response || error.message);
-                    setIsSubmiting(false);
-                    navigate('/error');
+                    updateLicenseDetailProducer(({...values, 'id':response.data.id}) as LicenseDetailFieldsProducer);
                 }
-                updateLicenseDetailProducer(values as LicenseDetailFieldsProducer);
-
 
 
                 // Set Applicatn level detail
@@ -517,17 +530,13 @@ const {
                 // formData2.append('tracking_number', `LHR-PRO-${applicantDetail.id.toString().padStart(3, '0')}`);
                 // Call updateApplicantDetail with updated values
                 // Update Tracking ID
-                try {
+                
                     const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                } catch (error) {
-                    console.error('Error in POST request:', error.response || error.message);
-                    setIsSubmiting(false);
-                    navigate('/error');
-                }
+                
                     console.log('Post successful:', response2.data);
         
                     // Add the ID to the values object
@@ -535,6 +544,7 @@ const {
         
                     // Call updateApplicantDetail with updated values
                     updateApplicantDetail(updatedValues);
+       
             }
             if (completedSections.includes('licenseDetailConsumer')) {
                     console.log('values:', values)
@@ -568,19 +578,28 @@ const {
                     formData.append('applicant', applicantDetail.id.toString());
                     
                     formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
-                    try{
+                    console.log('LicenseDetailConsumerSection', LicenseDetailConsumerSection)
+                    if(licenseDetailConsumer.id){
+                    
+                        const response = await AxiosBase.patch(`/pmc/consumers/${licenseDetailConsumer.id}/`, formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        updateLicenseDetailConsumer(({...values, 'id':response.data.id}) as LicenseDetailFieldsConsumer);
+                    
+                    }else{
+
                         const response = await AxiosBase.post('/pmc/consumers/', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
                             },
                         });
-                    } catch (error) {
-                        console.error('Error in POST request:', error.response || error.message);
-                        setIsSubmiting(false);
-                        navigate('/error');
+                        updateLicenseDetailConsumer(({...values, 'id':response.data.id}) as LicenseDetailFieldsConsumer);
+                    
                     }
         
-                    console.log('Consumer POST successful:', response.data);
+
                 
                     // Set Applicatn level detail
                     const formData2 = new FormData();
@@ -589,17 +608,13 @@ const {
                     // formData2.append('tracking_number', `LHR-CON-${applicantDetail.id.toString().padStart(3, '0')}`);
                     // Call updateApplicantDetail with updated values
                     // Update Tracking ID
-                    try{
+                    
                         const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
                             },
                         });
-                    } catch (error) {
-                        console.error('Error in POST request:', error.response || error.message);
-                        setIsSubmiting(false);
-                        navigate('/error');
-                    }
+                   
                         console.log('Post successful:', response2.data);
             
                         // Add the ID to the values object
@@ -609,7 +624,8 @@ const {
                         updateApplicantDetail(updatedValues);
 
 
-                updateLicenseDetailConsumer(values as LicenseDetailFieldsConsumer);
+               
+     
             }
             if (completedSections.includes('licenseDetailCollector')) {
                 console.log('values:', values);
@@ -641,16 +657,23 @@ const {
                 // Add applicant details
                 formData.append('applicant', applicantDetail.id.toString());
                 formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
-                try {
-                    // Post to Collector API
-                    const response = await AxiosBase.post('/pmc/collectors/', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-            
-                    console.log('Collector POST successful:', response.data);
-            
+                
+                    if(licenseDetailCollector.id){
+                        // Post to Collector API
+                        const response = await AxiosBase.patch(`/pmc/collectors/${licenseDetailCollector.id}/`, formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        updateLicenseDetailCollector(({...values, 'id':response.data.id}) as LicenseDetailFieldsCollector);
+                    }else{
+                        const response = await AxiosBase.post('/pmc/collectors/', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        });
+                        updateLicenseDetailCollector(({...values, 'id':response.data.id}) as LicenseDetailFieldsCollector);
+                    }
                     // Update Applicant Details
                     const formData2 = new FormData();
                     formData2.append('registration_for', 'Collector');
@@ -674,12 +697,8 @@ const {
                     updateApplicantDetail(updatedValues);
             
                     // Update state or local storage with the collector details
-                    updateLicenseDetailCollector(values as LicenseDetailFieldsCollector);
-                } catch (error) {
-                    console.error('Error posting Collector details:', error.response || error.message);
-                    setIsSubmiting(false);
-                    navigate('/error');
-                }
+                   
+              
             }
             console.log('completedSections', completedSections)
             if (completedSections.includes('licenseDetailRecycler')) {
@@ -714,21 +733,21 @@ const {
                 formData.append('applicant', applicantDetail.id.toString());
                 formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
 
-                try {
+                if(licenseDetailRecycler.id){
+                    const response = await AxiosBase.patch(`/pmc/recyclers/${licenseDetailRecycler.id}/`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    updateLicenseDetailRecycler(({...values, 'id':response.data.id}) as LicenseDetailFieldsRecycler);
+                }else{
                     const response = await AxiosBase.post('/pmc/recyclers/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-    
-                    console.log('Post successful:', response.data);
-                } catch (error) {
-                    console.error('Error in POST request:', error.response || error.message);
-                    setIsSubmiting(false);
-                    navigate('/error');
+                    updateLicenseDetailRecycler(({...values, 'id':response.data.id}) as LicenseDetailFieldsRecycler);
                 }
-                updateLicenseDetailRecycler(values as LicenseDetailFieldsRecycler);
-
                 // Set Applicatn level detail
                 const formData2 = new FormData();
                 formData2.append('registration_for', 'Recycler');
@@ -754,6 +773,8 @@ const {
             }
     
             setIsSubmiting(false);
+            console.log('Submitted values LicenseDetail:', values);
+            onNext(); // Move to the next step
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
