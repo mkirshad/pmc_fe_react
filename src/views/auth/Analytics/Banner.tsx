@@ -15,21 +15,22 @@ const Banner = () => {
   };
 
   const bannedItems = [
-    "Ear buds with plastic sticks",
-    "Plastic sticks for balloons",
-    "Plastic flags",
+    "Plastic shopping/carry bags (having thickness less than 75 micron)",
+        "Disposal Food Boxes made from polystyrene (Styrofoam)",
+    "Cutlery such as Forks, Spoons, Knives, Straw, Trays, Stirrers, etc.",
     "Candy sticks",
     "Ice-cream sticks",
     "Cigarette Packets",
     "Plates",
 "Plastic or PVC banners less than 80 microns",
     "Wrapping or Packing Films around sweet boxes",
-    "Disposal Food Boxes made from polystyrene (Styrofoam)",
+"Plastic sticks for balloons",
 
     "Disposable Cups & Glasses made from polystyrene (Styrofoam)",
-
-    "Cutlery such as Forks, Spoons, Knives, Straw, Trays, Stirrers, etc.",
-    "Invitation Cards",   
+"Plastic flags",
+    
+    "Invitation Cards",  
+    "Ear buds with plastic sticks", 
   ];
 
   return (

@@ -23,7 +23,7 @@ const ErrorPage = () => {
                 </p>
                 <div style={styles.buttonContainer}>
                     <button style={styles.button} onClick={handleGoHome}>
-                        Go to Home
+                        Go to My Applications
                     </button>
                     {/* <button
                         style={{ ...styles.button, ...styles.secondaryButton }}

@@ -182,37 +182,39 @@
 
 /* Banned Items */
 
+/* Make the first list item dark green */
+.banned-items-list li:first-child {
+  color: darkgoldenrod; /* Dark green for the first item */
+  font-weight: bold; /* Optional: Make it bold */
+  padding-right: 20px;
+}
 
+/* Existing styles */
 .banned-items h2 {
   font-size: 1.5rem;
   margin-bottom: 10px;
-
   text-align: left;
 }
-
-
-
-
 
 .banned-items-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Create 3 equal columns */
-  /*gap: 10px;  Add space between items */
   list-style-type: disc; /* Keep the bullet styling */
   padding-left: 20px; /* Adjust padding */
   margin: 0;
+  
 }
 
 .banned-item {
-  /* font-size: 1rem; */
   text-align: left; /* Align the text to the left */
   padding-left: 0; /* Remove extra padding */
-
+  padding-right: 20px;
 }
 
-.banned-items{
+.banned-items {
   margin-top: 100px;
 }
+
 
 
 /* Banner CSS End */
