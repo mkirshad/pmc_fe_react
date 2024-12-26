@@ -837,7 +837,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`Yes - Proceed to next stage (${groupList[2]?.label})`}
+                label={`Yes - As per remarks, proceed to next stage (${groupList[2]?.label})`}
               />
 
               <FormControlLabel
