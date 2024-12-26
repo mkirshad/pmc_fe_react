@@ -1,12 +1,10 @@
 import ApiService from './ApiService'
+import AxiosBase from '../services/axios/AxiosBase';
 
 export async function apiGetNotificationCount() {
-    return ApiService.fetchDataWithAxios<{
-        count: number
-    }>({
-        url: '/notification/count',
-        method: 'get',
-    })
+  // Reuse the same /pmc/applicant-alerts/ call, then get .length
+  const alerts = await apiGetApplicantAlerts();
+  return {'count': alerts.length};
 }
 
 export async function apiGetNotificationList() {
@@ -36,3 +34,15 @@ export async function apiGetSearchResult<T>(params: { query: string }) {
         params,
     })
 }
+
+export async function apiGetApplicantAlerts() {
+    try {
+      // This calls your new DRF endpoint returning
+      // remarks for the current user’s applications
+      const response = await AxiosBase.get('/pmc/applicant-alerts/');
+      return response.data; // An array of { id, applicant_id, tracking_number, remarks, created_at, ... }
+    } catch (error) {
+      console.error('Error fetching applicant alerts:', error);
+      return []; // Return an empty array if an error occurs
+    }
+  }

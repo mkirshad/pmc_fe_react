@@ -101,6 +101,8 @@ const {
     licenseDetailRecycler
 } = useFormStore();
     const isReadOnly = applicantDetail.applicationStatus !== 'Created';
+    const isReadOnly2 = applicantDetail.assignedGroup !== 'APPLICANT';
+    const isWritable = applicantDetail.assignedGroup === 'APPLICANT';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -152,7 +154,8 @@ const {
                 id:response.data.id,
                 has_identity_document:response.data.has_identity_document,
                 has_fee_challan:response.data.has_fee_challan,
-                applicationStatus:response.data.application_status
+                applicationStatus:response.data.application_status,
+                assignedGroup:response.data.assigned_group,
             }
              updateApplicantDetail(data_applicantDetail);
 
@@ -786,7 +789,7 @@ const {
         const formData = new FormData();
 
         // Append fields to FormData
-        if (!applicantDetail.has_identity_document && values.flow_diagram) {
+        if (values.flow_diagram) {
             formData.append('document', values.flow_diagram);
         
             formData.append('document_description',  'Identity Document');
@@ -1035,7 +1038,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={applicantDetail}
                 onFormSubmit={handleApplicantDetailFormSubmit}
-                readOnly={isReadOnly}
+                readOnly={isReadOnly && isReadOnly2}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1059,19 +1062,19 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
+                                icon={applicantDetail.applicationStatus === 'Created' || isWritable ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
+                                type={applicantDetail.applicationStatus === 'Created' || isWritable ? 'submit' : 'button'}
                                 loading={isSubmiting}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
+                                onClick={applicantDetail.applicationStatus === 'Created'  || isWritable ? null : onNext}
                             >
-                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                {applicantDetail.applicationStatus === 'Created' || isWritable ? 'Save & Next' : 'View & Next'}
                                 
                             </Button>
                         </div>
@@ -1083,7 +1086,8 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={BusinessEntityFormData}
                 onFormSubmit={handleBusinessEntityFormSubmit}
-                readOnly={isReadOnly}
+                readOnly={isReadOnly && isReadOnly2}
+                readOnlyDistrict={isReadOnly}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1107,19 +1111,19 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
+                                icon={applicantDetail.applicationStatus === 'Created' || isWritable ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
+                                type={applicantDetail.applicationStatus === 'Created' || isWritable ? 'submit' : 'button'}
                                 loading={isSubmiting}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? null : onNext}
                             >
-                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                {applicantDetail.applicationStatus === 'Created' || isWritable ? 'Save & Next' : 'View & Next'}
                                 
                             </Button>
                         </div>
@@ -1155,19 +1159,19 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
+                                icon={applicantDetail.applicationStatus === 'Created' || isWritable ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
+                                type={applicantDetail.applicationStatus === 'Created' || isWritable ? 'submit' : 'button'}
                                 loading={isSubmiting}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? null : onNext}
                             >
-                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                {applicantDetail.applicationStatus === 'Created' || isWritable ? 'Save & Next' : 'View & Next'}
                                 
                             </Button>
                         </div>
@@ -1179,7 +1183,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={LicenseDetailFormData}
                 onFormSubmit={handleDocumentFormSubmit}
-                readOnly={isReadOnly}
+                readOnly={isReadOnly && isReadOnly2}
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -1203,19 +1207,19 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                 type="button"
                                 loading={isSubmiting}
                                 disabled={ step === 0? true : false}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? handleGoBack : onPrevious}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? handleGoBack : onPrevious}
                             >
                                 Back
                             </Button>
 
                             <Button
-                                icon={applicantDetail.applicationStatus === 'Created' ?<BiSave /> : <BiArrowToRight/> }
+                                icon={applicantDetail.applicationStatus === 'Created' || isWritable ?<BiSave /> : <BiArrowToRight/> }
                                 variant="solid"
-                                type={applicantDetail.applicationStatus === 'Created' ? 'submit' : 'button'}
+                                type={applicantDetail.applicationStatus === 'Created' || isWritable ? 'submit' : 'button'}
                                 loading={isSubmiting}
-                                onClick={applicantDetail.applicationStatus === 'Created' ? null : onNext}
+                                onClick={applicantDetail.applicationStatus === 'Created' || isWritable ? null : onNext}
                             >
-                                {applicantDetail.applicationStatus === 'Created' ? 'Save & Next' : 'View & Next'}
+                                {applicantDetail.applicationStatus === 'Created' || isWritable ? 'Save & Next' : 'View & Next'}
                                 
                             </Button>
                         </div>
@@ -1227,7 +1231,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 newCustomer
                 defaultValues={LicenseDetailFormData}
                 onFormSubmit={submitApplication}
-                readOnly={applicantDetail.applicationStatus === 'Submitted'}
+                readOnly={applicantDetail.applicationStatus === 'Submitted'  && isReadOnly2}
             >
                 <Container>
                         <div className="flex items-center justify-between px-8">
@@ -1261,7 +1265,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                     variant="solid"
                                     type="submit"
                                     loading={isSubmiting}
-                                    disabled={applicantDetail.applicationStatus === 'Submitted'}
+                                    disabled={applicantDetail.applicationStatus === 'Submitted' && isReadOnly2}
                                 >
                                     Submit Application
                                 </Button>

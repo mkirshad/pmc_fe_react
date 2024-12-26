@@ -17,6 +17,7 @@ import {
 import isLastChild from '@/utils/isLastChild'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { useNavigate } from 'react-router-dom'
+import AxiosBase from '../../../services/axios/AxiosBase';
 
 import type { DropdownRef } from '@/components/ui/Dropdown'
 
@@ -63,12 +64,32 @@ const _Notification = ({ className }: { className?: string }) => {
 
     const onNotificationOpen = async () => {
         if (notificationList.length === 0) {
-            setLoading(true)
-            const resp = await apiGetNotificationList()
-            setLoading(false)
-            setNotificationList(resp)
+          setLoading(true);
+          const resp = await apiGetApplicantAlerts();
+          setLoading(false);
+          if (resp.length > 0) {
+            setNotificationList(
+              resp.map((item) => ({
+                id: String(item.id),
+                target: item.tracking_number,      // We'll show tracking number in "target"
+                description: item.remarks,         // We'll show remarks in "description"
+                date: item.created_at,             // "date" as the remark creation date
+                image: '',                         // not used
+                type: 1,                           // placeholder if you want
+                location: '',                      // not used
+                locationLabel: '',                 // not used
+                status: '',                        // not used
+                readed: false,                     // default as "unread"
+              }))
+            );
+            setNoResult(false);
+            setUnreadNotification(true);
+          } else {
+            setNoResult(true);
+          }
         }
-    }
+      };
+    
 
     const onMarkAllAsRead = () => {
         const list = notificationList.map((item: NotificationList) => {
@@ -104,6 +125,18 @@ const _Notification = ({ className }: { className?: string }) => {
             notificationDropdownRef.current.handleDropdownClose()
         }
     }
+
+  
+
+const apiGetApplicantAlerts = async () => {
+  try {
+    const response = await AxiosBase.get('/pmc/applicant-alerts/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching applicant alerts:', error);
+    return []; // or throw error
+  }
+};
 
     return (
         <Dropdown

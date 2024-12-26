@@ -25,7 +25,7 @@ const entityTypes = [
     { value: 'Company', label: 'Company / Corporation / Partnership' },
 ];
 
-const BusinessDetailSectionIndividual = ({ control, errors, readOnly = false }: BusinessDetailSectionIndividualProps) => {
+const BusinessDetailSectionIndividual = ({ control, errors, readOnly = false, readOnlyDistrict = false }: BusinessDetailSectionIndividualProps) => {
     const [districts, setDistricts] = useState([]);
     const [tehsils, setTehsils] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -192,7 +192,7 @@ console.log(districts)
                                 options={districts}
                                 placeholder="Select District"
                                 value={districts.find((option) => option.value === field.value)}
-                                isDisabled={readOnly}
+                                isDisabled={readOnlyDistrict}
                                 onChange={(option) => {
                                     field.onChange(option?.value);
                                     setSelectedDistrict(option?.value); // Update selected district

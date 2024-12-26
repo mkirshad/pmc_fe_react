@@ -19,6 +19,7 @@ type CustomerFormProps = {
     defaultValues?: BusinessEntityFormSchema
     newCustomer?: boolean
     readOnly?: boolean; // Add this prop
+    readOnlyDistrict?: boolean;
 } & CommonProps
 
 const validationSchema: ZodType<BusinessEntityFormSchema> = z.object({
@@ -152,6 +153,7 @@ const {
         newCustomer = false,
         children,
         readOnly,
+        readOnlyDistrict,
     } = props
 
     const {
@@ -194,7 +196,7 @@ const {
                     <div className="gap-4 flex flex-col flex-auto">
                         {/* <BusinessEntitySection control={control} errors={errors} /> */}
                         {/* {completedSections.includes('businessDetail') && <BusinessDetailSection control={control} errors={errors} />} */}
-                         <BusinessDetailIndividualSection control={control} errors={errors} readOnly={readOnly}></BusinessDetailIndividualSection>
+                         <BusinessDetailIndividualSection control={control} errors={errors} readOnly={readOnly} readOnlyDistrict = {readOnlyDistrict}></BusinessDetailIndividualSection>
                     </div>
                 </div>
             </Container>

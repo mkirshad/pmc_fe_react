@@ -296,7 +296,7 @@ const handleChangeManualFields = (fieldName, value) => {
           {documents.map((doc) => (
             <li key={doc.id}>
               <a href={doc.document} target="_blank" rel="noopener noreferrer">
-                {doc.document_description}
+                {doc.document_description} {doc.created_at.substring(0,19)}
               </a>
             </li>
           ))}

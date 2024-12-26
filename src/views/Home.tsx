@@ -6,38 +6,49 @@ import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
 
 // Utility function to flatten nested objects and handle null values
-const flattenObject = (obj, parentKey = '', result = {}, excludedKeys = []) => {
-    // for (const [key, value] of Object.entries(obj || {})) {
-    //     const newKey = parentKey ? `${parentKey}.${key}` : key;
+// Utility function to flatten nested objects and handle remarks
+const flattenObject = (obj) => {
+    // Step 1: Collect remarks from the assignment entries
+    // that have assigned_group === 'APPLICANT'.
+    const applicantAssignments = ((obj.assignedGroup === 'APPLICANT' && obj.applicationassignment) || []).filter(
+        (assignment) =>
+        assignment.assigned_group === 'APPLICANT' &&
+        assignment.remarks &&
+        assignment.remarks !== 'undefined'
+    );
 
-    //     // Check if the key matches any excluded keys
-    //     if (excludedKeys.some((excludedKey) => newKey.startsWith(excludedKey))) {
-    //         continue; // Skip this key
-    //     }
+    // Map out just the remarks from those assignments
+    const applicantRemarks = applicantAssignments.map((a) => a.remarks);
 
-    //     if (value && typeof value === 'object' && !Array.isArray(value)) {
-    //         // Recursively flatten nested objects
-    //         //flattenObject(value, newKey, result, excludedKeys);
-    //     } else {
-    //         // Assign value, defaulting to 'N/A' if undefined or null
-    //         result[newKey] = value !== undefined && value !== null ? value : 'N/A';
-    //     }
+    // If we want to ALSO include the top-level remarks if this applicant’s
+    // own assigned_group is 'APPLICANT', do something like:
+    // if (obj.assigned_group === 'APPLICANT' && obj.remarks) {
+    //   applicantRemarks.push(obj.remarks);
     // }
-    // return result;
+
+    // Step 2: Combine them or use 'N/A' if none
+    const combinedRemarks =
+        applicantRemarks.length > 0 ? applicantRemarks.join('; ') : 'N/A';
+  
+    // 3) Return your flattened fields + the combined remarks
     return {
-        id:obj.id,
-        tracking_number: obj.tracking_number,
-        first_name: obj.first_name,
-        last_name: obj.last_name,
-        cnic: obj.cnic,
-        mobile_no: obj.mobile_no,
-        application_status: obj.application_status,
-        assigned_group: obj.assigned_group,
-        registration_for: obj.registration_for,
-        application_Start_Time: obj.created_at.substring(0, 16),
-        application_Submission_Time: obj.submittedapplication?.created_at.substring(0, 16) || null,
+      id: obj.id,
+      tracking_number: obj.tracking_number,
+      first_name: obj.first_name,
+      last_name: obj.last_name,
+      cnic: obj.cnic,
+      mobile_no: obj.mobile_no,
+      application_status: obj.application_status,
+      assigned_group: obj.assigned_group,
+      registration_for: obj.registration_for,
+      application_Start_Time: obj.created_at?.substring(0, 16) || 'N/A',
+      application_Submission_Time:
+        obj.submittedapplication?.created_at?.substring(0, 16) || 'N/A',
+      // The new "remarks" field we’ll show in the grid:
+      remarks: combinedRemarks,
     };
-};
+  };
+  
 
 const sanitizeData = (data) => {
     return data.map((record) => {
@@ -120,7 +131,6 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
-            
             'first_name',
             'last_name',
             'cnic',
@@ -131,6 +141,7 @@ const Home = () => {
             'registration_for',
             'application_Start_Time',
             'application_Submission_Time',
+            'remarks',
         ]; // List of allowed columns
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data
