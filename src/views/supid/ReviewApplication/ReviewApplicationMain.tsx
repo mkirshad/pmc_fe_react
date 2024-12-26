@@ -115,6 +115,7 @@ const CustomerEdit = () => {
                 applicationassignment:formatJsonToJsx((response.data.applicationassignment)),
                 applicationdocument:response.data.applicationdocument,
                 field_responses:response.data.field_responses,
+                manual_fields: response.data.manual_fields
             }
              updateApplicantDetail(data_applicantDetail);
 
@@ -526,9 +527,134 @@ const CustomerEdit = () => {
             console.log("Responses submitted:", response.data);
             } catch (error) {
             console.error("Error submitting responses:", error);
+            navigate('/error');
             }
         }
       };
+    
+      const handleSubmitManualFields = async () => {
+        // Retrieve manualFields from applicantDetail (or from your local state)
+        const { manualFields } = applicantDetail;
+      
+        // Prepare form data
+        const formData = new FormData();
+        formData.append("applicant", applicantDetail.id);
+      
+      // Example fields — update/add/remove these as per your model
+        formData.append("latitude", manualFields.latitude || "");
+        formData.append("longitude", manualFields.longitude || "");
+        formData.append("list_of_products", manualFields.list_of_products || "");
+        formData.append("list_of_by_products", manualFields.list_of_by_products || "");
+        formData.append("raw_material_imported", manualFields.raw_material_imported || "");
+        formData.append("seller_name_if_raw_material_bought", manualFields.seller_name_if_raw_material_bought || "");
+        formData.append("self_import_details", manualFields.self_import_details || "");
+        formData.append("raw_material_utilized", manualFields.raw_material_utilized || "");
+        formData.append("compliance_thickness_75", manualFields.compliance_thickness_75 || "");
+        formData.append("valid_consent_permit_building_bylaws", manualFields.valid_consent_permit_building_bylaws || "");
+        formData.append("stockist_distributor_list", manualFields.stockist_distributor_list || "");
+        formData.append("procurement_per_day", manualFields.procurement_per_day || "");
+        formData.append("no_of_workers", manualFields.no_of_workers || "");
+        formData.append("labor_dept_registration_status", manualFields.labor_dept_registration_status || "");
+        formData.append("occupational_safety_and_health_facilities", manualFields.occupational_safety_and_health_facilities || "");
+        formData.append("adverse_environmental_impacts", manualFields.adverse_environmental_impacts || "");
+      
+        // File fields (append only if present)
+        if (manualFields.consent_permit_file) {
+        
+        const formData2 =  new FormData();
+        formData2.append('document', manualFields.consent_permit_file);
+    
+        formData2.append('document_description',  'Consent Permit');
+        formData2.append('applicant',  applicantDetail.id.toString());
+
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData2, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                navigate('/error');
+            }
+        }
+        if (manualFields.flow_diagram_file) {
+          
+            const formData2 =  new FormData();
+            formData2.append('document', manualFields.flow_diagram_file);
+        
+            formData2.append('document_description',  'Flow Diagram');
+            formData2.append('applicant',  applicantDetail.id.toString());
+
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData2, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                navigate('/error');
+            }
+        }
+        if (manualFields.action_plan_file) {
+          const formData2 =  new FormData();
+          formData2.append('document', manualFields.action_plan_file);
+      
+          formData2.append('document_description',  'Action Plan');
+          formData2.append('applicant',  applicantDetail.id.toString());
+
+          try {
+              const response = await AxiosBase.post('/pmc/applicant-documents/', formData2, {
+                  headers: {
+                      'Content-Type': 'multipart/form-data',
+                  },
+              });
+
+              console.log('Post successful:', response.data);
+          } catch (error) {
+              console.error('Error in POST request:', error.response || error.message);
+              navigate('/error');
+          }
+
+        }
+      
+        // Now decide whether to POST or PATCH
+        if (!manualFields.id) {
+          // CREATE (POST)
+          try {
+            const response = await AxiosBase.post("/pmc/manual-fields/", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+            console.log("POST success:", response.data);
+            alert("Data is saved!")
+            // Update local/manualFields state with newly created ID
+            // updateManualFields({ id: response.data.id });
+          } catch (error) {
+            console.error("Error POSTing manual fields:", error);
+            navigate('/error');
+          }
+        } else {
+            // UPDATE (PATCH)
+            try {
+                const response = await AxiosBase.patch(
+                `/pmc/manual-fields/${manualFields.id}/`,
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
+                );
+                alert("Data is saved!")
+                console.log("PATCH success:", response.data);
+            } catch (error) {
+                console.error("Error PATCHing manual fields:", error);
+                navigate('/error');
+            }
+        }
+      };
+
     const submitApplication = async () =>{
         // console.log(formData)
         setIsSubmiting(true)
@@ -566,6 +692,7 @@ const CustomerEdit = () => {
         }
 
         handleSubmitResponses()
+        handleSubmitManualFields()
         setIsSubmiting(false)
     }
 

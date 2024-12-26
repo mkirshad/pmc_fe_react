@@ -12,7 +12,7 @@ import useFormStore from '../../../store/supid/supidStore'
 
 type BusinessDetailSectionIndividualProps = FormSectionBaseProps & {
     readOnly?: boolean; // Add this prop
-};;
+};
 
 // const mobileOperators = [
 //     { value: 'Mobilink', label: 'Mobilink' },

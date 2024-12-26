@@ -21,10 +21,7 @@ import useFormStore from '../../../store/supid/supidStore'
 import { LicenseDetailFields, LicenseDetailFieldsConsumer, LicenseDetailFieldsCollector, LicenseDetailFieldsProducer, LicenseDetailFieldsRecycler } from '../LicenseDetailForm/types'
 import AxiosBase from '../../../services/axios/AxiosBase' 
 import { useParams } from 'react-router-dom';
-import LicenseDetailProducerSection from '../LicenseDetailForm/LicenseDetailProducerSection'
-import LicenseDetailConsumerSection from '../LicenseDetailForm/LicenseDetailConsumerSection'
-import LicenseDetailCollectorSection from '../LicenseDetailForm/LicenseDetailCollectorSection'
-import LicenseDetailRecyclerSection from '../LicenseDetailForm/LicenseDetailRecyclerSection'
+
 
 const CustomerEdit = () => {
     
