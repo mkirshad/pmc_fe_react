@@ -578,7 +578,7 @@ const {
                     formData.append('applicant', applicantDetail.id.toString());
                     
                     formData.append('registration_required_for_other_other_text', values.registration_required_for_other_other_text || '');
-                    console.log('LicenseDetailConsumerSection', LicenseDetailConsumerSection)
+                    // console.log('LicenseDetailConsumerSection', LicenseDetailConsumerSection)
                     if(licenseDetailConsumer.id){
                     
                         const response = await AxiosBase.patch(`/pmc/consumers/${licenseDetailConsumer.id}/`, formData, {

@@ -192,7 +192,7 @@ console.log(districts)
                                 options={districts}
                                 placeholder="Select District"
                                 value={districts.find((option) => option.value === field.value)}
-                                isDisabled={readOnlyDistrict}
+                                isDisabled={readOnlyDistrict && field.value}
                                 onChange={(option) => {
                                     field.onChange(option?.value);
                                     setSelectedDistrict(option?.value); // Update selected district

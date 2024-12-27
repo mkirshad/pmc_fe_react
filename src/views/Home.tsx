@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const flattenObject = (obj) => {
     // Step 1: Collect remarks from the assignment entries
     // that have assigned_group === 'APPLICANT'.
-    const applicantAssignments = ((obj.assignedGroup === 'APPLICANT' && obj.applicationassignment) || []).filter(
+    const applicantAssignments = ((obj.assigned_group === 'APPLICANT' && obj.applicationassignment) || []).filter(
         (assignment) =>
         assignment.assigned_group === 'APPLICANT' &&
         assignment.remarks &&

@@ -80,6 +80,7 @@ const _Notification = ({ className }: { className?: string }) => {
                 locationLabel: '',                 // not used
                 status: '',                        // not used
                 readed: false,                     // default as "unread"
+                link:`/spuid-signup/${String(item.applicant_id)}/`
               }))
             );
             setNoResult(false);
@@ -189,6 +190,16 @@ const apiGetApplicantAlerts = async () => {
                                     </div>
                                     <span className="text-xs">{item.date}</span>
                                 </div>
+                                <div className="ml-auto">
+                                    <a
+                                        href={item.link || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary underline"
+                                    >
+                                        View Details
+                                    </a>
+                                </div>
                                 <Badge
                                     className="absolute top-4 ltr:right-4 rtl:left-4 mt-1.5"
                                     innerClass={`${
@@ -204,7 +215,8 @@ const apiGetApplicantAlerts = async () => {
                                 ''
                             )}
                         </div>
-                    ))}
+                    ))
+                    }
                 {loading && (
                     <div
                         className={classNames(
