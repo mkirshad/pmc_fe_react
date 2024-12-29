@@ -175,6 +175,14 @@ const CustomerEdit = () => {
                     has_waste_storage_capacity: response.data.producer.has_waste_storage_capacity || '',
                     waste_disposal_provision: response.data.producer.waste_disposal_provision || '',
                     applicant: response.data.producer.applicant || '',
+                    totalFeeAmount: response.data.applicantfees
+                                    ? response.data.applicantfees.reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                                    : 0,
+                    verifiedFeeAmount: response.data.applicantfees
+                        ? response.data.applicantfees
+                            .filter((fee) => fee.is_settled)
+                            .reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                        : 0,
                 };
             
                 updateLicenseDetailProducer(dataProducer);
@@ -195,6 +203,14 @@ const CustomerEdit = () => {
                     segregated_plastics_handed_over_to_registered_recyclers:
                         response.data.consumer.segregated_plastics_handed_over_to_registered_recyclers || 'No',
                     applicant: response.data.consumer.applicant || '',
+                    totalFeeAmount: response.data.applicantfees
+                    ? response.data.applicantfees.reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                    : 0,
+                    verifiedFeeAmount: response.data.applicantfees
+                        ? response.data.applicantfees
+                            .filter((fee) => fee.is_settled)
+                            .reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                        : 0,
                 };
                 updateLicenseDetailConsumer(dataConsumer);
             }
@@ -209,6 +225,14 @@ const CustomerEdit = () => {
                     pollution_control_details: response.data.recycler.pollution_control_details || '',
                     applicant: response.data.recycler.applicant || '',
                     registration_required_for_other_other_text: (response.data.recycler.registration_required_for_other_other_text || ''),
+                    totalFeeAmount: response.data.applicantfees
+                    ? response.data.applicantfees.reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                    : 0,
+                    verifiedFeeAmount: response.data.applicantfees
+                        ? response.data.applicantfees
+                            .filter((fee) => fee.is_settled)
+                            .reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                        : 0,
                 };
                 updateLicenseDetailRecycler(dataRecycler);
             }
@@ -224,6 +248,14 @@ const CustomerEdit = () => {
                     number_of_vehicles: response.data.collector.number_of_vehicles || '',
                     number_of_persons: response.data.collector.number_of_persons || '',
                     applicant: response.data.collector.applicant || '',
+                    totalFeeAmount: response.data.applicantfees
+                    ? response.data.applicantfees.reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                    : 0,
+                    verifiedFeeAmount: response.data.applicantfees
+                        ? response.data.applicantfees
+                            .filter((fee) => fee.is_settled)
+                            .reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
+                        : 0,
                 };
                 updateLicenseDetailCollector(dataCollector);
             }

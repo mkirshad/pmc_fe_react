@@ -51,6 +51,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
   const [searchParams] = useSearchParams();
   const group = searchParams.get("group");
   const disabled = group !== "DO";
+  const disabled_lsm = group !== "LSM" && group !== "LSM2";
 
   useEffect(() => {
     setSelectedGroup(
@@ -118,6 +119,35 @@ const handleCommentChange = (key, comment) => {
       comment, // Update the comment for the specific field
     },
   }));
+};
+
+const handleDocumentFormSubmit = async (document, document_description) => {
+  const formData = new FormData();
+  // Append fields to FormData
+  formData.append('document', document);
+
+  formData.append('document_description',  document_description);
+  formData.append('applicant',  applicantDetail.id.toString());
+
+  try {
+      const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
+          headers: {
+              'Content-Type': 'multipart/form-data',
+          },
+      });
+          // Update the state using updateApplicantDetail
+    updateApplicantDetail({
+      applicationdocument: [
+        ...(applicantDetail.applicationdocument || []), // Ensure it remains an array
+        response.data, // Append the new response
+      ],
+    });
+    alert("Payment Verification Letter is uploaded")
+  } catch (error) {
+      console.error('Error in POST request:', error.response || error.message);
+      navigate('/error');
+  }
+
 };
 
 const handleChangeManualFields = (fieldName, value) => {
@@ -202,7 +232,9 @@ const handleChangeManualFields = (fieldName, value) => {
     has_adequate_pollution_control_systems: "Has adequate pollution control systems or equipment to meet the standards of emission or effluent?",
     pollution_control_details: "Polution control details",
     
-    licenseType:"License Type"
+    licenseType:"License Type",
+    totalFeeAmount: "Total Fee Amount",
+    verifiedFeeAmount: "Verified Fee Amount",
   };
 
   const renderSection = (title, data) => (
@@ -313,6 +345,7 @@ const handleChangeManualFields = (fieldName, value) => {
     marginBottom: "15px",
   };
   const renderManualFields = () => (
+    <>
     <Card sx={manualFieldStyles}>
       <CardContent>
         <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
@@ -762,6 +795,33 @@ const handleChangeManualFields = (fieldName, value) => {
         )}
       </CardContent>
     </Card>
+
+    <Card sx={manualFieldStyles}>
+<CardContent>
+  <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
+    Information to be provided by License Support Manager
+  </Typography>
+
+  {/* GLOBAL FIELDS */}
+  <div className="grid md:grid-cols-1 gap-4">
+      <FormItem
+                label="Fee Verification from Treasury/District Accounts Office"
+                invalid={Boolean(errors.consentPermitFile)}
+                errorMessage={errors.consentPermitFile?.message}
+              >
+                <Input
+                  type="file"
+                  accept=".pdf,.png,.jpg"
+                  onChange={(e) =>
+                    handleDocumentFormSubmit(e.target.files[0], "Fee Verification from Treasury/District Accounts Office")
+                  }
+                  disabled={disabled_lsm}
+                />
+      </FormItem>
+    </div>
+    </CardContent>
+    </Card>
+    </>
   );
   
   

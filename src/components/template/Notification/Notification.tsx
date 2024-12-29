@@ -193,7 +193,7 @@ const apiGetApplicantAlerts = async () => {
                                 <div className="ml-auto">
                                     <a
                                         href={item.link || '#'}
-                                        target="_blank"
+                                        // target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-primary underline"
                                     >

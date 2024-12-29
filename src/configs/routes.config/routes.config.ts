@@ -13,6 +13,12 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'homeSuper',
+        path: '/home-super',
+        component: lazy(() => import('@/views/HomeSuper')),
+        authority: [],
+    },
+    {
         key: 'error',
         path: '/error',
         component: lazy(() => import('@/views/ErrorPage')), // ErrorPage component
