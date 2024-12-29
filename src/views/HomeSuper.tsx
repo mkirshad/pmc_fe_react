@@ -74,6 +74,8 @@ const Home = () => {
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
+    const [selectedTile, setSelectedTile] = useState(null); // State for the selected tile
+
     console.log(selectedRowId)
     // APPLICANT > LSO > LSM > DO > LSM2 > TL > DEO > Download License
     const groups = [
@@ -126,8 +128,10 @@ const Home = () => {
     
     const handleTileClick = async (group) => {
         try {
+            setSelectedTile(group); // Update selected tile state
+
             // Fetch filtered data from the backend
-            const response = await AxiosBase.get('/pmc/applicant-detail/', {
+            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
                 params: {
                     assigned_group: group !== "All-Applications" && group !== "Challan-Downloaded" ? group : undefined,
                     application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
@@ -174,36 +178,46 @@ const Home = () => {
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data
         const firstRecord = flattenedData[0];
-        console.log(data)
+        console.log(data);
+    
         const columns = [
             ...Object.keys(firstRecord)
                 .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => ({
-                    accessorKey: key,
-                    header: key
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char) => char.toUpperCase()),
-                    size: 200,
-                    Cell: ({ cell, row }) => {
-                        const id = row.original.id;
-                        const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
-                        return (
-                            <a
-                                href={url} // Link to the desired URL
-                                target="_blank" // Open in a new tab on click
-                                rel="noopener noreferrer" // Security best practices for external links
-                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                            >
-                                {cell.getValue() || '-'}
-                            </a>
-                        );
-                    },
-                    
-                })),
+                .map((key) => {
+                    let customSize = 160; // Default column size
+                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
+                        customSize = 120; // Reduce size for these specific columns
+                    }else if (['first_name'].includes(key)) {
+                        customSize = 180; // Reduce size for these specific columns
+                    } 
+    
+                    return {
+                        accessorKey: key,
+                        header: key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (char) => char.toUpperCase()),
+                        size: customSize,
+                        Cell: ({ cell, row }) => {
+                            const id = row.original.id;
+                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                            return (
+                                <a
+                                    href={url} // Link to the desired URL
+                                    target="_blank" // Open in a new tab on click
+                                    rel="noopener noreferrer" // Security best practices for external links
+                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                >
+                                    {cell.getValue() || '-'}
+                                </a>
+                            );
+                        },
+                    };
+                }),
         ];
     
         return { flattenedData, columns };
     };
+    
     const navigate = useNavigate();
     useEffect(() => {
         
@@ -240,35 +254,6 @@ const Home = () => {
                 }
                 console.log('groupsResponse', groupsResponse)
     
-                const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-    
-                const dataApplicants = response.data;
-    
-                if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                    const extracted = extractColumns(dataApplicants, (groupsResponse.length>0), (groupsResponse.map(group => group.name))[0]);
-                    setFlattenedData(extracted.flattenedData);
-                    setColumns(extracted.columns);
-    
-                    // Debugging: Log the last row
-                    console.log('Flattened Data:', extracted.flattenedData);
-                    const lastRow = extracted.flattenedData[extracted.flattenedData.length - 1];
-                    console.log('Last Row:', lastRow);
-    
-                    if (lastRow && lastRow.id) {
-                        setSelectedRowId(lastRow.id); // Set last row ID as selected
-                        console.log('Last Row ID:', lastRow.id);
-    
-                        const groupIndex = groups.indexOf(lastRow.assigned_group);
-                        if (groupIndex !== -1) {
-                            setStep(groupIndex); // Set the step to match the last row's assigned group
-                        }
-                    }
-                }
-
                 // Fetch statistics for groups
                 const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
                     headers: {
@@ -309,7 +294,10 @@ console.log(selectedRowId)
             <div className="tiles-container">
                     {Object.entries(statistics).map(([group, count]) => (
                         <div key={group} className="tile"
-                        style={{ cursor: 'pointer' }} // Add cursor pointer for interactivity
+                        style={{ cursor: 'pointer', 
+                                 backgroundColor: selectedTile === group ? '#007BFF' : '#f8f9fa',
+                                 color: selectedTile === group ? '#fff' : '#000', 
+                                }} // Add cursor pointer for interactivity
                         onClick={() => handleTileClick(group)} // Call the handler with the group
                         >
                             <h3>{groupTitles[group] || group}</h3> {/* Use title or fallback to the group key */}
@@ -317,48 +305,13 @@ console.log(selectedRowId)
                         </div>
                     ))}
             </div>
-{/*             
-            <Steps current={step} className="mb-5">
-                {groups.map((group, index) => (
-                    <Steps.Item
-                        key={index}
-                        title={
-                            <div
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleStepClick(index)} // Handle step click
-                            >
-                                {groupTitles[group] || group} 
-                            </div>
-                        }
-                    />
-                ))}
-            </Steps> 
-*/}
+
             <div className='mb-4'>
                 <h3>{userGroups && userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
             </div>
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        // {
-                        //     accessorKey: 'selected',
-                        //     header: 'Select',
-                        //     size: 50,
-                        //     Cell: ({ row }) => (
-                        //         <input
-                        //             type="radio"
-                        //             name="rowSelect"
-                        //             onChange={() => {
-                        //                 setSelectedRowId(row.original.id);
-                        //                 const groupIndex = groups.indexOf(row.original.assigned_group);
-                        //                 if (groupIndex !== -1) {
-                        //                     setStep(groupIndex); // Update the Steps component
-                        //                 }
-                        //             }}
-                        //             checked={String(selectedRowId) === String(row.original.id)} // Ensure proper comparison
-                        //         />
-                        //     ),
-                        // },
                         ...columns,
                     ]}
                     data={flattenedData.map((row) => ({
@@ -370,9 +323,9 @@ console.log(selectedRowId)
                         showColumnFilters: false,
                     }}
                     defaultColumn={{
-                        maxSize: 420,
+                        maxSize: 200,
                         minSize: 1,
-                        size: 100, // default size is usually 180
+                        size: 50, // default size is usually 180
                     }}
                     enableColumnResizing
                     columnResizeMode="onChange" // default
