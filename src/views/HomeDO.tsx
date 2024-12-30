@@ -65,7 +65,7 @@ const sanitizeData = (data) => {
 const Home = () => {
     const [flattenedData, setFlattenedData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [userGroups, setUserGroups] = useState([]);
+    const [userGroups, setUserGroups] = useState(null);
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
@@ -269,12 +269,8 @@ const Home = () => {
 
     useEffect(() => {
         console.log('userGroups:', userGroups)
-        if(userGroups.includes('Super')){
-            navigate('/home-super');
-        }else if(userGroups.includes('Admin')){
-            navigate('/home-admin');
-        }else if(userGroups.includes('DO')){
-            navigate('/home-do');
+        if(userGroups && !userGroups.includes('DO')){
+            navigate('/home');
         }
     }, [userGroups, navigate]); // Run only once on component load
     
@@ -283,15 +279,15 @@ console.log(selectedRowId)
     return (
         <div>
                 {/* Display Tiles */}
-            <div className="tiles-container">
+            {/* <div className="tiles-container">
                     {Object.entries(statistics).map(([group, count]) => (
                         <div key={group} className="tile">
-                            <h3>{groupTitles[group] || group}</h3> {/* Use title or fallback to the group key */}
+                            <h3>{groupTitles[group] || group}</h3> 
                             <p>{count}</p>
                         </div>
                     ))}
-            </div>
-{/*             
+            </div> 
+             
             <Steps current={step} className="mb-5">
                 {groups.map((group, index) => (
                     <Steps.Item
@@ -309,7 +305,7 @@ console.log(selectedRowId)
             </Steps> 
 */}
             <div className='mb-4'>
-                <h3>{userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
+                <h3>{userGroups && userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
             </div>
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
@@ -350,7 +346,7 @@ console.log(selectedRowId)
                     }}
                     enableColumnResizing
                     columnResizeMode="onChange" // default
-                    enableTopToolbar={userGroups.length>0} // Disables the top-right controls entirely
+                    enableTopToolbar={true} // Disables the top-right controls entirely
                     // enableGlobalFilter={false} // Disables the global search/filter box
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting

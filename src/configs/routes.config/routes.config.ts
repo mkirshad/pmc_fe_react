@@ -25,6 +25,12 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'homeDO',
+        path: '/home-do',
+        component: lazy(() => import('@/views/HomeDO')),
+        authority: [],
+    },
+    {
         key: 'error',
         path: '/error',
         component: lazy(() => import('@/views/ErrorPage')), // ErrorPage component
