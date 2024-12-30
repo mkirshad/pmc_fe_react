@@ -1,8 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ErrorPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const errorDetails = location.state?.error; // Retrieve error details from location state
 
     const handleGoHome = () => {
         navigate('/home'); // Redirect to home or any other relevant page
@@ -18,28 +20,21 @@ const ErrorPage = () => {
                 <p style={styles.message}>
                     If the issue persists, our support team is here to help. You can reach out at:
                     <a href="mailto:fmd@epd.punjab.gov.pk" style={styles.email}>
-                    fmd@epd.punjab.gov.pk
+                        fmd@epd.punjab.gov.pk
                     </a>
                 </p>
+                {errorDetails && (
+                    <div style={styles.errorDetails}>
+                        <h3 style={styles.errorTitle}>Technical Details</h3>
+                        <pre style={styles.errorMessage}>{JSON.stringify(errorDetails, null, 2)}</pre>
+                    </div>
+                )}
                 <div style={styles.buttonContainer}>
                     <button style={styles.button} onClick={handleGoHome}>
                         Go to My Applications
                     </button>
-                    {/* <button
-                        style={{ ...styles.button, ...styles.secondaryButton }}
-                        onClick={() => window.location.reload()}
-                    >
-                        Refresh Page
-                    </button> */}
                 </div>
             </div>
-            {/* <div style={styles.imageContainer}>
-                <img
-                    src="/img/others/error.webp" // Replace with your error image URL
-                    alt="Error"
-                    style={styles.image}
-                />
-            </div> */}
         </div>
     );
 };
@@ -75,6 +70,26 @@ const styles = {
         textDecoration: 'none',
         marginLeft: '5px',
     },
+    errorDetails: {
+        marginTop: '20px',
+        textAlign: 'left',
+        backgroundColor: '#f8d7da',
+        padding: '10px',
+        borderRadius: '5px',
+        color: '#721c24',
+        border: '1px solid #f5c6cb',
+    },
+    errorTitle: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+    },
+    errorMessage: {
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word',
+        fontSize: '14px',
+        lineHeight: '1.4',
+    },
     buttonContainer: {
         marginTop: '20px',
     },
@@ -87,19 +102,6 @@ const styles = {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        margin: '0 10px',
-    },
-    secondaryButton: {
-        backgroundColor: '#6c757d',
-    },
-    imageContainer: {
-        marginLeft: '20px',
-    },
-    image: {
-        maxWidth: '100%',
-        height: 'auto',
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
 };
 

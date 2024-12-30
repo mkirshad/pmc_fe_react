@@ -113,7 +113,14 @@ const {
                     },
                 });
             } catch (error) {
-                navigate('/error');
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+
+                navigate('/error', { state: { error: errorDetails } });
             }
     }
     fetchData()
@@ -327,7 +334,14 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
-            navigate('/error');
+                // Extract serializable error details
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
         }
             onNext()
         }
@@ -383,7 +397,14 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
-            navigate('/error');
+                // Extract serializable error details
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
         }
     }
             onNext()
@@ -445,7 +466,14 @@ const {
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                 setIsSubmiting(false);
-                navigate('/error');
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+
+                navigate('/error', { state: { error: errorDetails } });
             }
         }
         else{
@@ -462,7 +490,14 @@ const {
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                 setIsSubmiting(false);
-                navigate('/error');
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+
+                navigate('/error', { state: { error: errorDetails } });
             }
         }
         setIsSubmiting(false)
@@ -778,7 +813,14 @@ const {
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
             setIsSubmiting(false);
-            navigate('/error');
+                // Extract serializable error details
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
         }
     };
     
@@ -804,7 +846,14 @@ const {
                 console.log('Post successful:', response.data);
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
-                navigate('/error');
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+
+                navigate('/error', { state: { error: errorDetails } });
             }
             // onNext();
         }
@@ -825,7 +874,14 @@ const {
                 console.log('Post successful:', response.data);
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
-                navigate('/error');
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+
+                navigate('/error', { state: { error: errorDetails } });
             }
             onNext();
         }
@@ -869,40 +925,40 @@ const {
         verifyChallanFormData.append('chalan_image', values.flow_diagram); // Assuming 'flow_diagram' is the challan image
         verifyChallanFormData.append('ApplicantId', applicantDetail.id.toString()); // Assuming 'flow_diagram' is the challan image
 
-        try {
-            const verifyResponse = await AxiosBase.post('/pmc/verify-chalan/', verifyChallanFormData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+        // try {
+        //     const verifyResponse = await AxiosBase.post('/pmc/verify-chalan/', verifyChallanFormData, {
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //         },
+        //     });
 
-            if (verifyResponse.data.status !== 'verified') {
-                console.error('Challan verification failed:', verifyResponse.data.message);
-                setThankYouPopupOpen(true); // Show popup for failure
-                setThankYouPopupMessage(
-                    verifyResponse.data.message || 'Challan verification failed. Please try again.'
-                );
-                setTankYouPopupType("danger")
+        //     if (verifyResponse.data.status !== 'verified') {
+        //         console.error('Challan verification failed:', verifyResponse.data.message);
+        //         setThankYouPopupOpen(true); // Show popup for failure
+        //         setThankYouPopupMessage(
+        //             verifyResponse.data.message || 'Challan verification failed. Please try again.'
+        //         );
+        //         setTankYouPopupType("danger")
                 
-                setIsSubmiting(false);
-                return; // Exit the function if verification fails
-            }
-        } catch (error) {
-            if (error.response && error.response.status === 400) {
-                console.error('Challan verification error:', error.response.data);
-                        // Show popup for error
-                setThankYouPopupOpen(true);
-                setThankYouPopupMessage(error.response.data.message || 'Invalid Challan. Please try again.');
-                setTankYouPopupType("danger")
-            } else {
-                console.error('Unexpected error during challan verification:', error);
-                setThankYouPopupOpen(true);
-                setThankYouPopupMessage('An unexpected error occurred during challan verification. Please try again.');
-                setTankYouPopupType("danger")
-            }
-            setIsSubmiting(false);
-            return; // Exit the function if verification fails
-        }
+        //         setIsSubmiting(false);
+        //         return; // Exit the function if verification fails
+        //     }
+        // } catch (error) {
+        //     if (error.response && error.response.status === 400) {
+        //         console.error('Challan verification error:', error.response.data);
+        //                 // Show popup for error
+        //         setThankYouPopupOpen(true);
+        //         setThankYouPopupMessage(error.response.data.message || 'Invalid Challan. Please try again.');
+        //         setTankYouPopupType("danger")
+        //     } else {
+        //         console.error('Unexpected error during challan verification:', error);
+        //         setThankYouPopupOpen(true);
+        //         setThankYouPopupMessage('An unexpected error occurred during challan verification. Please try again.');
+        //         setTankYouPopupType("danger")
+        //     }
+        //     setIsSubmiting(false);
+        //     return; // Exit the function if verification fails
+        // }
 
         const formData = new FormData();
 
@@ -921,7 +977,14 @@ const {
             console.log('Post successful:', response.data);
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
-            navigate('/error');
+                // Extract serializable error details
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
         }
 
 
@@ -937,7 +1000,14 @@ const {
             });
         } catch (error) {
             console.error('Error in POST request:', error.response || error.message);
-            navigate('/error');
+                // Extract serializable error details
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
         }
 
 
@@ -970,8 +1040,15 @@ const {
     
     } catch (error) {
         console.error('Error in POST request:', error.response || error.message);
-        navigate('/error');
-    }
+            // Extract serializable error details
+        const errorDetails = {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        };
+
+        navigate('/error', { state: { error: errorDetails } });
+        }
     }
 
 
