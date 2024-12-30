@@ -148,12 +148,33 @@ console.log('has_identity_document',applicantDetail.has_identity_document)
 
 
                 <FormItem
-                    label="CNIC / Utiility Bills / Passport / Driving License (Any document indicating name & address)*"
+                    label="CNIC (Front side + Back side) / Utiility Bills / Passport / Driving License (Any document indicating name & address)*"
                     invalid={Boolean(errors.flow_diagram)}
                     errorMessage={errors.flow_diagram?.message}
                 >
                     <Controller
                         name="flow_diagram"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                type="file"
+                                accept=".pdf,.png,.jpg,.jpeg" // Allow only specific file types
+                                disabled={readOnly} // Apply the read-only prop
+                                onChange={(e) => field.onChange(e.target.files[0] || null)} // Correctly set the file without using 'value'
+                            />
+                        )}
+                    />
+                </FormItem>
+                <div></div>
+                <label>If both front side and back side of CNIC are not uploaded, then please upload Back Side of CNIC as well</label>
+                <div></div>
+                <FormItem
+                    label="CNIC (Back side)"
+                    invalid={Boolean(errors.flow_diagram)}
+                    errorMessage={errors.flow_diagram?.message}
+                >
+                    <Controller
+                        name="flow_diagram2"
                         control={control}
                         render={({ field }) => (
                             <Input

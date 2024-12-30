@@ -63,13 +63,9 @@ const flattenObject = (obj) => {
         group_assignment_days: groupAssignmentDays, // Include the calculated days difference
         total_fee_amount: formatCurrency(totalFeeAmount.toFixed(2)), // Include total fee amount
         verified_fee_amount: formatCurrency(verifiedFeeAmount.toFixed(2)), // Include verified fee amount
+        created_by_username: obj.created_by_username,
     };
 };
-
-
-
-
-  
 
 const sanitizeData = (data) => {
     return data.map((record) => {
@@ -82,8 +78,6 @@ const sanitizeData = (data) => {
         return flattened;
     });
 };
-
-
 
 const Home = () => {
     const [flattenedData, setFlattenedData] = useState([]);
@@ -213,6 +207,7 @@ const Home = () => {
             'group_assignment_days', // Ensure this is included
             'total_fee_amount',
             'verified_fee_amount',
+            'created_by_username'
         ];
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data
@@ -255,17 +250,10 @@ const Home = () => {
     
         return { flattenedData, columns };
     };
-    
-    
+
     const navigate = useNavigate();
     useEffect(() => {
-        
-
- 
-
-                       
         const fetchData = async () => {
-
             try {
                 const response = await AxiosBase.get(`/pmc/ping/`, {
                     headers: {
@@ -318,7 +306,7 @@ const Home = () => {
     
         useEffect(() => {
             console.log('userGroups:', userGroups)
-            if(userGroups && !userGroups.includes('Super'))
+            if(userGroups && !userGroups.includes('Admin'))
             {
                 navigate('/home');
             }

@@ -271,6 +271,8 @@ const Home = () => {
         console.log('userGroups:', userGroups)
         if(userGroups.includes('Super')){
             navigate('/home-super');
+        }else if(userGroups.includes('Admin')){
+            navigate('/home-admin');
         }
     }, [userGroups, navigate]); // Run only once on component load
     

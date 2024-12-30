@@ -787,6 +787,28 @@ const {
         console.log('Submitted values LicenseDetail:', values);
         const formData = new FormData();
         // Append fields to FormData
+        
+        if (values.flow_diagram2) {
+            formData.append('document', values.flow_diagram2);
+        
+            formData.append('document_description',  'Identity Document - 2');
+            formData.append('applicant',  applicantDetail.id.toString());
+
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                navigate('/error');
+            }
+            // onNext();
+        }
+        
         if (values.flow_diagram) {
             formData.append('document', values.flow_diagram);
         
@@ -806,7 +828,9 @@ const {
                 navigate('/error');
             }
             onNext();
-        } else if(applicantDetail.has_identity_document){
+        }
+        
+        else if(applicantDetail.has_identity_document){
             onNext();
         }
     };
