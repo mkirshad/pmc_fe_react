@@ -486,6 +486,7 @@ const {
 
                 console.log('Post successful:', response.data);
 
+                updateBusinessDetailIndividual(({...values, 'id':response.data.id}) as BusinessDetailIndividualFields);
                 setIsSubmiting(false);
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);

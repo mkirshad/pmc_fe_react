@@ -116,7 +116,7 @@ console.log(districts)
                                             type="radio"
                                             value={option.value}
                                             checked={field.value === option.value  }
-                                            disabled={readOnly}
+                                            disabled={readOnlyDistrict}
                                             onChange={() => {
                                                 field.onChange(option.value); // Update form state
                                                 updateBusinessEntity({ businessEntityType: option.value }); // Update Zustand state

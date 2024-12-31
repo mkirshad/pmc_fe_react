@@ -53,7 +53,19 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   no_of_waste_disposible_bins : z
       .coerce.number()
       .optional(),
-  });
+  }).refine((data) => {
+    // If there's NO existingFileId, then a new file is mandatory
+    console.log(data.registration_required_for)
+    if (data.registration_required_for?.length ===0 && data.registration_required_for_other?.length===0) {
+        return false; // fails validation
+    }
+    return true; // passes
+}, {
+    message: "You must provide either Categories of Single Use Plastics or Categories for Other Plastics.",
+    // Attach the error to one field so it shows up where you want.
+    // Often we attach it to flow_diagram or the form as a whole.
+    path: ["registration_required_for"], 
+});
   
 
   // Collector License Detail Fields
@@ -95,7 +107,19 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .positive({ message: "Number of persons must be a positive number" })
       .optional(),
     registration_required_for_other_other_text: z.string().optional()
-  });
+  }).refine((data) => {
+    // If there's NO existingFileId, then a new file is mandatory
+    console.log(data.registration_required_for)
+    if (data.registration_required_for?.length ===0 && data.registration_required_for_other?.length===0) {
+        return false; // fails validation
+    }
+    return true; // passes
+}, {
+    message: "You must provide either Categories of Single Use Plastics or Categories for Other Plastics.",
+    // Attach the error to one field so it shows up where you want.
+    // Often we attach it to flow_diagram or the form as a whole.
+    path: ["registration_required_for"], 
+});
   
   const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for: z
@@ -159,7 +183,19 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     products_list: z.array(z.string()).optional(),
     by_products_list: z.array(z.string()).optional(),
     registration_required_for_other_other_text: z.string().optional()
-  });
+  }).refine((data) => {
+    // If there's NO existingFileId, then a new file is mandatory
+    console.log(data.registration_required_for)
+    if (data.registration_required_for?.length ===0 && data.registration_required_for_other?.length===0) {
+        return false; // fails validation
+    }
+    return true; // passes
+}, {
+    message: "You must provide either Categories of Single Use Plastics or Categories for Other Plastics.",
+    // Attach the error to one field so it shows up where you want.
+    // Often we attach it to flow_diagram or the form as a whole.
+    path: ["registration_required_for"], 
+});
   
   
   // Recycler License Detail Fields
