@@ -36,7 +36,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   const validationLicenseDetailFieldsConsumerSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for: z
         .array(z.string())
-        .min(1, { message: 'At least one registration type is required.' }),
+        .optional(),
     registration_required_for_other: z.array(z.string()).optional(),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
     PackagingItems: z.array(z.string()).optional(),
@@ -54,7 +54,6 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
       .coerce.number()
       .optional(),
   });
-
   
 
   // Collector License Detail Fields
@@ -64,7 +63,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     // Validation for registration_required_for
     registration_required_for: z
       .array(z.string())
-      .min(1, { message: "At least one category of Single Use Plastics must be selected" }),
+      .optional(),
   
     // Validation for registration_required_for_other
     registration_required_for_other: z.array(z.string()).optional(),
@@ -101,7 +100,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
   const validationLicenseDetailFieldsProducerSchema: ZodType<LicenseDetailFormSchema> = z.object({
     registration_required_for: z
       .array(z.string())
-      .min(1, { message: 'At least one registration type is required.' }),
+      .optional(),
       registration_required_for_other: z
       .array(z.string()).optional(),
     plain_plastic_Sheets_for_food_wrapping: z.array(z.string()).optional(),
