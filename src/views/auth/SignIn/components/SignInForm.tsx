@@ -67,7 +67,7 @@ const SignInForm = (props: SignInFormProps) => {
                 if (result.message.includes('400')){
                     setMessage?.('Invalid Credentials!')
                 }else{
-                    setMessage?.('Technical Error! please try again after sometime or email at fmd@epd.punjab.gov.pk')
+                    setMessage?.('Technical Error! please try again after sometime or email at fdm@epd.punjab.gov.pk')
                 }
                 
                 // setMessage?.(result.message)

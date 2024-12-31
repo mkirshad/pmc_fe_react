@@ -77,7 +77,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                     if (result.message.includes('400')){
                         throw new Error('Username Already Exist')
                     }else{
-                        throw new Error('Technical Error! please try again after sometime or email at fmd@epd.punjab.gov.pk')
+                        throw new Error('Technical Error! please try again after sometime or email at fdm@epd.punjab.gov.pk')
                     }
                     // throw new Error(result.message);
                 } else {

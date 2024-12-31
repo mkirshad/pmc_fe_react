@@ -19,8 +19,8 @@ const ErrorPage = () => {
                 </p>
                 <p style={styles.message}>
                     If the issue persists, our support team is here to help. You can reach out at:
-                    <a href="mailto:fmd@epd.punjab.gov.pk" style={styles.email}>
-                        fmd@epd.punjab.gov.pk
+                    <a href="mailto:fdm@epd.punjab.gov.pk" style={styles.email}>
+                        fdm@epd.punjab.gov.pk
                     </a>
                 </p>
                 {errorDetails && (

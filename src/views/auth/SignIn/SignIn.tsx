@@ -49,7 +49,7 @@ export const SignInBase = ({
                         >
                             Forgot password
                         </ActionLink> */}
-                     <span>In case you have forgot username or password, please email at <b>fmd@epd.punjab.gov.pk</b></span>
+                     <span>In case you have forgot username or password, please email at <b>fdm@epd.punjab.gov.pk</b></span>
                     </div>
                 }
             />
