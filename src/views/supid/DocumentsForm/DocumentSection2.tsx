@@ -55,7 +55,8 @@ const mobileOperators = [
     { value: 'Warid', label: 'Warid' },
 ];
 
-const LicenseDetailProducerSection = ({ control, errors, readOnly = false }: BusinessDetailSectionProps) => {
+const LicenseDetailProducerSection = ({ control, errors, register, readOnly = false }: BusinessDetailSectionProps) => {
+
     const [entityType, setEntityType] = useState('');
 
     const [checkboxList, setCheckboxList] = useState<(string)[]>([
@@ -261,6 +262,11 @@ const downloadFileReceipt = async () =>
 
                 <div className="grid md:grid-cols-2 gap-2">
                 <div>
+                <input
+                    type="hidden"
+                    {...register("existingFileId")}
+                    value={String(applicantDetail.has_fee_challan ?? "")}
+                />
                 <FormItem
                     label="Upload Paid Fee Challan Image and Submit Application*"
                     invalid={Boolean(errors.flow_diagram)}

@@ -19,20 +19,33 @@ type CustomerFormProps = {
     readOnly?: boolean; // Add this prop
 } & CommonProps
 
+
 const validationSchema: ZodType<LicenseDetailFormSchema> = 
  z.object({
+  existingFileId: z.string().optional(),
   flow_diagram: z
-      .instanceof(File, { message: 'Document is required.' }) // Ensure the value is a File instance
+      .instanceof(File, { message: 'Document is required.' }).optional() // Ensure the value is a File instance
       .refine(
-          (file) => file.size <= 10 * 1024 * 1024, // Check file size
+          (file) => !file || file.size <= 10 * 1024 * 1024, // Check file size
           { message: 'File must be smaller than 10 MB.' }
       )
        // Make the field mandatory
-      .refine(
-          (file) => !!file, // Ensure the file is provided
-          { message: 'File is required.' }
-      ),
-});
+      
+}).refine(
+  (data) => {
+    console.log(data.existingFileId)
+    // If there's no existing file ID, then flow_diagram is required
+    if (!data.existingFileId && !data.flow_diagram) {
+        return false;
+    }
+    return true;
+},
+{
+    message: "A new file or an existing file is required.",
+    // You can attach the error to either field. Here we attach it to "flow_diagram."
+    path: ["flow_diagram"],
+}
+);
 
 // Base License Detail Fields
  const validationLicenseDetailFieldsSchema: ZodType<LicenseDetailFormSchema> = z.object({
@@ -172,6 +185,7 @@ const {
         handleSubmit,
         reset,
         formState: { errors },
+        register,
         control
     } = useForm<LicenseDetailFormSchema>({
         defaultValues: {
@@ -206,7 +220,7 @@ const {
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <LicenseDetailSection control={control} errors={errors} readOnly={readOnly}/>
+                        <LicenseDetailSection control={control} errors={errors} register={register} readOnly={readOnly}/>
                     </div>
                 </div>
             </Container>
