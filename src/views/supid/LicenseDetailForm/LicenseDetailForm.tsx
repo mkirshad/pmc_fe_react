@@ -98,7 +98,6 @@ const validationSchema: ZodType<LicenseDetailFormSchema> = z.object({
     // Validation for number of vehicles
     number_of_vehicles: z
       .coerce.number()
-      .positive({ message: "Number of vehicles must be a positive number" })
       .optional(),
   
     // Validation for number of persons

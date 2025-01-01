@@ -153,7 +153,7 @@ const CustomerEdit = () => {
                     };
                     updateBusinessDetailIndividual(dataBusinessProfile);
                 }
-                    updateBusinessEntity({businessEntityType: 'Individual'//response.data.businessprofile.entity_type
+                    updateBusinessEntity({businessEntityType: response.data.businessprofile.entity_type//response.data.businessprofile.entity_type
 
                     });
             }
