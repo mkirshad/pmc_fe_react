@@ -213,18 +213,32 @@ const handlePSIDGeneration = async () => {
     try {
       const response = await AxiosBase.get(
         `/pmc/generate-psid?applicant_id=${applicantDetail.id}`,
-        { responseType: "text" } // or just omit if default is fine
+        { responseType: "text" }
       );
+  
+      // Handle successful response
       const htmlContent = response.data;
       const newWin = window.open("", "_blank");
       newWin.document.write(htmlContent);
       newWin.document.close();
     } catch (error) {
       console.error(error);
+  
+      // Handle error response (if the server sends an HTML error response)
+      if (error.response && error.response.data) {
+        const errorContent = error.response.data;
+        const errorWin = window.open("", "_blank");
+        errorWin.document.write(errorContent);
+        errorWin.document.close();
+      } else {
+        // If the error does not include a response or response data
+        alert("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsSubmiting(false);
     }
   };
+  
 
     return (
         <>
