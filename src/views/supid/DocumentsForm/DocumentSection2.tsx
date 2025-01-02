@@ -14,6 +14,8 @@ import Group from '@/components/ui/Checkbox/Group';
 import AxiosBase from '../../../services/axios/AxiosBase';
 import { ApplicantDetailForm } from '../ApplicantDetailForm';
 import useFormStore from '../../../store/supid/supidStore'
+import Button from '@/components/ui/Button'
+import { BiArrowBack, BiArrowToRight, BiSave, BiStreetView, BiIdCard } from 'react-icons/bi'
 
 type BusinessDetailSectionProps = FormSectionBaseProps & {
     readOnly?: boolean; // Add this prop
@@ -94,7 +96,7 @@ const LicenseDetailProducerSection = ({ control, errors, register, readOnly = fa
   
   const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
-
+  const [isSubmiting, setIsSubmiting] = useState(false)
   const handleChangeSP = (event, newValue) => {
     setSelectedOptions(newValue);
 
@@ -206,6 +208,16 @@ const downloadFileReceipt = async () =>
     document.body.removeChild(link);
 }
 
+const handlePSIDGeneration = async () => {
+    setIsSubmiting(true);
+    const response = await AxiosBase.get(`/pmc/generate-psid/?applicant_id=${applicantDetail.id}`, {
+        responseType: 'blob', // Important to get the data as a Blob
+    });
+    const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+    window.open(urlBlob, "_blank");
+    setIsSubmiting(false);
+}
+
     return (
         <>
         <Card>
@@ -230,6 +242,7 @@ const downloadFileReceipt = async () =>
                     
                     className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     onClick={()=>{downloadFile()}}
+                
                 >
                     Download Fee Challan
                 </a>
@@ -254,8 +267,7 @@ const downloadFileReceipt = async () =>
 
                 <img 
                     src="/img/others/warning-urdu3.png" 
-                    alt="Warning Icon" 
-                    
+                    alt="Warning Icon"
                     />
                 </div>
                 {/* </div> */}
@@ -279,7 +291,7 @@ const downloadFileReceipt = async () =>
                             <Input
                                 type="file"
                                 accept="image/*" // Restrict file picker to image types only
-                                disabled={readOnly} // Apply the read-only prop
+                                disabled={readOnly || !applicantDetail.has_fee_challan} // Apply the read-only prop
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
@@ -305,7 +317,15 @@ const downloadFileReceipt = async () =>
                     {applicantDetail.has_fee_challan && <label>Paid Fee Challan Document is already Uploaded!</label>}
             </div>
            
-
+            <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    onClick={handlePSIDGeneration}
+                                >
+            </Button>
                 <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {/* Business Name and Registration Type */}
 
