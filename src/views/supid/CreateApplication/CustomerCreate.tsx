@@ -258,7 +258,7 @@ const {
                     pollution_control_details: response.data.recycler.pollution_control_details || '',
                     applicant: response.data.recycler.applicant || '',
                     registration_required_for_other_other_text: (response.data.recycler.registration_required_for_other_other_text || ''),
-                    id: response.data.consumer.id || null
+                    id: response.data.recycler.id || null
                 };
                 updateLicenseDetailRecycler(dataRecycler);
             }
@@ -960,34 +960,31 @@ const {
         //     setIsSubmiting(false);
         //     return; // Exit the function if verification fails
         // }
-
-        const formData = new FormData();
-
-        // Append fields to FormData
-        formData.append('document', values.flow_diagram);
-    
-        formData.append('document_description',  'Fee Challan');
-        formData.append('applicant',  applicantDetail.id.toString());
-
-        try {
-            const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log('Post successful:', response.data);
-        } catch (error) {
-            console.error('Error in POST request:', error.response || error.message);
-                // Extract serializable error details
-            const errorDetails = {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message,
-            };
-
-            navigate('/error', { state: { error: errorDetails } });
+        if(values.flow_diagram)
+        {
+            const formData = new FormData();
+            // Append fields to FormData
+            formData.append('document', values.flow_diagram);
+            formData.append('document_description',  'Fee Challan');
+            formData.append('applicant',  applicantDetail.id.toString());
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+                navigate('/error', { state: { error: errorDetails } });
+            }
         }
-
 
         
         const formData2 = new FormData();

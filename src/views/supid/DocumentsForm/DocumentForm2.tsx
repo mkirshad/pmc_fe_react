@@ -35,7 +35,7 @@ const validationSchema: ZodType<LicenseDetailFormSchema> =
   (data) => {
     console.log(data.existingFileId)
     // If there's no existing file ID, then flow_diagram is required
-    if (!data.existingFileId && !data.flow_diagram) {
+    if ((data.existingFileId === 'false' || data.existingFileId === '') && !data.flow_diagram) {
         return false;
     }
     return true;
