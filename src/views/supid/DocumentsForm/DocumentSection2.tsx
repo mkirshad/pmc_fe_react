@@ -210,13 +210,21 @@ const downloadFileReceipt = async () =>
 
 const handlePSIDGeneration = async () => {
     setIsSubmiting(true);
-    const response = await AxiosBase.get(`/pmc/generate-psid/?applicant_id=${applicantDetail.id}`, {
-        responseType: 'blob', // Important to get the data as a Blob
-    });
-    const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
-    window.open(urlBlob, "_blank");
-    setIsSubmiting(false);
-}
+    try {
+      const response = await AxiosBase.get(
+        `/pmc/generate-psid?applicant_id=${applicantDetail.id}`,
+        { responseType: "text" } // or just omit if default is fine
+      );
+      const htmlContent = response.data;
+      const newWin = window.open("", "_blank");
+      newWin.document.write(htmlContent);
+      newWin.document.close();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmiting(false);
+    }
+  };
 
     return (
         <>
@@ -237,15 +245,18 @@ const handlePSIDGeneration = async () => {
 
 
                 <div>
-                <a
-                href='#'
-                    
-                    className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    onClick={()=>{downloadFile()}}
-                
-                >
+                <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    disabled={true}
+                                    onClick={downloadFile}
+                                >
+            
                     Download Fee Challan
-                </a>
+                </Button>
                 </div>
                 <div>
                 </div>
@@ -325,6 +336,7 @@ const handlePSIDGeneration = async () => {
                                     loading={isSubmiting}
                                     onClick={handlePSIDGeneration}
                                 >
+            Generate Gop PSID
             </Button>
                 <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {/* Business Name and Registration Type */}
