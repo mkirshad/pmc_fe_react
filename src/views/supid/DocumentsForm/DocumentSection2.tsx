@@ -371,14 +371,11 @@ const handlePSIDGeneration = async () => {
                 </div>
             </div>
             
-            <div>
+            {/* <div>
                     {applicantDetail.has_fee_challan && <label>Paid Fee Challan Document is already Uploaded!</label>}
-            </div>
+            </div> */}
             
-                <div className="grid md:grid-cols-2 mb-1 gap-4">
-                    {/* Business Name and Registration Type */}
-
-
+                {/* <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {applicantDetail.has_fee_challan && <div>
                         <a
                         href='#'
@@ -389,7 +386,7 @@ const handlePSIDGeneration = async () => {
                         </a>
                     </div>
                     }
-            </div>
+                </div> */}
         </Card>
 
         <Card>
@@ -413,17 +410,34 @@ const handlePSIDGeneration = async () => {
                         Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>.
                     </p>
                 </div>
+                <div className="grid md:grid-cols-3 mb-1 gap-4">
+            <div>
+                <Button
+                                        icon={<BiIdCard />}
+                                        className="ltr:mr-3 rtl:ml-3 mb-4"
+                                        variant="solid"
+                                        type="button"
+                                        loading={isSubmiting}
+                                        onClick={handlePSIDGeneration}
+                                    >
+                Generate GoP PSID
+                </Button>
+            </div>
 
-            <Button
-                                    icon={<BiIdCard />}
-                                    className="ltr:mr-3 rtl:ml-3"
-                                    variant="solid"
-                                    type="button"
-                                    loading={isSubmiting}
-                                    onClick={handlePSIDGeneration}
-                                >
-            Generate GoP PSID
-            </Button>
+                    {applicantDetail.has_fee_challan && <div>
+                        <Button
+                            icon={<BiSave />}
+                            className="ltr:mr-3 rtl:ml-3 mb-4"
+                            variant="solid"
+                            type="button"
+                            loading={isSubmiting}
+                            onClick={downloadFileReceipt}
+                        >
+                            Download Receipt
+                            </Button>
+                    </div>
+                    }
+                </div>
         </Card>
 
 
