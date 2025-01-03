@@ -221,6 +221,39 @@ const handlePSIDGeneration = async () => {
       const newWin = window.open("", "_blank");
       newWin.document.write(htmlContent);
       newWin.document.close();
+      updateApplicantDetail({"applicationStatus": 'Fee Challan'})
+    } catch (error) {
+      console.error(error);
+  
+      // Handle error response (if the server sends an HTML error response)
+      if (error.response && error.response.data) {
+        const errorContent = error.response.data;
+        const errorWin = window.open("", "_blank");
+        errorWin.document.write(errorContent);
+        errorWin.document.close();
+      } else {
+        // If the error does not include a response or response data
+        alert("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmiting(false);
+    }
+  };
+  
+  const handlePSIDCheckStatus = async () => {
+    setIsSubmiting(true);
+    try {
+      const response = await AxiosBase.get(
+        `/pmc/check-psid-status?applicant_id=${applicantDetail.id}`,
+        { responseType: "text" }
+      );
+  
+      // Handle successful response
+      const htmlContent = response.data;
+      const newWin = window.open("", "_blank");
+      newWin.document.write(htmlContent);
+      newWin.document.close();
+    //   updateApplicantDetail({"applicationStatus": 'Fee Challan'})
     } catch (error) {
       console.error(error);
   
@@ -242,7 +275,7 @@ const handlePSIDGeneration = async () => {
 
     return (
         <>
-        <Card>
+        <Card hidden={true}>
             <h4 className="mb-4">Payment</h4>
             <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
@@ -341,17 +374,7 @@ const handlePSIDGeneration = async () => {
             <div>
                     {applicantDetail.has_fee_challan && <label>Paid Fee Challan Document is already Uploaded!</label>}
             </div>
-           
-            <Button
-                                    icon={<BiIdCard />}
-                                    className="ltr:mr-3 rtl:ml-3"
-                                    variant="solid"
-                                    type="button"
-                                    loading={isSubmiting}
-                                    onClick={handlePSIDGeneration}
-                                >
-            Generate Gop PSID
-            </Button>
+            
                 <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {/* Business Name and Registration Type */}
 
@@ -365,11 +388,59 @@ const handlePSIDGeneration = async () => {
                             Download Receipt
                         </a>
                     </div>
-                    
-            
                     }
-
             </div>
+        </Card>
+
+        <Card>
+            <h4 className="mb-4">Payment</h4>
+            <div className="border border-gray-300 bg-gray-50 p-4 rounded-lg shadow-md mb-4">
+                    <h3 className="text-lg font-semibold text-blue-700">Important Note:</h3>
+                    <p className="mt-2 text-gray-700">
+                        Click the <strong className="text-blue-600">Generate GoP PSID</strong> button to obtain the PSID. After getting the PSID, follow these steps:
+                    </p>
+                    <ol className="list-decimal list-inside mt-3 text-gray-600">
+                        <li>Open your mobile banking app or mobile payment app.</li>
+                        <li>Click on <strong className="text-blue-600">Bill Payment</strong>, then select <strong className="text-blue-600">GoP</strong>.</li>
+                        <li>Enter the generated <strong className="text-blue-600">Consumer Number / PSID</strong> by this portal.</li>
+                        <li>Review your details carefully, save the payment, and click <strong className="text-blue-600">Payment</strong>.</li>
+                    </ol>
+                    <p className="mt-3 text-gray-700">
+                        After completing the payment, the payment status will be <strong className="text-blue-600">automatically updated</strong> in this portal. 
+                        If the status is not updated, you can click the <strong className="text-blue-600">Check PSID Payment Status</strong> button to manually verify.
+                    </p>
+                    <p className="mt-3 text-gray-700">
+                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>.
+                    </p>
+                </div>
+
+            <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    onClick={handlePSIDGeneration}
+                                >
+            Generate GoP PSID
+            </Button>
+        </Card>
+
+
+        <Card>
+            <h4 className="mb-4">Submission of Application</h4>
+            
+
+            <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    onClick={handlePSIDCheckStatus}
+                                >
+            Check GoP PSID Payment Status
+            </Button>
         </Card>
 
     </>
