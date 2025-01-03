@@ -36,7 +36,7 @@ const flattenObject = (obj) => {
       tracking_number: obj.tracking_number,
       first_name: obj.first_name,
       last_name: obj.last_name,
-      cnic: obj.cnic,
+      CNIC: obj.cnic,
       mobile_no: obj.mobile_no,
       application_status: obj.application_status,
       assigned_group: obj.assigned_group,
@@ -133,13 +133,11 @@ const Home = () => {
         const allowedColumns = [
             'first_name',
             'last_name',
-            'cnic',
+            'CNIC',
             'mobile_no',
-            'application_status',
             'tracking_number',
             'assigned_group',
             'registration_for',
-            'application_Start_Time',
             'application_Submission_Time',
             'remarks',
         ]; // List of allowed columns
@@ -150,31 +148,36 @@ const Home = () => {
         const columns = [
             ...Object.keys(firstRecord)
                 .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => ({
-                    accessorKey: key,
-                    header: key
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char) => char.toUpperCase()),
-                    size: 200,
-                    Cell: ({ cell, row }) => {
-                        return (
-                            <span
-                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                                onClick={() => {
-                                    const id = row.original.id;
-                                    console.log(`Clicked ${key}:`, cell.getValue());
-                                    console.log(`Navigating with ID: ${id}`);
-                                    // Perform navigation or other action
-                                    window.location.href = hasUserGroup
-                                        ? `/spuid-review/${id}?group=${group}`
-                                        : `/spuid-signup/${id}`;
-                                }}
-                            >
-                                {cell.getValue() || '-'}
-                            </span>
-                        );
-                    },
-                })),
+                .map((key) => {
+                    let customSize = 160; // Default column size
+                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
+                        customSize = 120; // Reduce size for these specific columns
+                    } else if (['first_name'].includes(key)) {
+                        customSize = 180; // Reduce size for these specific columns
+                    }
+    
+                    return {
+                        accessorKey: key,
+                        header: key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (char) => char.toUpperCase()),
+                        size: customSize,
+                        Cell: ({ cell, row }) => {
+                            const id = row.original.id;
+                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                            return (
+                                <a
+                                    href={url} // Link to the desired URL
+                                    target="_blank" // Open in a new tab on click
+                                    rel="noopener noreferrer" // Security best practices for external links
+                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                >
+                                    {cell.getValue() || '-'}
+                                </a>
+                            );
+                        },
+                    };
+                }),
         ];
     
         return { flattenedData, columns };
@@ -335,6 +338,7 @@ console.log(selectedRowId)
                         // },
                         ...columns,
                     ]}
+                    
                     data={flattenedData.map((row) => ({
                         ...row,
                         assigned_group_title: groupTitles[row.assigned_group] || row.assigned_group, // Add a title for the assigned group
@@ -348,8 +352,8 @@ console.log(selectedRowId)
                         minSize: 1,
                         size: 100, // default size is usually 180
                     }}
-                    enableColumnResizing
-                    columnResizeMode="onChange" // default
+                    enableColumnResizing={true}
+                    // columnResizeMode="onChange" // default
                     enableTopToolbar={userGroups.length>0} // Disables the top-right controls entirely
                     // enableGlobalFilter={false} // Disables the global search/filter box
                     enablePagination={true} // Optionally disable pagination controls

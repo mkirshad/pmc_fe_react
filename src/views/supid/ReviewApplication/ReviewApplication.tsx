@@ -839,7 +839,8 @@ const handleChangeManualFields = (fieldName, value) => {
         !disabled && <Card className="mb-4" >
           <CardContent>
           <Typography variant="h7" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
-          If the provided information is correct, please click "Yes". If it is incorrect, then please click "No" and add comments
+          Please review the information provided by the applicant. This information is not editable and it is for your review only. Please click "Yes" if information is found correct and "No" if information is not correct. In case of "No" pleae add your comments too.
+ 
         </Typography>
         </CardContent>
         </Card>
@@ -848,7 +849,7 @@ const handleChangeManualFields = (fieldName, value) => {
         disabled && <Card className="mb-4" >
           <CardContent>
           <Typography variant="h7" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
-          Please review the information provided by the District Incharge. This information is not editable and for your review only.
+          Please review the information provided by the applicant and District Incharge.
         </Typography>
         </CardContent>
         </Card>

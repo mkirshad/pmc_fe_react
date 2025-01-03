@@ -29,21 +29,40 @@ const flattenObject = (obj) => {
     // Step 2: Combine them or use 'N/A' if none
     const combinedRemarks =
         applicantRemarks.length > 0 ? applicantRemarks.join('; ') : 'N/A';
-  
+
+          // Step 1: Extract the latest time for the matching assigned_group in applicationassignment
+    const groupAssignments = obj.applicationassignment.filter(
+        (assignment) => assignment.assigned_group === obj.assigned_group
+    );
+
+    // Find the latest time for the matching group
+    const latestGroupAssignment = groupAssignments.reduce((latest, current) => {
+        const currentTime = new Date(current.updated_at).getTime();
+        return currentTime > new Date(latest.updated_at).getTime() ? current : latest;
+    }, groupAssignments[0]);
+
+
+    // Calculate group assignment days
+    let groupAssignmentDays = 'N/A';
+    if (latestGroupAssignment && latestGroupAssignment.updated_at) {
+        const assignmentDate = new Date(latestGroupAssignment.updated_at);
+        const currentDate = new Date();
+        const differenceInTime = currentDate - assignmentDate;
+        groupAssignmentDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+    }
+
     // 3) Return your flattened fields + the combined remarks
     return {
       id: obj.id,
       tracking_number: obj.tracking_number,
       first_name: obj.first_name,
       last_name: obj.last_name,
-      cnic: obj.cnic,
+      CNIC: obj.cnic,
       mobile_no: obj.mobile_no,
       application_status: obj.application_status,
       assigned_group: obj.assigned_group,
       registration_for: obj.registration_for,
-      application_Start_Time: obj.created_at?.substring(0, 16) || 'N/A',
-      application_Submission_Time:
-        obj.submittedapplication?.created_at?.substring(0, 16) || 'N/A',
+      days_pending_for: groupAssignmentDays,
       // The new "remarks" field we’ll show in the grid:
       remarks: combinedRemarks,
     };
@@ -132,15 +151,11 @@ const Home = () => {
     const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
             'first_name',
-            'last_name',
-            'cnic',
+            'CNIC',
             'mobile_no',
-            'application_status',
             'tracking_number',
-            'assigned_group',
             'registration_for',
-            'application_Start_Time',
-            'application_Submission_Time',
+            'days_pending_for',
             'remarks',
         ]; // List of allowed columns
     
@@ -150,44 +165,45 @@ const Home = () => {
         const columns = [
             ...Object.keys(firstRecord)
                 .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => ({
-                    accessorKey: key,
-                    header: key
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char) => char.toUpperCase()),
-                    size: 200,
-                    Cell: ({ cell, row }) => {
-                        return (
-                            <span
-                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                                onClick={() => {
-                                    const id = row.original.id;
-                                    console.log(`Clicked ${key}:`, cell.getValue());
-                                    console.log(`Navigating with ID: ${id}`);
-                                    // Perform navigation or other action
-                                    window.location.href = hasUserGroup
-                                        ? `/spuid-review/${id}?group=${group}`
-                                        : `/spuid-signup/${id}`;
-                                }}
-                            >
-                                {cell.getValue() || '-'}
-                            </span>
-                        );
-                    },
-                })),
+                .map((key) => {
+                    let customSize = 160; // Default column size
+                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
+                        customSize = 120; // Reduce size for these specific columns
+                    } else if (['first_name'].includes(key)) {
+                        customSize = 180; // Reduce size for these specific columns
+                    }
+    
+                    return {
+                        accessorKey: key,
+                        header: key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (char) => char.toUpperCase()),
+                        size: customSize,
+                        Cell: ({ cell, row }) => {
+                            const id = row.original.id;
+                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                            return (
+                                <a
+                                    href={url} // Link to the desired URL
+                                    target="_blank" // Open in a new tab on click
+                                    rel="noopener noreferrer" // Security best practices for external links
+                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                >
+                                    {cell.getValue() || '-'}
+                                </a>
+                            );
+                        },
+                    };
+                }),
         ];
+
     
         return { flattenedData, columns };
     };
     const navigate = useNavigate();
     useEffect(() => {
-        
-
- 
-
                        
         const fetchData = async () => {
-
             try {
                 const response = await AxiosBase.get(`/pmc/ping/`, {
                     headers: {
@@ -341,7 +357,7 @@ console.log(selectedRowId)
                     }}
                     defaultColumn={{
                         maxSize: 420,
-                        minSize: 1,
+                        minSize: 200,
                         size: 100, // default size is usually 180
                     }}
                     enableColumnResizing
