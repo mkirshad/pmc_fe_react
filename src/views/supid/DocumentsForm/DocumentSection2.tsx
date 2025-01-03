@@ -312,7 +312,7 @@ const handlePSIDGeneration = async () => {
             </div>
             </Card>
 
-            <Card hidden={true}>                
+            <Card>                
          
             <h4 className="mb-4">Submission of Application</h4>
 
@@ -427,7 +427,7 @@ const handlePSIDGeneration = async () => {
         </Card>
 
 
-        <Card>
+        <Card hidden={true}>
             <h4 className="mb-4">Submission of Application</h4>
             
 
