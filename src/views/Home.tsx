@@ -129,59 +129,58 @@ const Home = () => {
     };
 
     // Extract columns and flattened data
+    // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
-        const allowedColumns = [
-            'first_name',
-            'last_name',
-            'CNIC',
-            'mobile_no',
-            'tracking_number',
-            'assigned_group',
-            'registration_for',
-            'application_Submission_Time',
-            'remarks',
-        ]; // List of allowed columns
-    
-        const flattenedData = sanitizeData(data); // Ensure sanitized data
-        const firstRecord = flattenedData[0];
-        console.log(data)
-        const columns = [
-            ...Object.keys(firstRecord)
-                .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => {
-                    let customSize = 160; // Default column size
-                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
-                        customSize = 120; // Reduce size for these specific columns
-                    } else if (['first_name'].includes(key)) {
-                        customSize = 180; // Reduce size for these specific columns
-                    }
-    
-                    return {
+            const allowedColumns = [
+                'first_name',
+                'last_name',
+                'cnic',
+                'mobile_no',
+                'application_status',
+                'tracking_number',
+                'assigned_group',
+                'registration_for',
+                'application_Start_Time',
+                'application_Submission_Time',
+                'remarks',
+            ]; // List of allowed columns
+        
+            const flattenedData = sanitizeData(data); // Ensure sanitized data
+            const firstRecord = flattenedData[0];
+            console.log(data)
+            const columns = [
+                ...Object.keys(firstRecord)
+                    .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
+                    .map((key) => ({
+
                         accessorKey: key,
                         header: key
                             .replace(/_/g, ' ')
                             .replace(/\b\w/g, (char) => char.toUpperCase()),
-                        size: customSize,
                         Cell: ({ cell, row }) => {
-                            const id = row.original.id;
-                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
                             return (
-                                <a
-                                    href={url} // Link to the desired URL
-                                    target="_blank" // Open in a new tab on click
-                                    rel="noopener noreferrer" // Security best practices for external links
+                                <span
                                     style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                    onClick={() => {
+                                        const id = row.original.id;
+                                        console.log(`Clicked ${key}:`, cell.getValue());
+                                        console.log(`Navigating with ID: ${id}`);
+                                        // Perform navigation or other action
+                                        window.location.href = hasUserGroup
+                                            ? `/spuid-review/${id}?group=${group}`
+                                            : `/spuid-signup/${id}`;
+                                    }}
                                 >
                                     {cell.getValue() || '-'}
-                                </a>
+                                </span>
                             );
                         },
-                    };
-                }),
-        ];
-    
-        return { flattenedData, columns };
-    };
+                    })),
+            ];
+        
+            return { flattenedData, columns };
+        };
+
     const navigate = useNavigate();
     useEffect(() => {
         
@@ -349,8 +348,8 @@ console.log(selectedRowId)
                     }}
                     defaultColumn={{
                         maxSize: 420,
-                        minSize: 1,
-                        size: 100, // default size is usually 180
+                        minSize: 100,
+                        size: 140, // default size is usually 180
                     }}
                     enableColumnResizing={true}
                     // columnResizeMode="onChange" // default
