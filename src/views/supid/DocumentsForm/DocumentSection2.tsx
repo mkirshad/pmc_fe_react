@@ -275,7 +275,7 @@ const handlePSIDGeneration = async () => {
 
     return (
         <>
-        <Card>
+        <Card hidden={true}>
             <h4 className="mb-4">Payment</h4>
             <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
