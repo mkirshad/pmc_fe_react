@@ -163,6 +163,7 @@ const {
                 has_fee_challan:response.data.has_fee_challan,
                 applicationStatus:response.data.application_status,
                 assignedGroup:response.data.assigned_group,
+                is_downloaded_fee_challan:response.data.is_downloaded_fee_challan,
             }
              updateApplicantDetail(data_applicantDetail);
 

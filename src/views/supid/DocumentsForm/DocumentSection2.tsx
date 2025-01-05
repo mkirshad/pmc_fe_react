@@ -275,7 +275,7 @@ const handlePSIDGeneration = async () => {
 
     return (
         <>
-        <Card hidden={true}>
+        <Card>
             <h4 className="mb-4">Payment</h4>
             <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
@@ -298,7 +298,6 @@ const handlePSIDGeneration = async () => {
                                     variant="solid"
                                     type="button"
                                     loading={isSubmiting}
-                                    disabled={true}
                                     onClick={downloadFile}
                                 >
             
@@ -349,7 +348,7 @@ const handlePSIDGeneration = async () => {
                             <Input
                                 type="file"
                                 accept="image/*" // Restrict file picker to image types only
-                                disabled={readOnly || !applicantDetail.has_fee_challan} // Apply the read-only prop
+                                disabled={!applicantDetail.is_downloaded_fee_challan} // Apply the read-only prop
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
@@ -407,8 +406,13 @@ const handlePSIDGeneration = async () => {
                         If the status is not updated, you can click the <strong className="text-blue-600">Check PSID Payment Status</strong> button to manually verify.
                     </p>
                     <p className="mt-3 text-gray-700">
-                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>.
+                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>. And you can download receipt of submission over here.
                     </p>
+
+                    <p className="mt-3 text-gray-700">
+                        Note: If you have paid fee challan, please don't generate <strong className="text-blue-600">GoP PSID</strong>, after generation of <strong className="text-blue-600">GoP PSID</strong> you will not be able to upload existing fee challan.
+                    </p>
+
                 </div>
                 <div className="grid md:grid-cols-3 mb-1 gap-4">
             <div>
