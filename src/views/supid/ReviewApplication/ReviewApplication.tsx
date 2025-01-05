@@ -662,13 +662,13 @@ const handleChangeManualFields = (fieldName, value) => {
         {licenseDetail.licenseType === "Consumer" && (
           <div className="grid md:grid-cols-2 gap-4">
             <FormItem
-              label="Procurement (Kg per day)"
+              label="Average Sales (Kg per day)"
               invalid={Boolean(errors.procurementPerDay)}
               errorMessage={errors.procurementPerDay?.message}
             >
               <Input
                 type="text"
-                placeholder="Enter procurement"
+                placeholder="Average Sales"
                 value={manualFields.procurement_per_day || ""}
                 onChange={(e) =>
                   handleChangeManualFields("procurement_per_day", e.target.value)
@@ -898,7 +898,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`Yes - As per remarks, proceed to next stage (${groupList[2]?.label})`}
+                label={`Yes - As per remarks, for issuance of licence ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
               />
 
               <FormControlLabel
@@ -909,7 +909,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`No - Proceed to previous stage (${groupList[0]?.label})`}
+                label={`No - Proceed to previous stage for want of clarifications ${groupList[1]?.label === 'DO'? '': '(' + groupList[0]?.label + ')' } `}
               />
             </FormControl>
           </CardContent>
