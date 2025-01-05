@@ -56,6 +56,7 @@ const flattenObject = (obj) => {
         application_Submission_Time: obj.submittedapplication?.created_at?.substring(0, 16) || 'N/A',
         tracking_number: obj.tracking_number,
         first_name: obj.first_name,
+        last_name: obj.last_name,
         mobile_no: obj.mobile_no,
         application_status: obj.application_status,
         assigned_group: obj.assigned_group,
