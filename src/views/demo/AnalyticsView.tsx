@@ -94,7 +94,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
 
   const [tilesData, setTilesData] = useState([]);
   const [dataApplicants, setDataApplicants] = useState([]);
-  const [chartData, setChartData] = useState({ series: [], options: {} });
+  const [chartData, setChartData] = useState(null);
 
   const [filterDistrictCategory, setFilterDistrictCategory] = useState<string>('');
   const [filterStackholderSeries, setFilterStackholderSeries] = useState<string>('');
@@ -108,14 +108,25 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
         });
       console.log(respons.data)
 
-          const districtData = respons.data.district_data.reduce((acc, item) => {
-            const category = item.registration_for;
-            const district = item.businessprofile__district__district_name;
-            if (!acc[category]) acc[category] = [];
-            acc[category].push(item.count);
-            return acc;
-          })
+      const { district_data, registration_statistics, grid_data } = respons.data;
 
+        // Validate district_data
+        if (!district_data || !Array.isArray(district_data)) {
+          throw new Error('Invalid district_data format');
+        }
+
+        // Validate registration_statistics
+        if (!registration_statistics || !Array.isArray(registration_statistics)) {
+          throw new Error('Invalid registration_statistics format');
+        }
+
+        // Validate grid_data
+        if (!grid_data || !Array.isArray(grid_data)) {
+          throw new Error('Invalid grid_data format');
+        }
+
+        // Proceed with data processing...
+      
 
       const iconMap: Record<string, JSX.Element> = {
         Producer: <FaIndustry className="text-white text-3xl" />,
@@ -131,24 +142,33 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
         Collector: 'bg-yellow-500',
       };
 
-              // Map registration_statistics into tilesData
-              const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
-                title: stat.registration_for,
-                data: [
-                  { value: stat.Applications, label: 'Applications' },
-                  { value: stat.FeeChallan, label: 'Fee Challan' },
-                  { value: stat.DO, label: 'DO' },
-                  { value: stat.PMC, label: 'PMC' },
-                  { value: stat.Licenses, label: 'Licenses' },
-                ],
-                color: colorMap[stat.registration_for] || 'bg-gray-500',
-                icon: iconMap[stat.registration_for] || null,
-              }));
+        // Map registration_statistics into tilesData
+        const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
+          title: stat.registration_for,
+          data: [
+            { value: stat.Applications, label: 'Applications' },
+            { value: stat.FeeChallan, label: 'Fee Challan' },
+            { value: stat.DO, label: 'DO' },
+            { value: stat.PMC, label: 'PMC' },
+            { value: stat.Licenses, label: 'Licenses' },
+          ],
+          color: colorMap[stat.registration_for] || 'bg-gray-500',
+          icon: iconMap[stat.registration_for] || null,
+        }));
 
-    setTilesData(dynamicTiles);
+
           // Process district-wise statistics for ApexCharts
-          const districts = Array.from(new Set(respons.data.district_data.map(item => item.businessprofile__district__district_name)));
-          const categories = Array.from(new Set(respons.data.district_data.map(item => item.registration_for)));
+          const districts = Array.from(new Set(
+            district_data
+              .map(item => item.businessprofile__district__district_name?.trim() || 'Unknown')
+              .filter(name => name !== 'Unknown')
+          ));
+
+          const categories = Array.from(new Set(
+            district_data
+              .map(item => item.registration_for || 'Unknown')
+              .filter(category => category !== 'Unknown')
+          ));
 
           const series = categories.map(category => {
             const dataPoints = districts.map(district => {
@@ -163,7 +183,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
             options: {
               chart: {
                 type: 'bar',
-                height: 350,
+                height: 550,
                 stacked: true,
                 events: {
                   dataPointSelection: (event, chartContext, config) => {
@@ -182,6 +202,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
               colors: ['#F97316', '#3B82F6', '#22C55E', '#EAB308'],
             },
           });
+          setTilesData(dynamicTiles);
           
 
           // Grid data
@@ -280,7 +301,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
     },
   };
 
-
+console.log('chartData', chartData)
   return (
     <div className="dashboard-container flex flex-col flex-auto">
       <header className="dashboard-header">
@@ -296,7 +317,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
 
       {/* React Apex Chart */}
       <div id="chart" className="mt-5">
-        {chartData.series.length > 0 && (
+        {chartData && chartData.series && chartData.options && (
           <ReactApexChart options={chartData.options} series={chartData.series} type="bar" height={350} />
         )}
       </div>
