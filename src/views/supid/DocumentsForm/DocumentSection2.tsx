@@ -397,9 +397,9 @@ const handlePSIDGeneration = async () => {
                     </p>
                     <ol className="list-decimal list-inside mt-3 text-gray-600">
                         <li>Open your mobile banking app or mobile payment app.</li>
-                        <li>Click on <strong className="text-blue-600">Bill Payment</strong>, then select <strong className="text-blue-600">GoP</strong>.</li>
+                        <li>Click on <strong className="text-blue-600">Bill Payment</strong>, <strong className="text-blue-600">Add Payee</strong>, then select <strong className="text-blue-600">GoP</strong>.</li>
                         <li>Enter the generated <strong className="text-blue-600">Consumer Number / PSID</strong> by this portal.</li>
-                        <li>Review your details carefully, save the payment, and click <strong className="text-blue-600">Payment</strong>.</li>
+                        <li>Review your details carefully, save the Payee, and click <strong className="text-blue-600">Payment</strong>.</li>
                     </ol>
                     <p className="mt-3 text-gray-700">
                         After completing the payment, the payment status will be <strong className="text-blue-600">automatically updated</strong> in this portal. 
