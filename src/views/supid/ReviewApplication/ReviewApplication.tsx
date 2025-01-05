@@ -898,7 +898,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`Yes - As per remarks, for issuance of licence ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
+                label={`Yes - As per remarks and verification, please proceed for issuance of licence ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
               />
 
               <FormControlLabel
@@ -909,7 +909,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`No - Proceed to previous stage for want of clarifications ${groupList[1]?.label === 'DO'? '': '(' + groupList[0]?.label + ')' } `}
+                label={`No - As per remarks and verification, please proceed to previous stage for preliminary scrutiny/ data entry etc ${groupList[1]?.label === 'DO'? '': '(' + groupList[0]?.label + ')' } `}
               />
             </FormControl>
           </CardContent>
