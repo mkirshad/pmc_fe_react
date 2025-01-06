@@ -88,6 +88,7 @@ const Home = () => {
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
+    const [selectedTile, setSelectedTile] = useState(null); // State for the selected tile
     console.log(selectedRowId)
     // APPLICANT > LSO > LSM > DO > LSM2 > TL > DEO > Download License
     const groups = [
@@ -138,6 +139,47 @@ const Home = () => {
         }
     };
     
+    const handleTileClick = async (group) => {
+        try {
+            setSelectedTile(group); // Update selected tile state
+
+              // Logic for LSO.1, LSO.2, LSO.3
+        if (group === 'LSO1' || group === 'LSO2' || group === 'LSO3') {
+            const moduloValue = group === 'LSO1' ? 1 : group === 'LSO2' ? 2 : 0;
+
+            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+                params: {
+                    assigned_group: "LSO",
+                },
+            });
+            const filteredData = (response.data || []).filter((item) => item.submittedapplication?.id % 3 === moduloValue);
+            // Update the table data
+            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            setFlattenedData(extracted.flattenedData);
+            setColumns(extracted.columns);
+            
+        } else {
+
+            // Fetch filtered data from the backend
+            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+                params: {
+                    assigned_group: group !== "All-Applications" && group !== "Challan-Downloaded" ? group : undefined,
+                    application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
+                },
+            });
+            const filteredData = response.data || [];
+    
+            // Update the table data
+            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            setFlattenedData(extracted.flattenedData);
+            setColumns(extracted.columns);
+        }
+        } catch (error) {
+            console.error("Error fetching filtered data:", error);
+            setFlattenedData([])
+            setColumns([])
+        }
+    };
 
     const handleStepClick = (index) => {
         console.log('its here')
@@ -211,7 +253,14 @@ const Home = () => {
                     },
                 });
             } catch (error) {
-                navigate('/error');
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
+    
+                navigate('/error', { state: { error: errorDetails } });
+
             }
 
             try {
@@ -261,7 +310,7 @@ const Home = () => {
                 }
 
                 // Fetch statistics for groups
-                const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
+                const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-do-view-groups/`, {
                     headers: {
                     "Content-Type": "multipart/form-data",
                     },
@@ -295,15 +344,21 @@ console.log(selectedRowId)
     return (
         <div>
                 {/* Display Tiles */}
-            {/* <div className="tiles-container">
+                <div className="tiles-container">
                     {Object.entries(statistics).map(([group, count]) => (
-                        <div key={group} className="tile">
-                            <h3>{groupTitles[group] || group}</h3> 
+                        <div key={group} className="tile"
+                        style={{ cursor: 'pointer', 
+                                 backgroundColor: selectedTile === group ? '#007BFF' : '#f8f9fa',
+                                 color: selectedTile === group ? '#fff' : '#000', 
+                                }} // Add cursor pointer for interactivity
+                        onClick={() => handleTileClick(group)} // Call the handler with the group
+                        >
+                            <h3>{groupTitles[group] || group}</h3> {/* Use title or fallback to the group key */}
                             <p>{count}</p>
                         </div>
                     ))}
-            </div> 
-             
+                </div>
+      {/*         
             <Steps current={step} className="mb-5">
                 {groups.map((group, index) => (
                     <Steps.Item
