@@ -237,6 +237,48 @@ const handleChangeManualFields = (fieldName, value) => {
     verifiedFeeAmount: "Verified Fee Amount",
   };
 
+
+  const renderPSIDTracking = (title, psidData) => (
+    <Card className="mb-4">
+      <CardContent>
+        <Typography variant="h6" className="font-bold mb-4">
+          {title}
+        </Typography>
+        {Array.isArray(psidData) && psidData.length > 0 ? (
+          psidData.map((item, index) => (
+            <div
+              key={index}
+              className="border-b border-gray-300 last:border-none"
+            >
+              {Object.entries(item).map(([key, value]) =>
+                value !== "" ? (
+                  <div
+                    key={key}
+                    className="flex flex-col md:flex-row items-start md:items-center justify-between mb-2"
+                  >
+                    <span className="font-bold mr-2 capitalize">
+                      {key.replace(/_/g, " ")}:
+                    </span>
+                    <span className="text-normal break-words">
+                      {typeof value === "object" && value !== null
+                        ? JSON.stringify(value, null, 2)
+                        : value}
+                    </span>
+                  </div>
+                ) : null
+              )}
+            </div>
+          ))
+        ) : (
+          <Typography variant="body2" className="text-gray-600">
+            No PSID Tracking records available.
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
+  
+
   const renderSection = (title, data) => (
     <Card className="mb-4">
       <CardContent>
@@ -336,6 +378,9 @@ const handleChangeManualFields = (fieldName, value) => {
       </CardContent>
     </Card>
   );
+
+
+  
 
   const manualFieldStyles = {
     backgroundColor: "#f0f8ff",
@@ -871,6 +916,9 @@ const handleChangeManualFields = (fieldName, value) => {
           renderSection("Recycler Details", licenseDetailRecycler)}
         {applicantDetail?.applicationdocument?.length > 0 &&
           renderDocumentSection(applicantDetail.applicationdocument)}
+        {applicantDetail?.psid_tracking?.length > 0 &&
+          renderPSIDTracking("PSID Tracking", applicantDetail.psid_tracking)}
+
         {renderManualFields()}
 
         <Card sx={{ marginBottom: "20px" }}>

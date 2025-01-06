@@ -313,7 +313,7 @@ const handlePSIDGeneration = async () => {
 
             <Card>                
          
-            <h4 className="mb-4">Submission of Application</h4>
+            <h4 className="mb-4">Submission of Application (Applicable only for previously generated and paid Fee Challans)</h4>
 
 
                 <div className="grid md:grid-cols-1 gap-4 mb-1">
