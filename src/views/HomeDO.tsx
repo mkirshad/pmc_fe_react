@@ -147,7 +147,7 @@ const Home = () => {
         if (group === 'LSO1' || group === 'LSO2' || group === 'LSO3') {
             const moduloValue = group === 'LSO1' ? 1 : group === 'LSO2' ? 2 : 0;
 
-            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+            const response = await AxiosBase.get('/pmc/applicant-detail-main-do-list/', {
                 params: {
                     assigned_group: "LSO",
                 },
@@ -161,7 +161,7 @@ const Home = () => {
         } else {
 
             // Fetch filtered data from the backend
-            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+            const response = await AxiosBase.get('/pmc/applicant-detail-main-do-list/', {
                 params: {
                     assigned_group: group !== "All-Applications" && group !== "Challan-Downloaded" ? group : undefined,
                     application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
