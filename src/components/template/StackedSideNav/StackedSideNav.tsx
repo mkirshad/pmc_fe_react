@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     SPLITTED_SIDE_NAV_MINI_WIDTH,
     STACKED_SIDE_NAV_SECONDARY_WIDTH,
@@ -15,6 +15,7 @@ import navigationConfig from '@/configs/navigation.config'
 import isEmpty from 'lodash/isEmpty'
 import useTranslation from '@/utils/hooks/useTranslation'
 import type { TraslationFn } from '@/@types/common'
+
 
 const stackedSideNavDefaultStyle = {
     width: SPLITTED_SIDE_NAV_MINI_WIDTH,
@@ -36,6 +37,15 @@ const StackedSideNav = ({
     const currentRouteKey = useRouteKeyStore((state) => state.currentRouteKey)
 
     const userAuthority = useSessionUser((state) => state.user.authority)
+    const fetchUserGroups = useSessionUser((state) => state.fetchUserGroups)
+
+    console.log('its here kkj-m')
+    useEffect(() => {
+        console.log('userAuthority',userAuthority)
+        // if (!userAuthority || userAuthority.length === 0) {
+            fetchUserGroups() // Fetch user groups if userAuthority is empty
+        // }
+    }, [])
 
     const { larger } = useResponsive()
 

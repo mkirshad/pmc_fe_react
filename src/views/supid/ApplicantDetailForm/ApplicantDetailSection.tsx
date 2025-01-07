@@ -149,7 +149,7 @@ const ApplicantDetailSection = ({ control, errors, readOnly = false  }: Overview
                     />
                 </FormItem>
                 <FormItem
-                    label="Email (Optional)"
+                    label="Email"
                     invalid={Boolean(errors.email)}
                     errorMessage={errors.email?.message}
                 >

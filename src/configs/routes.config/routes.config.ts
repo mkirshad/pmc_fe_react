@@ -82,7 +82,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'single.analytics1',
+        key: 'analyticsMenu.analytics1',
         path: '/analytics1',
         component: lazy(() =>
             import('@/views/demo/AnalyticsView')
@@ -90,7 +90,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'single.signup',
+        key: 'signUp',
         path: '/spuid-signup',
         component: lazy(() =>
             import('@/views/supid/CreateApplication/CustomerCreate')

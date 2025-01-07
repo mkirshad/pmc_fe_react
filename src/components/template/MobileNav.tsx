@@ -8,6 +8,7 @@ import navigationConfig from '@/configs/navigation.config'
 import { useThemeStore } from '@/store/themeStore'
 import { useRouteKeyStore } from '@/store/routeKeyStore'
 import { useSessionUser } from '@/store/authStore'
+import { useEffect } from 'react'
 
 const VerticalMenuContent = lazy(
     () => import('@/components/template/VerticalMenuContent'),
@@ -39,6 +40,15 @@ const MobileNav = () => {
     const currentRouteKey = useRouteKeyStore((state) => state.currentRouteKey)
 
     const userAuthority = useSessionUser((state) => state.user.authority)
+
+    const fetchUserGroups = useSessionUser((state) => state.fetchUserGroups)
+console.log('its here kkj-m')
+    useEffect(() => {
+        console.log('userAuthority',userAuthority)
+        // if (!userAuthority || userAuthority.length === 0) {
+            fetchUserGroups() // Fetch user groups if userAuthority is empty
+        // }
+    }, [])
 
     return (
         <>

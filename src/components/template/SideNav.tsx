@@ -16,6 +16,7 @@ import {
     LOGO_X_GUTTER,
 } from '@/constants/theme.constant'
 import type { Mode } from '@/@types/theme'
+import { useEffect } from 'react'
 
 type SideNavProps = {
     translationSetup?: boolean
@@ -51,6 +52,15 @@ const SideNav = ({
     const currentRouteKey = useRouteKeyStore((state) => state.currentRouteKey)
 
     const userAuthority = useSessionUser((state) => state.user.authority)
+
+    const fetchUserGroups = useSessionUser((state) => state.fetchUserGroups)
+console.log('its here kkj')
+    useEffect(() => {
+        console.log('userAuthority',userAuthority)
+        // if (!userAuthority || userAuthority.length === 0) {
+            fetchUserGroups() // Fetch user groups if userAuthority is empty
+        // }
+    }, [])
 
     return (
         <div

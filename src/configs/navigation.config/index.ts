@@ -9,7 +9,7 @@ import type { NavigationTree } from '@/@types/navigation'
 const navigationConfig: NavigationTree[] = [
 
     {
-        key: 'SignUp',
+        key: 'signUp',
         path: '/spuid-signup',
         title: 'New Application',
         translateKey: 'nav.spuid.signup',
@@ -27,6 +27,38 @@ const navigationConfig: NavigationTree[] = [
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],
         subMenu: [],
+    },
+
+   {
+        key: 'analyticsMenu',
+        path: '',
+        title: 'Analytics',
+        translateKey: 'nav.collapseMenu.analyticsMenu',
+        icon: 'collapseMenu',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: ['Analytics1', 'Analytics2'],
+        subMenu: [
+            {
+                key: 'analyticsMenu.analytics1',
+                path: '/analytics1',
+                title: 'Summary Analytics',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['Analytics1'],
+                subMenu: [],
+            },
+            {
+                key: 'collapseMenu.item2',
+                path: '/collapse-menu-item-view-2',
+                title: 'Downloadable Reports',
+                translateKey: 'nav.collapseMenu.item22',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['Analytics2'],
+                subMenu: [],
+            },
+        ],
     },
     // /** Example purpose only, please remove */
     // {
