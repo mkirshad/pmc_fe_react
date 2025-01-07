@@ -9,6 +9,7 @@ import { MaterialReactTable } from 'material-react-table';
 import { FaIndustry, FaUser, FaRecycle, FaTruck } from 'react-icons/fa';
 import { number } from 'zod';
 import AxiosBase from '../../services/axios/AxiosBase';
+import { useNavigate } from 'react-router-dom'
 
 // new ApexCharts(document.querySelector("#spark3"), spark3).render();
 
@@ -98,9 +99,10 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
 
   const [filterDistrictCategory, setFilterDistrictCategory] = useState<string>('');
   const [filterStackholderSeries, setFilterStackholderSeries] = useState<string>('');
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
+      try{
     const respons = await AxiosBase.get('/pmc/applicant-statistics/', {
             headers: {
             "Content-Type": "multipart/form-data",
@@ -207,6 +209,15 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
 
           // Grid data
           setDataApplicants(respons.data.grid_data);
+        }catch(error){
+          const errorDetails = {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        };
+
+        navigate('/error', { state: { error: errorDetails } });
+        }
     }
 
     fetchData();

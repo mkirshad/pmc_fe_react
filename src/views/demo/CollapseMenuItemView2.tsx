@@ -3,11 +3,11 @@ import AxiosBase from '../../services/axios/AxiosBase';
 import Button from '@/components/ui/Button'
 import { BsBack, BsReceipt } from 'react-icons/bs'
 import { useState, useEffect } from 'react'
-
+import { useNavigate } from 'react-router-dom'
 
 const CollapseMenuItemView2 = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
-
+    const navigate = useNavigate();
     const handleDownloadReport = async () => {
         // Get the current date and time
         const currentDate = new Date();
@@ -33,6 +33,13 @@ const CollapseMenuItemView2 = () => {
             setIsSubmiting(false)
         } catch (error) {
             console.error('Error downloading report:', error);
+            const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+
+            navigate('/error', { state: { error: errorDetails } });
             setIsSubmiting(false)
         }
     };
