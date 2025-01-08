@@ -115,7 +115,8 @@ const CustomerEdit = () => {
                 applicationassignment:formatJsonToJsx((response.data.applicationassignment)),
                 applicationdocument:response.data.applicationdocument,
                 field_responses:response.data.field_responses,
-                manual_fields: response.data.manual_fields
+                manual_fields: response.data.manual_fields,
+                psid_tracking: response.data.psid_tracking,
             }
              updateApplicantDetail(data_applicantDetail);
 

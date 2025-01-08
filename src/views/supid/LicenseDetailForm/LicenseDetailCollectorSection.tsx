@@ -189,8 +189,8 @@ const LicenseDetailCollectorSection = ({ control, errors, readOnly = false }: Li
 
                 <FormItem
                         label="No. of persons for Collection"
-                        invalid={Boolean(errors.total_capacity_value)}
-                        errorMessage={errors.total_capacity_value?.message}
+                        invalid={Boolean(errors.number_of_persons)}
+                        errorMessage={errors.number_of_persons?.message}
                     >
                         <Controller
                             name="number_of_persons"

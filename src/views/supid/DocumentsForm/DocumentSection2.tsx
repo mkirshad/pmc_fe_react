@@ -14,6 +14,8 @@ import Group from '@/components/ui/Checkbox/Group';
 import AxiosBase from '../../../services/axios/AxiosBase';
 import { ApplicantDetailForm } from '../ApplicantDetailForm';
 import useFormStore from '../../../store/supid/supidStore'
+import Button from '@/components/ui/Button'
+import { BiArrowBack, BiArrowToRight, BiSave, BiStreetView, BiIdCard } from 'react-icons/bi'
 
 type BusinessDetailSectionProps = FormSectionBaseProps & {
     readOnly?: boolean; // Add this prop
@@ -94,7 +96,7 @@ const LicenseDetailProducerSection = ({ control, errors, register, readOnly = fa
   
   const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
-
+  const [isSubmiting, setIsSubmiting] = useState(false)
   const handleChangeSP = (event, newValue) => {
     setSelectedOptions(newValue);
 
@@ -206,9 +208,74 @@ const downloadFileReceipt = async () =>
     document.body.removeChild(link);
 }
 
+const handlePSIDGeneration = async () => {
+    setIsSubmiting(true);
+    try {
+      const response = await AxiosBase.get(
+        `/pmc/generate-psid?applicant_id=${applicantDetail.id}`,
+        { responseType: "text" }
+      );
+  
+      // Handle successful response
+      const htmlContent = response.data;
+      const newWin = window.open("", "_blank");
+      newWin.document.write(htmlContent);
+      newWin.document.close();
+      updateApplicantDetail({"applicationStatus": 'Fee Challan'})
+    } catch (error) {
+      console.error(error);
+  
+      // Handle error response (if the server sends an HTML error response)
+      if (error.response && error.response.data) {
+        const errorContent = error.response.data;
+        const errorWin = window.open("", "_blank");
+        errorWin.document.write(errorContent);
+        errorWin.document.close();
+      } else {
+        // If the error does not include a response or response data
+        alert("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmiting(false);
+    }
+  };
+  
+  const handlePSIDCheckStatus = async () => {
+    setIsSubmiting(true);
+    try {
+      const response = await AxiosBase.get(
+        `/pmc/check-psid-status?applicant_id=${applicantDetail.id}`,
+        { responseType: "text" }
+      );
+  
+      // Handle successful response
+      const htmlContent = response.data;
+      const newWin = window.open("", "_blank");
+      newWin.document.write(htmlContent);
+      newWin.document.close();
+    //   updateApplicantDetail({"applicationStatus": 'Fee Challan'})
+    } catch (error) {
+      console.error(error);
+  
+      // Handle error response (if the server sends an HTML error response)
+      if (error.response && error.response.data) {
+        const errorContent = error.response.data;
+        const errorWin = window.open("", "_blank");
+        errorWin.document.write(errorContent);
+        errorWin.document.close();
+      } else {
+        // If the error does not include a response or response data
+        alert("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmiting(false);
+    }
+  };
+  
+
     return (
         <>
-        <Card>
+        <Card hidden={true}>
             <h4 className="mb-4">Payment</h4>
             <div className="grid md:grid-cols-1 gap-4 mb-1">
                 <div style={{ color: 'blue', fontWeight: 'bold', margin: '10px 0' }}>
@@ -225,14 +292,17 @@ const downloadFileReceipt = async () =>
 
 
                 <div>
-                <a
-                href='#'
-                    
-                    className="inline-block px-6 py-3 bg-blue-500 text-white text-lg font-bold rounded-md shadow-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    onClick={()=>{downloadFile()}}
-                >
+                <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    onClick={downloadFile}
+                                >
+            
                     Download Fee Challan
-                </a>
+                </Button>
                 </div>
                 <div>
                 </div>
@@ -243,7 +313,7 @@ const downloadFileReceipt = async () =>
 
             <Card>                
          
-            <h4 className="mb-4">Submission of Application</h4>
+            <h4 className="mb-4">Submission of Application (Applicable only for previously generated and paid Fee Challans)</h4>
 
 
                 <div className="grid md:grid-cols-1 gap-4 mb-1">
@@ -254,8 +324,7 @@ const downloadFileReceipt = async () =>
 
                 <img 
                     src="/img/others/warning-urdu3.png" 
-                    alt="Warning Icon" 
-                    
+                    alt="Warning Icon"
                     />
                 </div>
                 {/* </div> */}
@@ -279,7 +348,7 @@ const downloadFileReceipt = async () =>
                             <Input
                                 type="file"
                                 accept="image/*" // Restrict file picker to image types only
-                                disabled={readOnly} // Apply the read-only prop
+                                disabled={!applicantDetail.is_downloaded_fee_challan} // Apply the read-only prop
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
@@ -301,15 +370,11 @@ const downloadFileReceipt = async () =>
                 </div>
             </div>
             
-            <div>
+            {/* <div>
                     {applicantDetail.has_fee_challan && <label>Paid Fee Challan Document is already Uploaded!</label>}
-            </div>
-           
-
-                <div className="grid md:grid-cols-2 mb-1 gap-4">
-                    {/* Business Name and Registration Type */}
-
-
+            </div> */}
+            
+                {/* <div className="grid md:grid-cols-2 mb-1 gap-4">
                     {applicantDetail.has_fee_challan && <div>
                         <a
                         href='#'
@@ -319,11 +384,81 @@ const downloadFileReceipt = async () =>
                             Download Receipt
                         </a>
                     </div>
-                    
-            
                     }
+                </div> */}
+        </Card>
 
+        <Card>
+            <h4 className="mb-4">Payment</h4>
+            <div className="border border-gray-300 bg-gray-50 p-4 rounded-lg shadow-md mb-4">
+                    <h3 className="text-lg font-semibold text-blue-700">Important Note:</h3>
+                    <p className="mt-2 text-gray-700">
+                        Click the <strong className="text-blue-600">Generate GoP PSID</strong> button to obtain the PSID. After getting the PSID, follow these steps:
+                    </p>
+                    <ol className="list-decimal list-inside mt-3 text-gray-600">
+                        <li>Open your mobile banking app or mobile payment app.</li>
+                        <li>Click on <strong className="text-blue-600">Bill Payment</strong>, <strong className="text-blue-600">Add Payee</strong>, then select <strong className="text-blue-600">GoP</strong>.</li>
+                        <li>Enter the generated <strong className="text-blue-600">Consumer Number / PSID</strong> by this portal.</li>
+                        <li>Review your details carefully, save the Payee, and click <strong className="text-blue-600">Payment</strong>.</li>
+                    </ol>
+                    <p className="mt-3 text-gray-700">
+                        After completing the payment, the payment status will be <strong className="text-blue-600">automatically updated</strong> in this portal. 
+                        If the status is not updated, you can click the <strong className="text-blue-600">Check PSID Payment Status</strong> button to manually verify.
+                    </p>
+                    <p className="mt-3 text-gray-700">
+                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>. And you can download receipt of submission over here.
+                    </p>
+
+                    <p className="mt-3 text-gray-700">
+                        Note: If you have paid fee challan, please don't generate <strong className="text-blue-600">GoP PSID</strong>, after generation of <strong className="text-blue-600">GoP PSID</strong> you will not be able to upload existing fee challan.
+                    </p>
+
+                </div>
+                <div className="grid md:grid-cols-3 mb-1 gap-4">
+            <div>
+                <Button
+                                        icon={<BiIdCard />}
+                                        className="ltr:mr-3 rtl:ml-3 mb-4"
+                                        variant="solid"
+                                        type="button"
+                                        loading={isSubmiting}
+                                        onClick={handlePSIDGeneration}
+                                    >
+                Generate GoP PSID
+                </Button>
             </div>
+
+                    {applicantDetail.has_fee_challan && <div>
+                        <Button
+                            icon={<BiSave />}
+                            className="ltr:mr-3 rtl:ml-3 mb-4"
+                            variant="solid"
+                            type="button"
+                            loading={isSubmiting}
+                            onClick={downloadFileReceipt}
+                        >
+                            Download Receipt
+                            </Button>
+                    </div>
+                    }
+                </div>
+        </Card>
+
+
+        <Card hidden={true}>
+            <h4 className="mb-4">Submission of Application</h4>
+            
+
+            <Button
+                                    icon={<BiIdCard />}
+                                    className="ltr:mr-3 rtl:ml-3"
+                                    variant="solid"
+                                    type="button"
+                                    loading={isSubmiting}
+                                    onClick={handlePSIDCheckStatus}
+                                >
+            Check GoP PSID Payment Status
+            </Button>
         </Card>
 
     </>
