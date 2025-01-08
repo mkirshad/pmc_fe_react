@@ -692,35 +692,47 @@ const CustomerEdit = () => {
         setIsSubmiting(true)
         if(applicantDetail.assignedGroup2 !== '' && applicantDetail.assignedGroup2 !== undefined ){
             // Add non-file fields
-            const formData = new FormData();
-            formData.append('assigned_group', (applicantDetail.assignedGroup2));
-            formData.append('id', applicantDetail.id.toString())
-            if (applicantDetail.id > 0) {
-                try {
-                    const response = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+            // const formData = new FormData();
+            // formData.append('assigned_group', (applicantDetail.assignedGroup2));
+            // formData.append('id', applicantDetail.id.toString())
+            // if (applicantDetail.id > 0) {
+            //     try {
+            //         const response = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData, {
+            //             headers: {
+            //                 'Content-Type': 'multipart/form-data',
+            //             },
+            //         });
+            //         // setIsSubmiting(false);
+            //         navigate('/home');
+            //     } catch (error) {
+            //         console.error('Error in POST request:', error.response || error.message);
+            //         // setIsSubmiting(false);
+            //     }
+            //         // onNext()
+            //     }
+
+                try
+                {
+                    const formData2 = new FormData();
+                    formData2.append('applicant', applicantDetail.id.toString())
+                    formData2.append('assigned_group', (applicantDetail.assignedGroup2));
+                    formData2.append('remarks', applicantDetail.remarks);
+                    console.log(applicantDetail.remarks)
+                    await AxiosBase.post(`/pmc/application-assignment/`, formData2, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                    // setIsSubmiting(false);
                     navigate('/home');
-                } catch (error) {
-                    console.error('Error in POST request:', error.response || error.message);
-                    // setIsSubmiting(false);
+                } catch(error){
+                    const errorDetails = {
+                        status: error.response?.status,
+                        data: error.response?.data,
+                        message: error.message,
+                    };
+    
+                    navigate('/error', { state: { error: errorDetails } });
                 }
-                    // onNext()
-                }
-
-                const formData2 = new FormData();
-                formData2.append('applicant', applicantDetail.id.toString())
-                formData2.append('assigned_group', (applicantDetail.assignedGroup2));
-                formData2.append('remarks', applicantDetail.remarks);
-                console.log(applicantDetail.remarks)
-                await AxiosBase.post(`/pmc/application-assignment/`, formData2, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
         }
 
         handleSubmitResponses()

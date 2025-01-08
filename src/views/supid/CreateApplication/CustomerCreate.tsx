@@ -1301,7 +1301,7 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                                     variant="solid"
                                     type="submit"
                                     loading={isSubmiting}
-                                    disabled={applicantDetail.applicationStatus === 'Submitted' && isReadOnly2}
+                                    disabled={isReadOnly && isReadOnly2}
                                 >
                                     Submit Application
                                 </Button>
