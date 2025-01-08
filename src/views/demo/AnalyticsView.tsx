@@ -149,16 +149,16 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
         const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
           title: stat.registration_for,
           data: [
-            { value: stat.Applications, label: 'Applications' },
-            { value: stat.DO, label: 'DO' },
-            { value: stat.PMC, label: 'PMC' },
-            { value: stat.APPLICANT, label: 'Applicant' },
-            { value: stat.Licenses, label: 'Licenses' },
+            { value: stat.Applications, label: 'Applications', title: 'Applications' },
+            { value: stat.DO, label: 'DO', title: 'District Officer (Environment)/Assistant/Deputy Director/District In-Charge' },
+            { value: stat.PMC, label: 'PMC', title: 'Plastic Management Cell' },
+            { value: stat.APPLICANT, label: 'Applicant', title: 'Applicant' },
+            { value: stat.Licenses, label: 'Licenses', title: 'Licenses' },
           ],
           color: colorMap[stat.registration_for] || 'bg-gray-500',
           icon: iconMap[stat.registration_for] || null,
         }));
-
+        
 
           // Process district-wise statistics for ApexCharts
           const districts = Array.from(new Set(
@@ -225,14 +225,126 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
   }, []);
 
   const columns = [
-    { accessorKey: 'tracking_number', header: 'Tracking Number', size:150 },
-    { accessorKey: 'first_name', header: 'First Name' },
-    { accessorKey: 'last_name', header: 'Last Name' },
-    { accessorKey: 'cnic', header: 'CNIC' },
-    { accessorKey: 'mobile_no', header: 'Mobile No' },
-    { accessorKey: 'application_status', header: 'Status' },
-    { accessorKey: 'assigned_group', header: 'Assigned Group' },
-    { accessorKey: 'registration_for', header: 'Category' },
+    { accessorKey: 'tracking_number', header: 'Tracking Number', size:150, Cell: ({ cell, row }) => {
+                    const id = row.original.id;
+                    const url = `/spuid-review/${id}`; // Adjust URL as needed
+                    return (
+                        <a
+                            href={url} // Link to the desired URL
+                            target="_blank" // Open in a new tab on click
+                            rel="noopener noreferrer" // Security best practices for external links
+                            style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                        >
+                            {cell.getValue() || '-'}
+                        </a>
+                    );
+                }, 
+    },
+    { accessorKey: 'first_name', header: 'First Name', Cell: ({ cell, row }) => {
+                    const id = row.original.id;
+                    const url = `/spuid-review/${id}`; // Adjust URL as needed
+                    return (
+                        <a
+                            href={url} // Link to the desired URL
+                            target="_blank" // Open in a new tab on click
+                            rel="noopener noreferrer" // Security best practices for external links
+                            style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                        >
+                            {cell.getValue() || '-'}
+                        </a>
+                    );
+                },  
+              },
+    { accessorKey: 'last_name', header: 'Last Name', Cell: ({ cell, row }) => {
+                  const id = row.original.id;
+                  const url = `/spuid-review/${id}`; // Adjust URL as needed
+                  return (
+                      <a
+                          href={url} // Link to the desired URL
+                          target="_blank" // Open in a new tab on click
+                          rel="noopener noreferrer" // Security best practices for external links
+                          style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                      >
+                          {cell.getValue() || '-'}
+                      </a>
+                  );
+              },  
+            },
+    { accessorKey: 'cnic', header: 'CNIC', Cell: ({ cell, row }) => {
+                const id = row.original.id;
+                const url = `/spuid-review/${id}`; // Adjust URL as needed
+                return (
+                    <a
+                        href={url} // Link to the desired URL
+                        target="_blank" // Open in a new tab on click
+                        rel="noopener noreferrer" // Security best practices for external links
+                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                    >
+                        {cell.getValue() || '-'}
+                    </a>
+                );
+            },  
+          },
+    { accessorKey: 'mobile_no', header: 'Mobile No', Cell: ({ cell, row }) => {
+                const id = row.original.id;
+                const url = `/spuid-review/${id}`; // Adjust URL as needed
+                return (
+                    <a
+                        href={url} // Link to the desired URL
+                        target="_blank" // Open in a new tab on click
+                        rel="noopener noreferrer" // Security best practices for external links
+                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                    >
+                        {cell.getValue() || '-'}
+                    </a>
+                );
+            },  
+          },
+    { accessorKey: 'application_status', header: 'Status', Cell: ({ cell, row }) => {
+                  const id = row.original.id;
+                  const url = `/spuid-review/${id}`; // Adjust URL as needed
+                  return (
+                      <a
+                          href={url} // Link to the desired URL
+                          target="_blank" // Open in a new tab on click
+                          rel="noopener noreferrer" // Security best practices for external links
+                          style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                      >
+                          {cell.getValue() || '-'}
+                      </a>
+                  );
+              },  
+            },
+    { accessorKey: 'assigned_group', header: 'Assigned Group', Cell: ({ cell, row }) => {
+                const id = row.original.id;
+                const url = `/spuid-review/${id}`; // Adjust URL as needed
+                return (
+                    <a
+                        href={url} // Link to the desired URL
+                        target="_blank" // Open in a new tab on click
+                        rel="noopener noreferrer" // Security best practices for external links
+                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                    >
+                        {cell.getValue() || '-'}
+                    </a>
+                );
+            },  
+          },
+    { accessorKey: 'registration_for', header: 'Category', Cell: ({ cell, row }) => {
+                const id = row.original.id;
+                const url = `/spuid-review/${id}`; // Adjust URL as needed
+                return (
+                    <a
+                        href={url} // Link to the desired URL
+                        target="_blank" // Open in a new tab on click
+                        rel="noopener noreferrer" // Security best practices for external links
+                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                    >
+                        {cell.getValue() || '-'}
+                    </a>
+                );
+            },  
+          },
   ];
 
 
@@ -393,7 +505,7 @@ const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
       </div>
       <div className="grid grid-cols-3 gap-4">
         {data.map((item, index) => (
-          <div key={index} className="text-center">
+          <div key={index} className="text-center" title={item.title}> {/* Use item.title for the tooltip */}
             <p className="text-3xl font-bold text-white">{item.value}</p>
             <p className="text-sm text-white">{item.label}</p>
           </div>
@@ -402,6 +514,7 @@ const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
     </div>
   );
 };
+
 
 
 export default KPIDashboard; // Export only the base component
