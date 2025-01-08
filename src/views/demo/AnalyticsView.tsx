@@ -6,7 +6,7 @@ import { GoogleMap, LoadScript, Marker, InfoWindow  } from '@react-google-maps/a
 import Select from 'react-select';
 import DemoBoxContent from '@/components/docs/DemoBoxContent';
 import { MaterialReactTable } from 'material-react-table';
-import { FaIndustry, FaUser, FaRecycle, FaTruck } from 'react-icons/fa';
+import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/fa';
 import { number } from 'zod';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { useNavigate } from 'react-router-dom'
@@ -131,6 +131,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
       
 
       const iconMap: Record<string, JSX.Element> = {
+        Total: <FaChartBar className="text-white text-3xl" />,
         Producer: <FaIndustry className="text-white text-3xl" />,
         Consumer: <FaUser className="text-white text-3xl" />,
         Recycler: <FaRecycle className="text-white text-3xl" />,
@@ -149,9 +150,9 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
           title: stat.registration_for,
           data: [
             { value: stat.Applications, label: 'Applications' },
-            { value: stat.FeeChallan, label: 'Fee Challan' },
             { value: stat.DO, label: 'DO' },
             { value: stat.PMC, label: 'PMC' },
+            { value: stat.APPLICANT, label: 'Applicant' },
             { value: stat.Licenses, label: 'Licenses' },
           ],
           color: colorMap[stat.registration_for] || 'bg-gray-500',
@@ -320,7 +321,7 @@ console.log('chartData', chartData)
       </header>
 
       {/* KPI Tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {tilesData.map((tile, index) => (
           <Tile key={index} title={tile.title} data={tile.data} color={tile.color} icon={tile.icon} />
         ))}
