@@ -52,10 +52,16 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'collapseMenu.item2',
+        key: 'analyticsMenu.analytics2',
         path: '/collapse-menu-item-view-2',
         component: lazy(() => import('@/views/demo/CollapseMenuItemView2')),
-        authority: [],
+        authority: ['Analytics2'],
+    },
+    {
+        key: 'analyticsMenu.analytics3',
+        path: '/collapse-menu-item-view-3',
+        component: lazy(() => import('@/views/demo/CollapseMenuItemView3')),
+        authority: ['Analytics3'],
     },
     {
         key: 'groupMenu.single',
@@ -87,7 +93,7 @@ export const protectedRoutes: Routes = [
         component: lazy(() =>
             import('@/views/demo/AnalyticsView')
         ),
-        authority: [],
+        authority: ['Analytics1'],
     },
     {
         key: 'signUp',
