@@ -16,6 +16,9 @@ import { useForm, Controller } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 import AxiosBase from '../../../services/axios/AxiosBase';
 import { Divider } from '@mui/material';
+import { FaInfoCircle } from 'react-icons/fa'; // Information icon
+import { Tooltip } from 'react-tooltip'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 
 const ReviewAndSavePage = ({ groupList, children }) => {
   const [selectedGroup, setSelectedGroup] = useState(
@@ -24,6 +27,12 @@ const ReviewAndSavePage = ({ groupList, children }) => {
   const [checkboxState, setCheckboxState] = useState({ previousStage: false, nextStage: false });
   const [fieldResponses, setFieldResponses] = useState({});
   const [manualFields, setManualFields] = useState({ latitude: "", longitude: "" });
+
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleOpenModal = () => setModalVisible(true);
+  const handleCloseModal = () => setModalVisible(false);
 
   const {
     applicantDetail,
@@ -123,6 +132,9 @@ const handleCommentChange = (key, comment) => {
 
 const handleDocumentFormSubmit = async (document, document_description) => {
   const formData = new FormData();
+  
+
+
   // Append fields to FormData
   formData.append('document', document);
 
@@ -399,8 +411,10 @@ const handleChangeManualFields = (fieldName, value) => {
   
         {/* GLOBAL FIELDS */}
         <div className="grid md:grid-cols-2 gap-4">
+         
+        
           <FormItem
-            label="Latitude"
+            label={"Latitude"}
             invalid={Boolean(errors.latitude)}
             errorMessage={errors.latitude?.message}
           >
@@ -414,7 +428,8 @@ const handleChangeManualFields = (fieldName, value) => {
               readOnly={disabled}
             />
           </FormItem>
-  
+         
+         
           <FormItem
             label="Longitude"
             invalid={Boolean(errors.longitude)}
@@ -664,9 +679,19 @@ const handleChangeManualFields = (fieldName, value) => {
                   disabled={disabled}
                 />
               </FormItem>
-  
+
               <FormItem
-                label="Action Plan"
+                label={<p><p>Action Plan (in accordance with the Section 6 of the Regulations)</p><span
+                  data-tip
+                  data-for="info-tooltip"
+                  className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer"
+                  onClick={handleOpenModal} // Trigger modal on click
+                  onMouseEnter={() => setModalVisible(true)} // Track hover start
+                  // onMouseLeave={() => setIsHovered(false)} // Track hover end
+                >
+                  <FaInfoCircle className="text-blue-500" />
+                </span>
+                </p>}
                 invalid={Boolean(errors.actionPlanFile)}
                 errorMessage={errors.actionPlanFile?.message}
               >
@@ -679,7 +704,10 @@ const handleChangeManualFields = (fieldName, value) => {
                   disabled={disabled}
                 />
               </FormItem>
-  
+              <span data-tip data-for="info-tooltip" className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer">
+                <FaInfoCircle className="text-blue-500" />
+              </span>
+
               <FormItem
                 label="List of Stockist/Distributor/Supplier to whom the products will be supplied"
                 invalid={Boolean(errors.stockistDistributorList)}
@@ -876,6 +904,7 @@ const handleChangeManualFields = (fieldName, value) => {
       className="p-4"
       style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "20px" }}
     >
+      <Tooltip id="my-tooltip" />
       <div>
         <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: "20px" }}>
           Review Information
@@ -991,6 +1020,39 @@ const handleChangeManualFields = (fieldName, value) => {
       <div>
       
       </div>
+            {/* Modal */}
+      {(isModalVisible || isHovered) && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={handleCloseModal}>
+              &times;
+            </span>
+            <h2>Modal Title</h2>
+            <p>This is the modal content.</p>
+          </div>
+        </div>
+      )}
+
+
+<ConfirmDialog
+            isOpen={(isModalVisible || isHovered)}
+            title="Responsibilities of the producer.-"
+            onClose={handleCloseModal}
+            onRequestClose={handleCloseModal}
+            onCancel={handleCloseModal}
+            onConfirm={handleCloseModal}
+        >
+            <p>
+              The producer shall:
+              <ol className="list-decimal pl-6">
+                <li>establish a system for collection of the plastic waste generated due to his products within a period of six months from the commencement of the regulations;</li>
+                <li>ensure that the minimum requirement of twenty percent mixing of recycled material shall be met in production of single-use plastic product along with virgin material;</li>
+                <li>carry out awareness campaigns regarding proper disposal of single-use plastic product which may include, but not limited to, displaying educative slogans, or messages, etc.; and</li>
+                <li>perform other function as notified by the Agency for implementation of the regulations.</li>
+              </ol>
+            </p>
+        </ConfirmDialog>
+
     </div>
   );
 };
