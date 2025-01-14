@@ -406,7 +406,7 @@ const handlePSIDGeneration = async () => {
                         If the status is not updated, you can click the <strong className="text-blue-600">Check PSID Payment Status</strong> button to manually verify.
                     </p>
                     <p className="mt-3 text-gray-700">
-                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>. And you can download receipt of submission over here.
+                        Once the payment verification is successful, the application will be <strong className="text-blue-600">automatically submitted</strong>. Go to  <strong className="text-blue-600">My Applications</strong> and come back to this application and page and you can download receipt of submission for your record.
                     </p>
 
                     <p className="mt-3 text-gray-700">

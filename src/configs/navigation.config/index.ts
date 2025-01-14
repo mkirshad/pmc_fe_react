@@ -28,7 +28,16 @@ const navigationConfig: NavigationTree[] = [
         authority: [],
         subMenu: [],
     },
-
+    {
+        key: 'home.license',
+        path: '/home',
+        title: 'Download License',
+        translateKey: 'nav.home1',
+        icon: 'home',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [],
+        subMenu: [],
+    },
    {
         key: 'analyticsMenu',
         path: '',

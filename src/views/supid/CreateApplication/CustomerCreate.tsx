@@ -927,40 +927,7 @@ const {
         verifyChallanFormData.append('chalan_image', values.flow_diagram); // Assuming 'flow_diagram' is the challan image
         verifyChallanFormData.append('ApplicantId', applicantDetail.id.toString()); // Assuming 'flow_diagram' is the challan image
 
-        // try {
-        //     const verifyResponse = await AxiosBase.post('/pmc/verify-chalan/', verifyChallanFormData, {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
 
-        //     if (verifyResponse.data.status !== 'verified') {
-        //         console.error('Challan verification failed:', verifyResponse.data.message);
-        //         setThankYouPopupOpen(true); // Show popup for failure
-        //         setThankYouPopupMessage(
-        //             verifyResponse.data.message || 'Challan verification failed. Please try again.'
-        //         );
-        //         setTankYouPopupType("danger")
-                
-        //         setIsSubmiting(false);
-        //         return; // Exit the function if verification fails
-        //     }
-        // } catch (error) {
-        //     if (error.response && error.response.status === 400) {
-        //         console.error('Challan verification error:', error.response.data);
-        //                 // Show popup for error
-        //         setThankYouPopupOpen(true);
-        //         setThankYouPopupMessage(error.response.data.message || 'Invalid Challan. Please try again.');
-        //         setTankYouPopupType("danger")
-        //     } else {
-        //         console.error('Unexpected error during challan verification:', error);
-        //         setThankYouPopupOpen(true);
-        //         setThankYouPopupMessage('An unexpected error occurred during challan verification. Please try again.');
-        //         setTankYouPopupType("danger")
-        //     }
-        //     setIsSubmiting(false);
-        //     return; // Exit the function if verification fails
-        // }
         if(values.flow_diagram)
         {
             const formData = new FormData();
@@ -987,67 +954,69 @@ const {
             }
         }
 
-        
-        const formData2 = new FormData();
-        // Add non-file fields
-        formData2.append('application_status', 'Submitted');
-        try{
-            const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-        } catch (error) {
-            console.error('Error in POST request:', error.response || error.message);
-                // Extract serializable error details
-            const errorDetails = {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message,
-            };
-
-            navigate('/error', { state: { error: errorDetails } });
-        }
-
-
-        updateApplicantDetail({applicationStatus: "Submitted"})
-
-
+        if (values.existingFileId === true || values.flow_diagram){
             
-        // Download Fee Challan
-        try{            
-            const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
-                responseType: 'blob', // Important to get the data as a Blob
-            }); 
-        
-   
-        // Create a blob URL for the downloaded file
-        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = urlBlob;
-        // Set filename for the downloaded file
-        link.setAttribute('download', `Recipt.pdf`);
-        document.body.appendChild(link);
-        link.click();
-        // Clean up
-        document.body.removeChild(link);
-        setIsSubmiting(false);
-        setThankYouPopupOpen(true); 
-        setThankYouPopupMessage("Application is submitted successfully!")
-        setTankYouPopupType("success")
-        // const formData = new FormData();
+            const formData2 = new FormData();
+            // Add non-file fields
+            formData2.append('application_status', 'Submitted');
+            try{
+                const response2 = await AxiosBase.patch(`/pmc/applicant-detail/${applicantDetail.id}/`, formData2, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
     
-    } catch (error) {
-        console.error('Error in POST request:', error.response || error.message);
-            // Extract serializable error details
-        const errorDetails = {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        };
+                navigate('/error', { state: { error: errorDetails } });
+            }
+    
+    
+                updateApplicantDetail({applicationStatus: "Submitted"})
+                        
+                // Download Fee Challan
+                try{            
+                    const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+                        responseType: 'blob', // Important to get the data as a Blob
+                    }); 
+                // Create a blob URL for the downloaded file
+                const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = urlBlob;
+                // Set filename for the downloaded file
+                link.setAttribute('download', `Recipt.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                // Clean up
+                document.body.removeChild(link);
+                setIsSubmiting(false);
+                setThankYouPopupOpen(true); 
+                setThankYouPopupMessage("Application is submitted successfully!")
+                setTankYouPopupType("success")
+                // const formData = new FormData();
+            
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                    // Extract serializable error details
+                const errorDetails = {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                };
 
-        navigate('/error', { state: { error: errorDetails } });
+                navigate('/error', { state: { error: errorDetails } });
+                }
         }
+            
+        loadData(applicantDetail.id)
+        setIsSubmiting(false);
+       
     }
 
 
