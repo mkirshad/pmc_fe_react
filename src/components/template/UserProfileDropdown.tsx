@@ -5,6 +5,7 @@ import { useSessionUser } from '@/store/authStore'
 import { Link } from 'react-router-dom'
 import { PiUserDuotone, PiSignOutDuotone } from 'react-icons/pi'
 import { useAuth } from '@/auth'
+import { FaKey } from 'react-icons/fa'; // Key icon for password-related functionality
 
 type DropdownList = {
     label: string
@@ -13,6 +14,11 @@ type DropdownList = {
 }
 
 const dropdownItemList: DropdownList[] = [
+    {
+        label:'Reset Password',
+        path:'/reset-password',
+        icon:<FaKey />
+    }
 ]
 
 const _UserDropdown = () => {

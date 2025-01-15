@@ -37,6 +37,12 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'reset.password',
+        path: '/reset-password',
+        component: lazy(() => import('@/views/auth/ResetPassword/ResetPassword2')),
+        authority: [],
+    },
+    {
         key: 'error',
         path: '/error',
         component: lazy(() => import('@/views/ErrorPage')), // ErrorPage component

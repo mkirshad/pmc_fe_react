@@ -42,14 +42,14 @@ export const SignInBase = ({
                 setMessage={setMessage}
                 passwordHint={
                     <div className="mb-7 mt-2">
-                        {/* <ActionLink
+                        <ActionLink
                             to={forgetPasswordUrl}
                             className="font-semibold heading-text mt-2 underline"
                             themeColor={false}
                         >
                             Forgot password
-                        </ActionLink> */}
-                     <span>In case you have forgot username or password, please email at <b>fdm@epd.punjab.gov.pk</b></span>
+                        </ActionLink>
+                    {/* <br /> <span>In case you have forgot username or password, please email at <b>fdm@epd.punjab.gov.pk</b></span> */}
                     </div>
                 }
             />
