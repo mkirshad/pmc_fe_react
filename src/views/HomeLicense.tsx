@@ -4,11 +4,6 @@ import AxiosBase from '../services/axios/AxiosBase';
 import { Link } from 'react-router-dom'; // For navigation
 import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
-import Tabs from '@/components/ui/Tabs'
-import { HiOutlineHome, HiOutlineUser, HiOutlinePhone, HiViewList, HiDocumentDownload } from 'react-icons/hi'
-
-const { TabNav, TabList, TabContent } = Tabs
-
 
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
@@ -73,11 +68,7 @@ const Home = () => {
     const [userGroups, setUserGroups] = useState([]);
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
-    const [statistics, setStatistics] = useState({});
-    const [currentTab, setCurrentTab] = useState('tab1')
-    console.log(selectedRowId)
     // APPLICANT > LSO > LSM > DO > LSM2 > TL > DEO > Download License
-    const [loading, setLoading] = useState(false);
     const groups = [
         'APPLICANT',
         'LSO',
@@ -196,7 +187,6 @@ const Home = () => {
 
                        
         const fetchData = async () => {
-            setLoading(true); // Show the loading spinner
 
             try {
                 const response = await AxiosBase.get(`/pmc/ping/`, {
@@ -225,7 +215,7 @@ const Home = () => {
                 }
                 console.log('groupsResponse', groupsResponse)
     
-                const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
+                const response = await AxiosBase.get(`/pmc/license-by-user/`, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -253,19 +243,9 @@ const Home = () => {
                         }
                     }
                 }
-
-                // Fetch statistics for groups
-                const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
-                    headers: {
-                    "Content-Type": "multipart/form-data",
-                    },
-                });
-                setStatistics(statsResponse.data); // Save statistics to state
                 
             } catch (error) {
                 console.error('Error fetching data:', error);
-            } finally{
-                setLoading(false); // Hide the loading spinner
             }
           };
     
@@ -290,72 +270,12 @@ const Home = () => {
         }
     }, [userGroups, navigate]); // Run only once on component load
     
-console.log('selectedRowId:', selectedRowId)
-console.log(selectedRowId)
     return (
         <div>
-                {/* Display Tiles */}
-            <div className="tiles-container">
-                    {Object.entries(statistics).map(([group, count]) => (
-                        <div key={group} className="tile">
-                            <h3>{groupTitles[group] || group}</h3> {/* Use title or fallback to the group key */}
-                            <p>{count}</p>
-                        </div>
-                    ))}
-            </div>
-{/*             
-            <Steps current={step} className="mb-5">
-                {groups.map((group, index) => (
-                    <Steps.Item
-                        key={index}
-                        title={
-                            <div
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleStepClick(index)} // Handle step click
-                            >
-                                {groupTitles[group] || group} 
-                            </div>
-                        }
-                    />
-                ))}
-            </Steps> 
-*/}
-            {userGroups.length > 0 && 
-            <div className='mb-4'>
-                <h3>{userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
-            </div>
-            }
 
-{loading ? (
-            // Show a spinner or loading message
-<div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-    <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent border-solid rounded-full animate-spin"></div>
-    <p className="mt-4 text-lg font-medium text-gray-600">Loading data, please wait...</p>
-</div>
-
-        ) : (
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        // {
-                        //     accessorKey: 'selected',
-                        //     header: 'Select',
-                        //     size: 50,
-                        //     Cell: ({ row }) => (
-                        //         <input
-                        //             type="radio"
-                        //             name="rowSelect"
-                        //             onChange={() => {
-                        //                 setSelectedRowId(row.original.id);
-                        //                 const groupIndex = groups.indexOf(row.original.assigned_group);
-                        //                 if (groupIndex !== -1) {
-                        //                     setStep(groupIndex); // Update the Steps component
-                        //                 }
-                        //             }}
-                        //             checked={String(selectedRowId) === String(row.original.id)} // Ensure proper comparison
-                        //         />
-                        //     ),
-                        // },
                         ...columns,
                     ]}
                     
@@ -379,8 +299,7 @@ console.log(selectedRowId)
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting
                 />
-                )
-                }
+
         </div>
     );
 };

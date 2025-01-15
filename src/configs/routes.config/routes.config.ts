@@ -13,19 +13,25 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'homeSuper',
+        key: 'home.license',
+        path: '/home-license',
+        component: lazy(() => import('@/views/HomeLicense')),
+        authority: [],
+    },
+    {
+        key: 'home',
         path: '/home-super',
         component: lazy(() => import('@/views/HomeSuper')),
         authority: [],
     },
     {
-        key: 'homeAdmin',
+        key: 'home',
         path: '/home-admin',
         component: lazy(() => import('@/views/HomeAdmin')),
         authority: [],
     },
     {
-        key: 'homeDO',
+        key: 'home',
         path: '/home-do',
         component: lazy(() => import('@/views/HomeDO')),
         authority: [],

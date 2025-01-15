@@ -3,7 +3,6 @@ import {
     NAV_ITEM_TYPE_ITEM,
     NAV_ITEM_TYPE_COLLAPSE
 } from '@/constants/navigation.constant'
-
 import type { NavigationTree } from '@/@types/navigation'
 
 const navigationConfig: NavigationTree[] = [
@@ -13,7 +12,7 @@ const navigationConfig: NavigationTree[] = [
         path: '/spuid-signup',
         title: 'New Application',
         translateKey: 'nav.spuid.signup',
-        icon: 'singleMenu',
+        icon: 'FaUserPlus',
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],
         subMenu: [],
@@ -30,10 +29,10 @@ const navigationConfig: NavigationTree[] = [
     },
     {
         key: 'home.license',
-        path: '/home',
+        path: '/home-license',
         title: 'Download License',
         translateKey: 'nav.home1',
-        icon: 'home',
+        icon: 'MdDownload', // Material Icons
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],
         subMenu: [],

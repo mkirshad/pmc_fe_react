@@ -39,6 +39,15 @@ const flattenObject = (obj) => {
         groupAssignmentDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
     }
 
+
+    let duration = 'N/A';
+    if (obj.submittedapplication?.created_at && obj.submittedapplication?.created_at) {
+        const assignmentDate = new Date(obj.submittedapplication?.created_at);
+        const currentDate = new Date();
+        const differenceInTime = currentDate - assignmentDate;
+        duration = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+    }
+
     // Calculate the total fee amount and settled fee amount
     const totalFeeAmount = obj.applicantfees
         ? obj.applicantfees.reduce((sum, fee) => sum + parseFloat(fee.fee_amount || 0), 0)
@@ -54,6 +63,7 @@ const flattenObject = (obj) => {
     return {
         id: obj.id,
         application_Submission_Time: obj.submittedapplication?.created_at?.substring(0, 16) || 'N/A',
+        duration: duration || 'N/A',
         tracking_number: obj.tracking_number,
         first_name: obj.first_name,
         mobile_no: obj.mobile_no,
@@ -209,6 +219,7 @@ const Home = () => {
             'registration_for',
             'application_Start_Time',
             'application_Submission_Time',
+            'duration',
             'remarks',
             'group_assignment_days', // Ensure this is included
             'total_fee_amount',
@@ -227,6 +238,8 @@ const Home = () => {
                         customSize = 120; // Reduce size for these specific columns
                     } else if (['first_name'].includes(key)) {
                         customSize = 180; // Reduce size for these specific columns
+                    } else if (['duration'].includes(key)) {
+                        customSize = 80; // Reduce size for these specific columns
                     }
     
                     return {
