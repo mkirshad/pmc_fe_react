@@ -954,7 +954,7 @@ const {
             }
         }
 console.log('values.existingFileId', values.existingFileId)
-        if (values.existingFileId === true || values.flow_diagram){
+        if (values.existingFileId === 'true' || values.flow_diagram){
             console.log('its in if of existingField')
             
             const formData2 = new FormData();
