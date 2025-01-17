@@ -37,6 +37,16 @@ const navigationConfig: NavigationTree[] = [
         authority: [],
         subMenu: [],
     },
+    {
+        key: 'track.application',
+        path: '/track-application',
+        title: 'Track Application',
+        translateKey: 'nav.home1',
+        icon: 'MdOutlineTrackChanges', // Material Icons
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [],
+        subMenu: [],
+    },
    {
         key: 'analyticsMenu',
         path: '',

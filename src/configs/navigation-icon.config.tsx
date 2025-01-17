@@ -8,7 +8,7 @@ import {
 } from 'react-icons/pi'
 
 import { FaHome, FaChartPie, FaUserPlus } from 'react-icons/fa';
-import { MdAnalytics, MdDownload } from 'react-icons/md';
+import { MdAnalytics, MdDownload, MdOutlineTrackChanges } from 'react-icons/md';
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -20,7 +20,8 @@ const navigationIcon: NavigationIcons = {
     groupCollapseMenu: <PiBookBookmarkDuotone />,
     groupMenu: <PiBagSimpleDuotone />,
     FaUserPlus: <FaUserPlus />,
-    MdDownload: <MdDownload />
+    MdDownload: <MdDownload />,
+    MdOutlineTrackChanges:<MdOutlineTrackChanges />
 }
 
 export default navigationIcon

@@ -37,6 +37,12 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'track.application',
+        path: '/track-application',
+        component: lazy(() => import('@/views/TrackApplication')),
+        authority: [],
+    },
+    {
         key: 'reset.password',
         path: '/reset-password',
         component: lazy(() => import('@/views/auth/ResetPassword/ResetPassword2')),
