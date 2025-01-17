@@ -54,7 +54,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.collapseMenu.analyticsMenu',
         icon: 'collapseMenu',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: ['Analytics1', 'Analytics2'],
+        authority: ['Analytics', 'Analytics1', 'Analytics2', 'Analytics3'],
         subMenu: [
             {
                 key: 'analyticsMenu.analytics1',
