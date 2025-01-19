@@ -97,8 +97,8 @@ const Home = () => {
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
     const [selectedTile, setSelectedTile] = useState(null); // State for the selected tile
+    const [loading, setLoading] = useState(false);
 
-    console.log(selectedRowId)
     // APPLICANT > LSO > LSM > DO > LSM2 > TL > DEO > Download License
     const groups = [
         'APPLICANT',
@@ -153,6 +153,7 @@ const Home = () => {
     
     const handleTileClick = async (group) => {
         try {
+            setLoading(true);
             setSelectedTile(group); // Update selected tile state
 
               // Logic for LSO.1, LSO.2, LSO.3
@@ -190,6 +191,8 @@ const Home = () => {
             console.error("Error fetching filtered data:", error);
             setFlattenedData([])
             setColumns([])
+        }finally{
+            setLoading(false); // Hide the loading spinner
         }
     };
     const handleStepClick = (index) => {
@@ -265,6 +268,7 @@ const Home = () => {
     const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true); // Show the loading spinner
             try {
                 const response = await AxiosBase.get(`/pmc/ping/`, {
                     headers: {
@@ -302,6 +306,8 @@ const Home = () => {
                 
             } catch (error) {
                 console.error('Error fetching data:', error);
+            } finally{
+                setLoading(false); // Hide the loading spinner
             }
           };
     
@@ -347,6 +353,14 @@ console.log(selectedRowId)
             <div className='mb-4'>
                 <h3>{userGroups && userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
             </div>
+            {loading ? (
+            // Show a spinner or loading message
+<div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+    <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent border-solid rounded-full animate-spin"></div>
+    <p className="mt-4 text-lg font-medium text-gray-600">Loading data, please wait...</p>
+</div>
+
+        ) : (
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
@@ -372,7 +386,7 @@ console.log(selectedRowId)
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting
                 />
-
+                )}
         </div>
     );
 };
