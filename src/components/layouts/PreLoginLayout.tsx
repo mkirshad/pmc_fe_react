@@ -5,7 +5,7 @@ import type { CommonProps } from '@/@types/common'
 
 const PreLoginLayout = ({ children }: CommonProps) => {
     const location = useLocation()
-    const public_pages = ['/pub']
+    const public_pages = ['/pub', '/mis-directory']
 
 
     const { pathname } = location

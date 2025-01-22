@@ -137,6 +137,9 @@ const formatTrackingNumber = (value, isBackspace) => {
           <Link onClick={()=>{setTrackingPopupOpen(true); setDialogContent(null); setTankYouPopupType('info');}} to="" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
             Track Application
           </Link>
+          {/* <Link to="/mis-directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+            MIS-Directory
+          </Link> */}
         </div>
 
         <ConfirmDialog
@@ -187,8 +190,6 @@ const formatTrackingNumber = (value, isBackspace) => {
                 </Divider>
       </div>
       <footer className="footer-container">
-
-
         <span className="footer-text">
           Copyright &copy; {new Date().getFullYear()}{" "}
           <span className="font-semibold">PLMIS</span> All rights reserved. <br />

@@ -31,8 +31,24 @@ const ReviewAndSavePage = ({ groupList, children }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  const [documentType, setDocumentType] = useState(
+    "Fee Verification from Treasury/District Accounts Office"
+  );
+
   const handleOpenModal = () => setModalVisible(true);
   const handleCloseModal = () => setModalVisible(false);
+
+  // Handler for radio change
+  const handleDocumentTypeChange = (e) => {
+    setDocumentType(e.target.value);
+  };
+
+  // Wrap the file change handler so that it sends the current documentType
+  const onFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleDocumentFormSubmit(e.target.files[0], documentType);
+    }
+  };
 
   const {
     applicantDetail,
@@ -154,7 +170,7 @@ const handleDocumentFormSubmit = async (document, document_description) => {
         response.data, // Append the new response
       ],
     });
-    alert("Payment Verification Letter is uploaded")
+    alert(documentType + " is uploaded")
   } catch (error) {
       console.error('Error in POST request:', error.response || error.message);
       navigate('/error');
@@ -877,21 +893,49 @@ const handleChangeManualFields = (fieldName, value) => {
 
   {/* GLOBAL FIELDS */}
   <div className="grid md:grid-cols-1 gap-4">
+
+    <div className="flex flex-col mb-4">
+          <label className="mb-2 font-semibold">Select Document Type:</label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="documentType"
+                value="Fee Verification from Treasury/District Accounts Office"
+                checked={documentType === "Fee Verification from Treasury/District Accounts Office"}
+                onChange={handleDocumentTypeChange}
+                className="mr-2"
+              />
+              Fee Verification from Treasury/District Accounts Office
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="documentType"
+                value="Identity Document"
+                checked={documentType === "Identity Document"}
+                onChange={handleDocumentTypeChange}
+                className="mr-2"
+              />
+              Identity Document
+            </label>
+          </div>
+        </div>
+
       <FormItem
-                label="Fee Verification from Treasury/District Accounts Office"
+                label="Fee Verification from Treasury/District Accounts Office / Identity Document"
                 invalid={Boolean(errors.consentPermitFile)}
                 errorMessage={errors.consentPermitFile?.message}
               >
                 <Input
                   type="file"
                   accept=".pdf,.png,.jpg"
-                  onChange={(e) =>
-                    handleDocumentFormSubmit(e.target.files[0], "Fee Verification from Treasury/District Accounts Office")
-                  }
+                  onChange={onFileChange}
                   disabled={disabled_lsm}
                 />
       </FormItem>
-    </div>
+      </div>
+
     </CardContent>
     </Card>
     </>

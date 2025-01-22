@@ -41,7 +41,6 @@
   align-items: center;    /* Horizontally center items */
   justify-content: center; /* Vertically center items */
   text-align: center;      /* Center-align text */
-  padding: 0,20px;           /* Add padding for spacing */
   background-color: transparent; /* Make the background transparent */
   font-size: 14px;         /* Adjust font size */
   border-top: 1px solid #ddd; /* Optional border for visual separation */
@@ -59,9 +58,20 @@
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #a8e6cf, #dcedc1);
-  padding: 30px 20px;
+  padding: 30px 20px 0px;
   width: 100%;
-  height: 100vh;
+  height: 100vh; /* 100% of the viewport height */
+}
+
+
+
+.banner-container2 {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #a8e6cf, #dcedc1);
+  padding: 30px 20px 0px;
+  width: 100%;
+  height: 110vh; /* 100% of the viewport height */
 }
 
 .banner-header {
