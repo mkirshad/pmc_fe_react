@@ -418,6 +418,9 @@ console.log(selectedRowId)
             <div className='mb-4'>
                 <h3>{userGroups && userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
             </div>
+            <div>
+                <span>Red colored records needs immediate attention.</span>
+            </div>
             {loading ? (
             // Show a spinner or loading message
 <div className="flex flex-col items-center justify-center h-screen bg-gray-50">

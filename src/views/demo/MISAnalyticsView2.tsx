@@ -10,6 +10,9 @@ import { Fill, Stroke, Style } from 'ol/style';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { parse } from 'terraformer-wkt-parser';
 import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { motion } from "framer-motion";
+import { Divider } from '@mui/material';
 
 const DistrictMap = ({ onDistrictClick }) => {
   const mapRef = useRef(null);
@@ -238,14 +241,61 @@ const DistrictMap = ({ onDistrictClick }) => {
 
   
   return (
-  <div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {tilesData.map((tile, index) => (
-          <Tile key={index} title={tile.title} data={tile.data} color={tile.color} icon={tile.icon} />
-        ))}
+  
+    <div className="banner-container2 grid">
+    
+      <header className="banner-header" >
+        <Link to="/pub" className='transition-all duration-300 ease-in-out transform hover:scale-105'>
+          <div className="logo-section">
+              <img
+              src="/img/logo/epa_logo-removebg-preview.png"
+              alt="GOP Logo"
+              className="header-logo"
+              />
+              <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
+              <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
+
+              <span className="header-text">PLMIS</span>
+          </div>
+      </Link>
+      <h6 className="header-text">Public Directory - MIS</h6>
+      <nav className="banner-nav">
+        <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+          Login
+        </Link>
+      </nav>
+    </header>
+  
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+          {tilesData.map((tile, index) => (
+            <Tile key={index} title={tile.title} data={tile.data} color={tile.color} icon={tile.icon} />
+          ))}
+        </div>
+
+      <div>
+        <div ref={mapRef} style={{ height: '600px', width: '500px' }} className='mb-4' />
       </div>
 
-    <div ref={mapRef} style={{ height: '600px', width: '500px' }} />
+
+
+
+
+
+
+      <div className="mb-0">
+                <Divider textAlign="left">
+                </Divider>
+        </div>
+        <footer className="footer-container ">
+            <span className="footer-text">
+                Copyright &copy; {new Date().getFullYear()}{" "}
+                <span className="font-semibold">PLMIS</span> All rights reserved. <br />
+                Plastic Management Cell, Strategic Planning & Implementation Unit,
+                Environmental Protection Agency, and Environment Protection & Climate
+                Change Department, Government of the Punjab.
+            </span>
+        </footer>
+
   </div>
   ); // Adjust the width to 50%
 };
@@ -267,12 +317,10 @@ const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
       <div className="flex items-center mb-4">
         {icon}
         <h2 className="text-2xl font-bold text-white ml-2">{title}</h2>
-      </div>
-      <div className="">
-        {data.map((item, index) => (
+      {data.map((item, index) => (
           (index === 0 )?
           <div key={index} className="text-center" title={item.title}> {/* Use item.title for the tooltip */}
-            <p className="text-3xl font-bold text-white">{item.value}</p>
+            <p className="text-3xl font-bold text-white ml-3">{item.value}</p>
           </div>
           :null
         ))}

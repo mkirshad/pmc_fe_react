@@ -118,7 +118,7 @@ const formatTrackingNumber = (value, isBackspace) => {
         </div>
         <nav className="banner-nav">
           <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            Staff Login
+            Login
           </Link>
         </nav>
       </header>
