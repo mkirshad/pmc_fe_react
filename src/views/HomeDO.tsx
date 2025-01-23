@@ -8,50 +8,31 @@ import { useNavigate } from 'react-router-dom';
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
 const flattenObject = (obj) => {
-    // Step 1: Collect remarks from the assignment entries
-    // that have assigned_group === 'APPLICANT'.
-    const applicantAssignments = ((obj.assigned_group === 'APPLICANT' && obj.applicationassignment) || []).filter(
-        (assignment) =>
-        assignment.assigned_group === 'APPLICANT' &&
-        assignment.remarks &&
-        assignment.remarks !== 'undefined'
+    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'Download License'];
+  
+    // Step 1: Determine if assigned group is moving backward
+    const currentGroupIndex = groupOrder.indexOf(obj.assigned_group);
+    const previousAssignments = obj.applicationassignment || [];
+    const previousGroupIndex = (() => {
+        // Get the second-to-last assignment
+        if (previousAssignments.length > 1) {
+          const secondLastAssignment = previousAssignments[previousAssignments.length - 2];
+          return groupOrder.indexOf(secondLastAssignment.assigned_group);
+        }
+        // Return -1 if there are fewer than two valid assignments
+        return -1;
+      })();
+    
+  
+    const isAssignedBack = previousGroupIndex !== -1 && previousGroupIndex > currentGroupIndex;
+  
+    // Step 2: Extract the latest comment when assigned back
+    const lastBackAssignment = previousAssignments.find(
+      (assignment) => groupOrder.indexOf(assignment.assigned_group) === previousGroupIndex
     );
-
-    // Map out just the remarks from those assignments
-    const applicantRemarks = applicantAssignments.map((a) => a.remarks);
-
-    // If we want to ALSO include the top-level remarks if this applicant’s
-    // own assigned_group is 'APPLICANT', do something like:
-    // if (obj.assigned_group === 'APPLICANT' && obj.remarks) {
-    //   applicantRemarks.push(obj.remarks);
-    // }
-
-    // Step 2: Combine them or use 'N/A' if none
-    const combinedRemarks =
-        applicantRemarks.length > 0 ? applicantRemarks.join('; ') : 'N/A';
-
-          // Step 1: Extract the latest time for the matching assigned_group in applicationassignment
-    const groupAssignments = obj.applicationassignment.filter(
-        (assignment) => assignment.assigned_group === obj.assigned_group
-    );
-
-    // Find the latest time for the matching group
-    const latestGroupAssignment = groupAssignments.reduce((latest, current) => {
-        const currentTime = new Date(current.updated_at).getTime();
-        return currentTime > new Date(latest.updated_at).getTime() ? current : latest;
-    }, groupAssignments[0]);
-
-
-    // Calculate group assignment days
-    let groupAssignmentDays = 'N/A';
-    if (latestGroupAssignment && latestGroupAssignment.updated_at) {
-        const assignmentDate = new Date(latestGroupAssignment.updated_at);
-        const currentDate = new Date();
-        const differenceInTime = currentDate - assignmentDate;
-        groupAssignmentDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
-    }
-
-    // 3) Return your flattened fields + the combined remarks
+    const lastBackComment = lastBackAssignment ? lastBackAssignment.remarks : 'N/A';
+  
+    // Step 3: Combine the flattened fields
     return {
       id: obj.id,
       tracking_number: obj.tracking_number,
@@ -62,11 +43,12 @@ const flattenObject = (obj) => {
       application_status: obj.application_status,
       assigned_group: obj.assigned_group,
       registration_for: obj.registration_for,
-      days_pending_for: groupAssignmentDays,
-      // The new "remarks" field we’ll show in the grid:
-      remarks: combinedRemarks,
+      remarks: obj.remarks || 'N/A',
+      last_back_comment: lastBackComment, // Add last comment when assigned back
+      is_assigned_back: isAssignedBack? 'Yes':'No', // Flag for highlighting
     };
   };
+  
   
 
 const sanitizeData = (data) => {
@@ -196,56 +178,109 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
         const allowedColumns = [
-            'first_name',
-            'CNIC',
-            'mobile_no',
-            'tracking_number',
-            'registration_for',
-            'days_pending_for',
-            'remarks',
-        ]; // List of allowed columns
-    
+          'first_name',
+          'CNIC',
+          'mobile_no',
+          'tracking_number',
+          'registration_for',
+          'days_pending_for',
+          'remarks',
+          'is_assigned_back', // Include this column
+        ];
+      
         const flattenedData = sanitizeData(data); // Ensure sanitized data
         const firstRecord = flattenedData[0];
-        console.log(data)
+      
         const columns = [
-            ...Object.keys(firstRecord)
-                .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => {
-                    let customSize = 160; // Default column size
-                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
-                        customSize = 120; // Reduce size for these specific columns
-                    } else if (['first_name'].includes(key)) {
-                        customSize = 180; // Reduce size for these specific columns
-                    }
-    
-                    return {
-                        accessorKey: key,
-                        header: key
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char) => char.toUpperCase()),
-                        size: customSize,
-                        Cell: ({ cell, row }) => {
-                            const id = row.original.id;
-                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
-                            return (
-                                <a
-                                    href={url} // Link to the desired URL
-                                    target="_blank" // Open in a new tab on click
-                                    rel="noopener noreferrer" // Security best practices for external links
-                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                                >
-                                    {cell.getValue() || '-'}
-                                </a>
-                            );
-                        },
-                    };
-                }),
+          ...Object.keys(firstRecord)
+            .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
+            .map((key) => {
+              let customSize = 160; // Default column size
+              if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
+                customSize = 120; // Reduce size for these specific columns
+              } else if (['first_name'].includes(key)) {
+                customSize = 180; // Increase size for these specific columns
+              }
+      
+              // Add custom filter for is_assigned_back
+              if (key === 'is_assigned_back') {
+                return {
+                  accessorKey: key,
+                  header: 'Assigned Back',
+                  size: customSize,
+                  Filter: ({ column }) => (
+                    <select
+                      value={column.getFilterValue() || ''}
+                      onChange={(e) => column.setFilterValue(e.target.value || undefined)} // Set the filter value
+                      style={{ width: '100%', padding: '4px' }}
+                    >
+                      <option value="">All</option>
+                      <option value="Yes">Yes</option>
+                      <option value="">No</option>
+                    </select>
+                  ),
+                  filterFn: (row, _id, filterValue) => {
+                    return filterValue === '' || row.original[key] === filterValue;
+                  },
+                  Cell: ({ cell, row }) => {
+                    const id = row.original.id;
+                    const assignedBack = row.original.is_assigned_back;
+                    const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                  
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          cursor: 'pointer',
+                          // If assigned_back = 'Yes', color is red; otherwise, it's blue
+                          color: assignedBack === 'Yes' ? 'red' : 'blue',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {cell.getValue() || '-'}
+                      </a>
+                    );
+                  },
+                };
+              }
+      
+              return {
+                accessorKey: key,
+                header: key
+                  .replace(/_/g, ' ')
+                  .replace(/\b\w/g, (char) => char.toUpperCase()),
+                size: customSize,
+                Cell: ({ cell, row }) => {
+                    const id = row.original.id;
+                    const assignedBack = row.original.is_assigned_back;
+                    const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                  
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          cursor: 'pointer',
+                          // If assigned_back = 'Yes', color is red; otherwise, it's blue
+                          color: assignedBack === 'Yes' ? 'red' : 'blue',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {cell.getValue() || '-'}
+                      </a>
+                    );
+                  },
+                  
+              };
+            }),
         ];
-
-    
+      
         return { flattenedData, columns };
-    };
+      };
+      
     const navigate = useNavigate();
     useEffect(() => {
                        
@@ -394,49 +429,27 @@ console.log(selectedRowId)
 
         ) : (
             <MaterialReactTable
-                    key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        // {
-                        //     accessorKey: 'selected',
-                        //     header: 'Select',
-                        //     size: 50,
-                        //     Cell: ({ row }) => (
-                        //         <input
-                        //             type="radio"
-                        //             name="rowSelect"
-                        //             onChange={() => {
-                        //                 setSelectedRowId(row.original.id);
-                        //                 const groupIndex = groups.indexOf(row.original.assigned_group);
-                        //                 if (groupIndex !== -1) {
-                        //                     setStep(groupIndex); // Update the Steps component
-                        //                 }
-                        //             }}
-                        //             checked={String(selectedRowId) === String(row.original.id)} // Ensure proper comparison
-                        //         />
-                        //     ),
-                        // },
-                        ...columns,
+                        ...columns
                     ]}
                     data={flattenedData.map((row) => ({
                         ...row,
-                        assigned_group_title: groupTitles[row.assigned_group] || row.assigned_group, // Add a title for the assigned group
-                    }))} // Include updated data
-                    getRowId={(row) => row.id} // Explicitly set the row ID using the `id` field from your original data
+                        assigned_group_title: groupTitles[row.assigned_group] || row.assigned_group,
+                    }))}
+                    getRowId={(row) => row.id}
                     initialState={{
                         showColumnFilters: false,
                     }}
                     defaultColumn={{
                         maxSize: 420,
                         minSize: 200,
-                        size: 100, // default size is usually 180
+                        size: 100,
                     }}
                     enableColumnResizing
-                    columnResizeMode="onChange" // default
-                    enableTopToolbar={true} // Disables the top-right controls entirely
-                    // enableGlobalFilter={false} // Disables the global search/filter box
-                    enablePagination={true} // Optionally disable pagination controls
-                    // enableSorting={false} // Optionally disable column sorting
-                />
+                    columnResizeMode="onChange"
+                    enableTopToolbar={true}
+                    enablePagination={true}
+                    />
                 )
             }
         </div>
