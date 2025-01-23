@@ -8,6 +8,31 @@ import { useNavigate } from 'react-router-dom';
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
 const flattenObject = (obj) => {
+
+    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'Download License'];
+  
+    // Step 1: Determine if assigned group is moving backward
+    const currentGroupIndex = groupOrder.indexOf(obj.assigned_group);
+    const previousAssignments = obj.applicationassignment || [];
+    const previousGroupIndex = (() => {
+        // Get the second-to-last assignment
+        if (previousAssignments.length > 1) {
+          const secondLastAssignment = previousAssignments[previousAssignments.length - 2];
+          return groupOrder.indexOf(secondLastAssignment.assigned_group);
+        }
+        // Return -1 if there are fewer than two valid assignments
+        return -1;
+      })();
+    
+  
+    const isAssignedBack = previousGroupIndex !== -1 && previousGroupIndex > currentGroupIndex;
+  
+    // Step 2: Extract the latest comment when assigned back
+    const lastBackAssignment = previousAssignments.find(
+      (assignment) => groupOrder.indexOf(assignment.assigned_group) === previousGroupIndex
+    );
+
+
     // Utility to format numbers as PKR currency
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-PK', {
@@ -73,6 +98,7 @@ const flattenObject = (obj) => {
         group_assignment_days: groupAssignmentDays, // Include the calculated days difference
         total_fee_amount: formatCurrency(totalFeeAmount.toFixed(2)), // Include total fee amount
         verified_fee_amount: formatCurrency(verifiedFeeAmount.toFixed(2)), // Include verified fee amount
+        is_assigned_back: isAssignedBack? 'Yes':'No', // Flag for highlighting
     };
 };
 
@@ -229,47 +255,99 @@ const Home = () => {
             'group_assignment_days', // Ensure this is included
             'total_fee_amount',
             'verified_fee_amount',
+            'is_assigned_back', // Include this column
         ];
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data
         const firstRecord = flattenedData[0];
     
+        
         const columns = [
             ...Object.keys(firstRecord)
-                .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                .map((key) => {
-                    let customSize = 160; // Default column size
-                    if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
-                        customSize = 120; // Reduce size for these specific columns
-                    } else if (['first_name'].includes(key)) {
-                        customSize = 180; // Reduce size for these specific columns
-                    } else if (['duration'].includes(key)) {
-                        customSize = 80; // Reduce size for these specific columns
-                    }
-    
-                    return {
-                        accessorKey: key,
-                        header: key
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char) => char.toUpperCase()),
-                        size: customSize,
-                        Cell: ({ cell, row }) => {
-                            const id = row.original.id;
-                            const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
-                            return (
-                                <a
-                                    href={url} // Link to the desired URL
-                                    target="_blank" // Open in a new tab on click
-                                    rel="noopener noreferrer" // Security best practices for external links
-                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                                >
-                                    {cell.getValue() || '-'}
-                                </a>
-                            );
-                        },
-                    };
-                }),
-        ];
+              .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
+              .map((key) => {
+                let customSize = 160; // Default column size
+                if (['mobile_no', 'application_status', 'assigned_group', 'total_fee_amount'].includes(key)) {
+                  customSize = 120; // Reduce size for these specific columns
+                } else if (['first_name'].includes(key)) {
+                  customSize = 180; // Increase size for these specific columns
+                }
+        
+                // Add custom filter for is_assigned_back
+                if (key === 'is_assigned_back') {
+                  return {
+                    accessorKey: key,
+                    header: 'Assigned Back',
+                    size: customSize,
+                    Filter: ({ column }) => (
+                      <select
+                        value={column.getFilterValue() || ''}
+                        onChange={(e) => column.setFilterValue(e.target.value || undefined)} // Set the filter value
+                        style={{ width: '100%', padding: '4px' }}
+                      >
+                        <option value="">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="">No</option>
+                      </select>
+                    ),
+                    filterFn: (row, _id, filterValue) => {
+                      return filterValue === '' || row.original[key] === filterValue;
+                    },
+                    Cell: ({ cell, row }) => {
+                      const id = row.original.id;
+                      const assignedBack = row.original.is_assigned_back;
+                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                    
+                      return (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            cursor: 'pointer',
+                            // If assigned_back = 'Yes', color is red; otherwise, it's blue
+                            color: assignedBack === 'Yes' ? 'red' : 'blue',
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          {cell.getValue() || '-'}
+                        </a>
+                      );
+                    },
+                  };
+                }
+        
+                return {
+                  accessorKey: key,
+                  header: key
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, (char) => char.toUpperCase()),
+                  size: customSize,
+                  Cell: ({ cell, row }) => {
+                      const id = row.original.id;
+                      const assignedBack = row.original.is_assigned_back;
+                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                    
+                      return (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            cursor: 'pointer',
+                            // If assigned_back = 'Yes', color is red; otherwise, it's blue
+                            color: assignedBack === 'Yes' ? 'red' : 'blue',
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          {cell.getValue() || '-'}
+                        </a>
+                      );
+                    },
+                    
+                };
+              }),
+          ];
     
         return { flattenedData, columns };
     };

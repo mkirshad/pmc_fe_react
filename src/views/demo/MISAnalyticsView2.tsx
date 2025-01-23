@@ -1,4 +1,3 @@
-// src/DistrictMap.js
 import React, { useEffect, useRef, useState } from 'react';
 import 'ol/ol.css';
 import { Map, View } from 'ol';
@@ -10,6 +9,7 @@ import OSM from 'ol/source/OSM';
 import { Fill, Stroke, Style } from 'ol/style';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { parse } from 'terraformer-wkt-parser';
+import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/fa';
 
 const DistrictMap = ({ onDistrictClick }) => {
   const mapRef = useRef(null);
@@ -17,6 +17,9 @@ const DistrictMap = ({ onDistrictClick }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState(null);
 
+  const [tilesData, setTilesData] = useState([]);
+  const [dataApplicants, setDataApplicants] = useState([]);
+  
   useEffect(() => {
     // Initialize the map
     const initialMap = new Map({
@@ -59,7 +62,7 @@ const DistrictMap = ({ onDistrictClick }) => {
   useEffect(() => {
     // Fetch districts and populate the map
     const fetchData = async () => {
-      const response = await AxiosBase.get('/pmc/districts', {
+      const response = await AxiosBase.get('/pmc/districts-public', {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -97,6 +100,116 @@ const DistrictMap = ({ onDistrictClick }) => {
           maxZoom: 10, // Set a maximum zoom level to avoid over-zooming
         });
       }
+
+
+
+
+
+
+      
+      try{
+        const respons = await AxiosBase.get('/pmc/mis-applicant-statistics/', {
+                headers: {
+                "Content-Type": "multipart/form-data",
+                },
+            });
+          console.log(respons.data)
+    
+          const { district_data, registration_statistics, grid_data } = respons.data;
+    
+            // Validate district_data
+            if (!district_data || !Array.isArray(district_data)) {
+              throw new Error('Invalid district_data format');
+            }
+    
+            // Validate registration_statistics
+            if (!registration_statistics || !Array.isArray(registration_statistics)) {
+              throw new Error('Invalid registration_statistics format');
+            }
+    
+            // Validate grid_data
+            if (!grid_data || !Array.isArray(grid_data)) {
+              throw new Error('Invalid grid_data format');
+            }
+    
+            // Proceed with data processing...
+          
+    
+          const iconMap: Record<string, JSX.Element> = {
+            Total: <FaChartBar className="text-white text-3xl" />,
+            Producer: <FaIndustry className="text-white text-3xl" />,
+            Consumer: <FaUser className="text-white text-3xl" />,
+            Recycler: <FaRecycle className="text-white text-3xl" />,
+            Collector: <FaTruck className="text-white text-3xl" />,
+          };
+      
+          const colorMap: Record<string, string> = {
+            Producer: 'bg-orange-500',
+            Consumer: 'bg-blue-500',
+            Recycler: 'bg-green-500',
+            Collector: 'bg-yellow-500',
+          };
+    
+            // Map registration_statistics into tilesData
+        // Map registration_statistics into tilesData
+        const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
+          title: stat.registration_for,
+          data: [
+            { value: stat.Applications, label: 'Applications', title: 'Applications' },
+            { value: stat.DO, label: 'DO', title: 'District Officer (Environment)/Assistant/Deputy Director/District In-Charge' },
+            { value: stat.PMC, label: 'PMC', title: 'Plastic Management Cell' },
+            { value: stat.APPLICANT, label: 'Applicant', title: 'Applicant' },
+            { value: stat.Licenses, label: 'Licenses', title: 'Licenses' },
+          ],
+          color: colorMap[stat.registration_for] || 'bg-gray-500',
+          icon: iconMap[stat.registration_for] || null,
+        }));
+        
+            
+    
+              // Process district-wise statistics for ApexCharts
+              const districts = Array.from(new Set(
+                district_data
+                  .map(item => item.businessprofile__district__district_name?.trim() || 'Unknown')
+                  .filter(name => name !== 'Unknown')
+              ));
+    
+              const categories = Array.from(new Set(
+                district_data
+                  .map(item => item.registration_for || 'Unknown')
+                  .filter(category => category !== 'Unknown')
+              ));
+    
+              const series = categories.map(category => {
+                const dataPoints = districts.map(district => {
+                  const record = respons.data.district_data.find(item => item.registration_for === category && item.businessprofile__district__district_name === district);
+                  return record ? record.count : 0;
+                });
+                return { name: category, data: dataPoints };
+              });
+    
+
+              setTilesData(dynamicTiles);
+              
+    
+              // Grid data
+              setDataApplicants(respons.data.grid_data);
+            }catch(error){
+              const errorDetails = {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            };
+    
+            navigate('/error', { state: { error: errorDetails } });
+            }
+
+
+
+
+
+
+
     };
 
     fetchData();
@@ -123,7 +236,49 @@ const DistrictMap = ({ onDistrictClick }) => {
     return () => mapInstance.un('click', handleMapClick); // Cleanup
   }, [mapInstance, vectorLayer]);
 
-  return <div ref={mapRef} style={{ height: '600px', width: '100%' }} />;
+  
+  return (
+  <div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {tilesData.map((tile, index) => (
+          <Tile key={index} title={tile.title} data={tile.data} color={tile.color} icon={tile.icon} />
+        ))}
+      </div>
+
+    <div ref={mapRef} style={{ height: '600px', width: '500px' }} />
+  </div>
+  ); // Adjust the width to 50%
+};
+
+
+interface TileProps {
+  title: string;
+  data: {
+    value: number;
+    label: string;
+  }[];
+  color: string;
+  icon: React.ReactNode;
+}
+
+const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
+  return (
+    <div className={`shadow-md rounded p-6 w-full ${color}`}>
+      <div className="flex items-center mb-4">
+        {icon}
+        <h2 className="text-2xl font-bold text-white ml-2">{title}</h2>
+      </div>
+      <div className="">
+        {data.map((item, index) => (
+          (index === 0 )?
+          <div key={index} className="text-center" title={item.title}> {/* Use item.title for the tooltip */}
+            <p className="text-3xl font-bold text-white">{item.value}</p>
+          </div>
+          :null
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default DistrictMap;

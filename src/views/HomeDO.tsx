@@ -30,7 +30,6 @@ const flattenObject = (obj) => {
     const lastBackAssignment = previousAssignments.find(
       (assignment) => groupOrder.indexOf(assignment.assigned_group) === previousGroupIndex
     );
-    const lastBackComment = lastBackAssignment ? lastBackAssignment.remarks : 'N/A';
   
     // Step 3: Combine the flattened fields
     return {
@@ -44,7 +43,6 @@ const flattenObject = (obj) => {
       assigned_group: obj.assigned_group,
       registration_for: obj.registration_for,
       remarks: obj.remarks || 'N/A',
-      last_back_comment: lastBackComment, // Add last comment when assigned back
       is_assigned_back: isAssignedBack? 'Yes':'No', // Flag for highlighting
     };
   };
