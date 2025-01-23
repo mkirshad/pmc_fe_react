@@ -720,9 +720,6 @@ const handleChangeManualFields = (fieldName, value) => {
                   disabled={disabled}
                 />
               </FormItem>
-              <span data-tip data-for="info-tooltip" className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer">
-                <FaInfoCircle className="text-blue-500" />
-              </span>
 
               <FormItem
                 label="List of Stockist/Distributor/Supplier to whom the products will be supplied"

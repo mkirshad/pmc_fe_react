@@ -574,8 +574,8 @@ const CustomerEdit = () => {
         formData.append("applicant", applicantDetail.id);
       
       // Example fields — update/add/remove these as per your model
-        formData.append("latitude", manualFields.latitude || "");
-        formData.append("longitude", manualFields.longitude || "");
+        formData.append("latitude", (manualFields.latitude ? parseFloat(manualFields.latitude).toFixed(6) : ""));
+        formData.append("longitude", (manualFields.longitude ? parseFloat(manualFields.longitude).toFixed(6) : ""));      
         formData.append("list_of_products", manualFields.list_of_products || "");
         formData.append("list_of_by_products", manualFields.list_of_by_products || "");
         formData.append("raw_material_imported", manualFields.raw_material_imported || "");
