@@ -137,9 +137,9 @@ const formatTrackingNumber = (value, isBackspace) => {
           <Link onClick={()=>{setTrackingPopupOpen(true); setDialogContent(null); setTankYouPopupType('info');}} to="" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
             Track Application
           </Link>
-          <Link to="/mis-directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+          {/* <Link to="/mis-directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
             MIS-Directory
-          </Link>
+          </Link> */}
         </div>
 
         <ConfirmDialog
