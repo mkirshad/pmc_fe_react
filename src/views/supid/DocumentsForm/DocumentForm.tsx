@@ -28,7 +28,14 @@ const validationSchema: ZodType<LicenseDetailFormSchema> =
       .refine(
           (file) => file.size <= 10 * 1024 * 1024, // Check file size
           { message: 'File must be smaller than 10 MB.' }
-      ).optional()
+      ).optional(),
+  flow_diagram2: z
+    .instanceof(File) // Ensure the value is a File instance
+    .refine(
+        (file) => file.size <= 10 * 1024 * 1024, // Check file size
+        { message: 'File must be smaller than 10 MB.' }
+    ).optional()
+
        // Make the field mandatory
       // .refine(
       //     (file) => !!file, // Ensure the file is provided

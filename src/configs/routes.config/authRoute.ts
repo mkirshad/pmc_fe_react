@@ -11,7 +11,7 @@ const authRoute: Routes = [
     {
         key: 'pub',
         path: `/mis-directory`,
-        component: lazy(() => import('@/views/demo/MISAnalyticsView')),
+        component: lazy(() => import('@/views/demo/MISAnalyticsView2')),
         authority: [],
     },
     {
