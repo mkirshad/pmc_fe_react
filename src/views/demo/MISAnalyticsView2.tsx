@@ -44,6 +44,8 @@ const DistrictMap = ({ onDistrictClick }) => {
 
   // ---------- Applicant data and filters ----------
   const [applicantData, setApplicantData] = useState([]);
+  const [districtOptions,  setDistrictOptions]= useState([]);
+
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [enabledCategories, setEnabledCategories] = useState<string[]>([
     'Producer', 'Distributor', 'Collector', 'Recycler'
@@ -115,12 +117,21 @@ const DistrictMap = ({ onDistrictClick }) => {
       try {
         const resp = await AxiosBase.get('/pmc/applicant-location-public/');
         setApplicantData(resp.data);
+  
+        // Extract unique district names directly from resp.data
+        const distinctDistricts = new Set(
+          resp.data.map((row) => row.district_name).filter(Boolean)
+        );
+        const sortedDistricts = Array.from(distinctDistricts).sort();
+        setDistrictOptions(sortedDistricts);
+  
       } catch (error) {
         console.error('Error fetching applicant data:', error);
       }
     };
     fetchApplicantData();
   }, []);
+  
 
   const districtFilteredData = useMemo(() => {
       if (!selectedDistrict) return applicantData;
@@ -288,7 +299,12 @@ const DistrictMap = ({ onDistrictClick }) => {
     });
     return result;
   }
-
+  // set district options
+  // const districtOptions = useMemo(() => {
+  //   // Extract unique district names from data
+  //   const distinct = new Set(applicantData.map((row) => row.district_name).filter(Boolean));
+  //   return Array.from(distinct).sort(); // convert to array, sort alphabetically
+  // }, [applicantData]);
 
   // const handleColumnFiltersChange = (updaterOrValue) => {
   //   // 1) Resolve the new filter data from MRT
@@ -359,6 +375,7 @@ const DistrictMap = ({ onDistrictClick }) => {
     //  - an object
     //  - a functional updater (like (old) => newFilters)
     let newFilters;
+    // alert('its here 2')
 
     if (typeof updaterOrValue === 'function') {
       // It's a functional updater
@@ -463,6 +480,7 @@ const DistrictMap = ({ onDistrictClick }) => {
             enabledCategories={enabledCategories}
             setEnabledCategories={setEnabledCategories}
             columnFilters={columnFilters}
+            districtOptions={districtOptions}
             onColumnFiltersChange={handleColumnFiltersChange}
           />
         </div>
@@ -654,8 +672,10 @@ const CategoryTiles = ({
     enabledCategories,
     setEnabledCategories,
     columnFilters,
-    onColumnFiltersChange,
+    districtOptions,
+    onColumnFiltersChange
   }) => {
+console.log('districtOptions', districtOptions)
 
   // // // 1) Gather unique district names for the District filter
   // const districtOptions = useMemo(() => {
@@ -666,11 +686,11 @@ const CategoryTiles = ({
 
 
     // // 1) Gather unique district names for the District filter
-    const districtOptions = useMemo(() => {
-      // Extract unique district names from data
-      const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
-      return Array.from(distinct).sort(); // convert to array, sort alphabetically
-    }, [data]);
+    // const districtOptions = useMemo(() => {
+    //   // Extract unique district names from data
+    //   const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
+    //   return Array.from(distinct).sort(); // convert to array, sort alphabetically
+    // }, [data]);
 
   const columns = useMemo(
     () => [
@@ -686,8 +706,10 @@ const CategoryTiles = ({
             <Select
               displayEmpty
               value={filterValue} // store the filter state
-              onChange={(e) =>
+              onChange={(e) => {
                 column.setFilterValue(e.target.value || undefined)
+                // alert('its here')
+              }
               }
               style={{ width: '100%' }}
             >
@@ -779,12 +801,13 @@ const CategoryTiles = ({
       },
       // ... any other columns ...
     ],
-    [],
+    [districtOptions],
   );
 
   
 
-  return (
+  return (<>{ 
+    districtOptions.length > 0 &&
     <MaterialReactTable
       columns={columns}
       data={data}
@@ -797,6 +820,9 @@ const CategoryTiles = ({
         showColumnFilters: true,
       }}
     />
+  }
+  </>
+    
   );
 
 };
