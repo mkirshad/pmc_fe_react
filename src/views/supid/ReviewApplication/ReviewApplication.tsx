@@ -19,6 +19,7 @@ import { Divider } from '@mui/material';
 import { FaInfoCircle } from 'react-icons/fa'; // Information icon
 import { Tooltip } from 'react-tooltip'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import { useSessionUser } from '@/store/authStore';
 
 const ReviewAndSavePage = ({ groupList, children }) => {
   const [selectedGroup, setSelectedGroup] = useState(
@@ -50,6 +51,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
     }
   };
 
+
   const {
     applicantDetail,
     businessDetailIndividual,
@@ -63,6 +65,20 @@ const ReviewAndSavePage = ({ groupList, children }) => {
     completedSections,
   } = useFormStore();
 
+  const userAuthority = useSessionUser((state) => state.user.authority) || []
+  const isAuthorized = userAuthority.some(
+    group => group === applicantDetail.assignedGroup
+  );
+  const isAuthorizedDO = userAuthority.some(
+    group => group === 'DO'
+  );
+  const isAuthorizedLSM = userAuthority.some(
+    group => group === 'LSM'
+  );
+  const isAuthorizedLSM2 = userAuthority.some(
+    group => group === 'LSM2'
+  );
+
   const {
     control,
     handleSubmit,
@@ -75,8 +91,8 @@ const ReviewAndSavePage = ({ groupList, children }) => {
 
   const [searchParams] = useSearchParams();
   const group = searchParams.get("group");
-  const disabled = group !== "DO";
-  const disabled_lsm = group !== "LSM" && group !== "LSM2";
+  const disabled = !isAuthorizedDO;
+  const disabled_lsm = !isAuthorizedLSM && !isAuthorizedLSM2;
 
   useEffect(() => {
     setSelectedGroup(
@@ -991,7 +1007,9 @@ const handleChangeManualFields = (fieldName, value) => {
           renderPSIDTracking("PSID Tracking", applicantDetail.psid_tracking)}
 
         {renderManualFields()}
-
+  
+        {isAuthorized &&
+        <>
         <Card sx={{ marginBottom: "20px" }}>
           <CardContent>
             <FormControl fullWidth>
@@ -1032,6 +1050,7 @@ const handleChangeManualFields = (fieldName, value) => {
             </FormControl>
           </CardContent>
         </Card>
+      </>}
       </div>
 
       <div>
@@ -1051,13 +1070,14 @@ const handleChangeManualFields = (fieldName, value) => {
         </Card>
         
       </div>
-
+{ isAuthorized &&
       <Card>
           <CardContent>
            {children}
           </CardContent>
       </Card>
-
+}
+          
       <div>
       
       </div>
