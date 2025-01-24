@@ -448,7 +448,7 @@ console.log(selectedRowId)
             </div>
 
             <div className='mb-2'>
-                <span>Records highlighted in red require immediate attention, as they have been returned from a next step.</span>
+                <h6 className="text-red-500">Records highlighted in red require immediate attention, as they have been returned from a next step.</h6>
             </div>
 
 
