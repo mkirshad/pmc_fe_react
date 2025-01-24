@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo  } from 'react';
 import 'ol/ol.css';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -13,6 +13,7 @@ import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { Divider } from '@mui/material';
+import { MaterialReactTable } from 'material-react-table';
 
 const DistrictMap = ({ onDistrictClick }) => {
   const mapRef = useRef(null);
@@ -22,6 +23,18 @@ const DistrictMap = ({ onDistrictClick }) => {
 
   const [tilesData, setTilesData] = useState([]);
   const [dataApplicants, setDataApplicants] = useState([]);
+  
+  // ---------- 1) Applicant data + filters ----------
+  const [applicantData, setApplicantData] = useState([]);
+
+  // District selected from the map or from the table filter
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+
+  // Categories that are *enabled* (Producer, Distributor, Collector, Recycler, etc.)
+  // Initially, all categories are selected. For toggling, we add/remove from this list.
+  const [enabledCategories, setEnabledCategories] = useState<string[]>([
+    'Producer', 'Distributor', 'Collector', 'Recycler'
+  ]);
   
   useEffect(() => {
     // Initialize the map
@@ -61,6 +74,22 @@ const DistrictMap = ({ onDistrictClick }) => {
 
     return () => initialMap.setTarget(null); // Cleanup on unmount
   }, [selectedDistrictId]);
+
+
+    // ---------- 2) On mount, fetch applicant data ----------
+    useEffect(() => {
+      const fetchApplicantData = async () => {
+        try {
+          const resp = await AxiosBase.get('/pmc/applicant-location-public/');
+          // This will be an array of applicant objects
+          setApplicantData(resp.data);
+        } catch (error) {
+          console.error('Error fetching applicant data:', error);
+        }
+      };
+  
+      fetchApplicantData();
+    }, []);
 
   useEffect(() => {
     // Fetch districts and populate the map
@@ -110,102 +139,102 @@ const DistrictMap = ({ onDistrictClick }) => {
 
 
       
-      try{
-        const respons = await AxiosBase.get('/pmc/mis-applicant-statistics/', {
-                headers: {
-                "Content-Type": "multipart/form-data",
-                },
-            });
-          console.log(respons.data)
+      // try{
+      //   const respons = await AxiosBase.get('/pmc/mis-applicant-statistics/', {
+      //           headers: {
+      //           "Content-Type": "multipart/form-data",
+      //           },
+      //       });
+      //     console.log(respons.data)
     
-          const { district_data, registration_statistics, grid_data } = respons.data;
+      //     const { district_data, registration_statistics, grid_data } = respons.data;
     
-            // Validate district_data
-            if (!district_data || !Array.isArray(district_data)) {
-              throw new Error('Invalid district_data format');
-            }
+      //       // Validate district_data
+      //       if (!district_data || !Array.isArray(district_data)) {
+      //         throw new Error('Invalid district_data format');
+      //       }
     
-            // Validate registration_statistics
-            if (!registration_statistics || !Array.isArray(registration_statistics)) {
-              throw new Error('Invalid registration_statistics format');
-            }
+      //       // Validate registration_statistics
+      //       if (!registration_statistics || !Array.isArray(registration_statistics)) {
+      //         throw new Error('Invalid registration_statistics format');
+      //       }
     
-            // Validate grid_data
-            if (!grid_data || !Array.isArray(grid_data)) {
-              throw new Error('Invalid grid_data format');
-            }
+      //       // Validate grid_data
+      //       if (!grid_data || !Array.isArray(grid_data)) {
+      //         throw new Error('Invalid grid_data format');
+      //       }
     
-            // Proceed with data processing...
+      //       // Proceed with data processing...
           
     
-          const iconMap: Record<string, JSX.Element> = {
-            Total: <FaChartBar className="text-white text-3xl" />,
-            Producer: <FaIndustry className="text-white text-3xl" />,
-            Consumer: <FaUser className="text-white text-3xl" />,
-            Recycler: <FaRecycle className="text-white text-3xl" />,
-            Collector: <FaTruck className="text-white text-3xl" />,
-          };
+      //     const iconMap: Record<string, JSX.Element> = {
+      //       Total: <FaChartBar className="text-white text-3xl" />,
+      //       Producer: <FaIndustry className="text-white text-3xl" />,
+      //       Consumer: <FaUser className="text-white text-3xl" />,
+      //       Recycler: <FaRecycle className="text-white text-3xl" />,
+      //       Collector: <FaTruck className="text-white text-3xl" />,
+      //     };
       
-          const colorMap: Record<string, string> = {
-            Producer: 'bg-orange-500',
-            Consumer: 'bg-blue-500',
-            Recycler: 'bg-green-500',
-            Collector: 'bg-yellow-500',
-          };
+      //     const colorMap: Record<string, string> = {
+      //       Producer: 'bg-orange-500',
+      //       Consumer: 'bg-blue-500',
+      //       Recycler: 'bg-green-500',
+      //       Collector: 'bg-yellow-500',
+      //     };
     
-            // Map registration_statistics into tilesData
-        // Map registration_statistics into tilesData
-        const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
-          title: stat.registration_for,
-          data: [
-            { value: stat.Applications, label: 'Applications', title: 'Applications' },
-            { value: stat.DO, label: 'DO', title: 'District Officer (Environment)/Assistant/Deputy Director/District In-Charge' },
-            { value: stat.PMC, label: 'PMC', title: 'Plastic Management Cell' },
-            { value: stat.APPLICANT, label: 'Applicant', title: 'Applicant' },
-            { value: stat.Licenses, label: 'Licenses', title: 'Licenses' },
-          ],
-          color: colorMap[stat.registration_for] || 'bg-gray-500',
-          icon: iconMap[stat.registration_for] || null,
-        }));
+      //       // Map registration_statistics into tilesData
+      //   // Map registration_statistics into tilesData
+      //   const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
+      //     title: stat.registration_for,
+      //     data: [
+      //       { value: stat.Applications, label: 'Applications', title: 'Applications' },
+      //       { value: stat.DO, label: 'DO', title: 'District Officer (Environment)/Assistant/Deputy Director/District In-Charge' },
+      //       { value: stat.PMC, label: 'PMC', title: 'Plastic Management Cell' },
+      //       { value: stat.APPLICANT, label: 'Applicant', title: 'Applicant' },
+      //       { value: stat.Licenses, label: 'Licenses', title: 'Licenses' },
+      //     ],
+      //     color: colorMap[stat.registration_for] || 'bg-gray-500',
+      //     icon: iconMap[stat.registration_for] || null,
+      //   }));
         
             
     
-              // Process district-wise statistics for ApexCharts
-              const districts = Array.from(new Set(
-                district_data
-                  .map(item => item.businessprofile__district__district_name?.trim() || 'Unknown')
-                  .filter(name => name !== 'Unknown')
-              ));
+      //         // Process district-wise statistics for ApexCharts
+      //         const districts = Array.from(new Set(
+      //           district_data
+      //             .map(item => item.businessprofile__district__district_name?.trim() || 'Unknown')
+      //             .filter(name => name !== 'Unknown')
+      //         ));
     
-              const categories = Array.from(new Set(
-                district_data
-                  .map(item => item.registration_for || 'Unknown')
-                  .filter(category => category !== 'Unknown')
-              ));
+      //         const categories = Array.from(new Set(
+      //           district_data
+      //             .map(item => item.registration_for || 'Unknown')
+      //             .filter(category => category !== 'Unknown')
+      //         ));
     
-              const series = categories.map(category => {
-                const dataPoints = districts.map(district => {
-                  const record = respons.data.district_data.find(item => item.registration_for === category && item.businessprofile__district__district_name === district);
-                  return record ? record.count : 0;
-                });
-                return { name: category, data: dataPoints };
-              });
+      //         const series = categories.map(category => {
+      //           const dataPoints = districts.map(district => {
+      //             const record = respons.data.district_data.find(item => item.registration_for === category && item.businessprofile__district__district_name === district);
+      //             return record ? record.count : 0;
+      //           });
+      //           return { name: category, data: dataPoints };
+      //         });
     
 
-              setTilesData(dynamicTiles);
+      //         setTilesData(dynamicTiles);
               
     
-              // Grid data
-              setDataApplicants(respons.data.grid_data);
-            }catch(error){
-              const errorDetails = {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message,
-            };
+      //         // Grid data
+      //         setDataApplicants(respons.data.grid_data);
+      //       }catch(error){
+      //         const errorDetails = {
+      //           status: error.response?.status,
+      //           data: error.response?.data,
+      //           message: error.message,
+      //       };
     
-            navigate('/error', { state: { error: errorDetails } });
-            }
+      //       navigate('/error', { state: { error: errorDetails } });
+      //       }
 
 
 
@@ -239,7 +268,40 @@ const DistrictMap = ({ onDistrictClick }) => {
     return () => mapInstance.un('click', handleMapClick); // Cleanup
   }, [mapInstance, vectorLayer]);
 
+  const filteredApplicants = applicantData.filter((item) => {
+    // If we have a selected district, skip anything that isn’t in that district
+    if (selectedDistrict && item.district_name !== selectedDistrict) {
+      return false;
+    }
+    // If the item's category is not in the enabled categories, skip it
+    if (!enabledCategories.includes(item.category)) {
+      return false;
+    }
+    return true;
+  });
   
+    // Example stats helper
+  function computeCategoryStats(data) {
+    const result = {
+      Total: data.length,
+      Producer: 0,
+      Distributor: 0,
+      Collector: 0,
+      Recycler: 0,
+    };
+    data.forEach((item) => {
+      if (item.category === 'Producer') result.Producer++;
+      if (item.category === 'Distributor') result.Distributor++;
+      if (item.category === 'Collector') result.Collector++;
+      if (item.category === 'Recycler') result.Recycler++;
+    });
+    return result;
+  }
+
+  // 2) Compute stats from the filtered data
+  const categoryStats = computeCategoryStats(filteredApplicants);
+
+
   return (
   
     <div className="banner-container2 grid">
@@ -268,15 +330,21 @@ const DistrictMap = ({ onDistrictClick }) => {
       </nav>
     </header>
   
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-          {tilesData.map((tile, index) => (
-            <Tile key={index} title={tile.title} data={tile.data} color={tile.color} icon={tile.icon} />
-          ))}
-        </div>
+        <CategoryTiles
+          stats={categoryStats}
+          enabledCategories={enabledCategories}
+          setEnabledCategories={setEnabledCategories}
+        />
 
       <div>
         <div ref={mapRef} style={{ height: '600px', width: '500px' }} className='mb-4' />
       </div>
+       {/* The data grid for filtered applicants */}
+       <MyDataTable
+        data={filteredApplicants}
+        // onDistrictFilterChange and onCategoryFilterChange can be passed here if you want
+        // the table to manipulate the parent’s selectedDistrict / enabledCategories
+      />
 
 
 
@@ -302,6 +370,21 @@ const DistrictMap = ({ onDistrictClick }) => {
   ); // Adjust the width to 50%
 };
 
+
+// Example data table
+const MyDataTable = ({ data }) => {
+  const columns = useMemo(
+    () => [
+      { accessorKey: 'full_name', header: 'Name' },
+      { accessorKey: 'district_name', header: 'District' },
+      { accessorKey: 'category', header: 'Category' },
+      // ...
+    ],
+    []
+  );
+
+  return <MaterialReactTable columns={columns} data={data} />;
+};
 
 interface TileProps {
   title: string;
@@ -330,5 +413,101 @@ const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
     </div>
   );
 };
+
+
+const CategoryTiles = ({
+  stats,
+  enabledCategories,
+  setEnabledCategories
+}) => {
+  // We expect stats = { Total, Producer, Distributor, Recycler, Collector }
+  // We'll show them in the order: Total, Producer, Distributor, Collector, Recycler
+
+  // A helper to handle toggling a category:
+  const handleTileClick = (cat: string) => {
+    if (cat === 'Total') {
+      // Maybe "Total" tile does something special, like toggling ALL categories
+      if (enabledCategories.length === 4) {
+        // All categories currently enabled → disable them
+        setEnabledCategories([]);
+      } else {
+        // Re-enable all categories
+        setEnabledCategories(['Producer', 'Distributor', 'Collector', 'Recycler']);
+      }
+      return;
+    }
+    // Otherwise, toggle an individual category
+    if (enabledCategories.includes(cat)) {
+      // Remove it
+      setEnabledCategories(enabledCategories.filter((c) => c !== cat));
+    } else {
+      // Add it
+      setEnabledCategories([...enabledCategories, cat]);
+    }
+  };
+
+  // A helper to determine if tile is "faded"
+  const isTileEnabled = (cat: string) => {
+    // "Total" is 'enabled' if not all are turned off
+    if (cat === 'Total') {
+      return enabledCategories.length > 0;
+    }
+    return enabledCategories.includes(cat);
+  };
+
+  const tileData = [
+    { key: 'Total', value: stats.Total },
+    { key: 'Producer', value: stats.Producer },
+    { key: 'Distributor', value: stats.Distributor },
+    { key: 'Collector', value: stats.Collector },
+    { key: 'Recycler', value: stats.Recycler },
+  ];
+
+  const iconMap: Record<string, JSX.Element> = {
+    Total: <FaChartBar className="text-white text-3xl" />,
+    Producer: <FaIndustry className="text-white text-3xl" />,
+    Distributor: <FaUser className="text-white text-3xl" />,
+    Recycler: <FaRecycle className="text-white text-3xl" />,
+    Collector: <FaTruck className="text-white text-3xl" />,
+  };
+
+// ,
+// icon =  iconMap[stat.registration_for] || null,
+
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+      {tileData.map(({ key, value }) => {
+        const enabled = isTileEnabled(key);
+
+
+
+        return (
+          <div
+            key={key}
+            onClick={() => handleTileClick(key)}
+            className={`shadow-md rounded p-6 w-full cursor-pointer transition
+                        ${enabled ? 'opacity-100' : 'opacity-50'}
+                        ${
+                          key === 'Producer' ? 'bg-orange-500'
+                          : key === 'Distributor' ? 'bg-blue-500'
+                          : key === 'Recycler' ? 'bg-green-500'
+                          : key === 'Collector' ? 'bg-yellow-500'
+                          : 'bg-gray-500'
+                        }`}
+          >
+            {iconMap[key] || null}
+            <h2 className="text-2xl font-bold text-white">{key}</h2>
+            <div key={key} className="text-center" title={key}> 
+              <p className="text-3xl font-bold text-white">{value}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+
 
 export default DistrictMap;
