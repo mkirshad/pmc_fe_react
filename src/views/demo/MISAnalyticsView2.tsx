@@ -288,6 +288,57 @@ const DistrictMap = ({ onDistrictClick }) => {
     });
     return result;
   }
+
+
+  // const handleColumnFiltersChange = (updaterOrValue) => {
+  //   // 1) Resolve the new filter data from MRT
+  //   let newFilters;
+  
+  //   if (typeof updaterOrValue === 'function') {
+  //     // It's a functional state updater
+  //     setColumnFilters((old) => {
+  //       newFilters = updaterOrValue(old);
+  //       return newFilters;
+  //     });
+  //   } else {
+  //     // It's already the new filters array or object
+  //     newFilters = updaterOrValue;
+  //     setColumnFilters(newFilters);
+  //   }
+  
+  //   // 2) Once we have newFilters, parse out district/category
+  //   //    Because setState can be async, we either parse inside
+  //   //    the same tick or in a small effect. If you do it synchronously:
+  //   setTimeout(() => {
+  //     let filtersArray = [];
+  //     if (Array.isArray(newFilters)) {
+  //       filtersArray = newFilters;
+  //     } else if (typeof newFilters === 'object' && newFilters !== null) {
+  //       filtersArray = Object.values(newFilters);
+  //     }
+  
+  //     let newSelectedDistrict = null;
+  //     let newEnabledCats = ['Producer', 'Distributor', 'Collector', 'Recycler'];
+  
+  //     filtersArray.forEach((f) => {
+  //       if (f.id === 'district_name') {
+  //         newSelectedDistrict = f.value || null;
+  //       }
+  //       if (f.id === 'category') {
+  //         // If user picks e.g. 'Collector' only, then filter to just that
+  //         if (f.value) {
+  //           newEnabledCats = [f.value];
+  //         }
+  //       }
+  //     });
+  
+  //     // 3) Update your top-level states
+  //     setSelectedDistrict(newSelectedDistrict);
+  //     setEnabledCategories(newEnabledCats);
+  //   }, 0);
+  // };
+
+
   const categoryStats = computeCategoryStats(districtFilteredData);
 
   // const filteredApplicants = useMemo(() => {
@@ -297,6 +348,64 @@ const DistrictMap = ({ onDistrictClick }) => {
   // }, [districtFilteredData, enabledCategories]);
 
   const enabledTotal = enabledCategories.reduce((acc, cat) => acc + categoryStats[cat], 0);
+
+
+
+  const [columnFilters, setColumnFilters] = useState([]);
+   // 6) handle MRT filter changes
+   const handleColumnFiltersChange = (updaterOrValue) => {
+    // The new filter state could be:
+    //  - an array
+    //  - an object
+    //  - a functional updater (like (old) => newFilters)
+    let newFilters;
+
+    if (typeof updaterOrValue === 'function') {
+      // It's a functional updater
+      setColumnFilters((old) => {
+        newFilters = updaterOrValue(old);
+        return newFilters;
+      });
+    } else {
+      // It's already the new filters array or object
+      setColumnFilters(updaterOrValue);
+      newFilters = updaterOrValue;
+    }
+
+    // Because state setting is async, we parse inside the setter
+    // or parse after a small delay.  If it's an object, you might need Object.values
+    // But typically it's an array: e.g. [{ id: 'district_name', value: 'Lahore' }]
+  };
+
+  // 7) parse the new columnFilters each time it changes
+  useEffect(() => {
+    // Because "columnFilters" might be an array or an object, let's unify it
+    let filtersArray = [];
+    if (Array.isArray(columnFilters)) {
+      filtersArray = columnFilters;
+    } else if (typeof columnFilters === 'object' && columnFilters !== null) {
+      filtersArray = Object.values(columnFilters);
+    }
+
+    // default
+    let newSelectedDistrict = null;
+    let newEnabledCats = ['Producer', 'Distributor', 'Collector', 'Recycler'];
+
+    filtersArray.forEach((f) => {
+      if (f.id === 'district_name') {
+        newSelectedDistrict = f.value || null;
+      }
+      if (f.id === 'category') {
+        // if user picked 'Collector', that means we only want "Collector"
+        if (f.value) {
+          newEnabledCats = [f.value];
+        }
+      }
+    });
+
+    setSelectedDistrict(newSelectedDistrict);
+    setEnabledCategories(newEnabledCats);
+  }, [columnFilters]);
 
   // Render
   return (
@@ -347,7 +456,15 @@ const DistrictMap = ({ onDistrictClick }) => {
           className="mb-4"
         />
         <div className="ml-4 flex-grow">
-          <MyDataTable data={filteredApplicants} />
+        <MyDataTable
+            data={filteredApplicants}
+            selectedDistrict={selectedDistrict}
+            setSelectedDistrict={setSelectedDistrict}
+            enabledCategories={enabledCategories}
+            setEnabledCategories={setEnabledCategories}
+            columnFilters={columnFilters}
+            onColumnFiltersChange={handleColumnFiltersChange}
+          />
         </div>
       </div>
 
@@ -458,8 +575,8 @@ const CategoryTiles = ({
 };
 
 // --------------------- MyDataTable ---------------------
-const MyDataTable = ({ data }) => {
-  // A helper map from category name to icon
+// const MyDataTable = ({ data }) => {
+//   // A helper map from category name to icon
   const categoryIconMap = {
     Producer:   <FaIndustry className="text-xl" />, 
     Distributor:<FaUser className="text-xl" />, 
@@ -530,13 +647,30 @@ const MyDataTable = ({ data }) => {
   // }}
   // />;
 
+  const MyDataTable = ({
+    data,
+    selectedDistrict,
+    setSelectedDistrict,
+    enabledCategories,
+    setEnabledCategories,
+    columnFilters,
+    onColumnFiltersChange,
+  }) => {
 
-  // 1) Gather unique district names for the District filter
-  const districtOptions = useMemo(() => {
-    // Extract unique district names from data
-    const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
-    return Array.from(distinct).sort(); // convert to array, sort alphabetically
-  }, [data]);
+  // // // 1) Gather unique district names for the District filter
+  // const districtOptions = useMemo(() => {
+  //   // Extract unique district names from data
+  //   const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
+  //   return Array.from(distinct).sort(); // convert to array, sort alphabetically
+  // }, [data]);
+
+
+    // // 1) Gather unique district names for the District filter
+    const districtOptions = useMemo(() => {
+      // Extract unique district names from data
+      const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
+      return Array.from(distinct).sort(); // convert to array, sort alphabetically
+    }, [data]);
 
   const columns = useMemo(
     () => [
@@ -645,21 +779,22 @@ const MyDataTable = ({ data }) => {
       },
       // ... any other columns ...
     ],
-    [districtOptions],
+    [],
   );
+
+  
 
   return (
     <MaterialReactTable
       columns={columns}
       data={data}
-      enableRowStriping
-      // This enables filtering UI by default
-      // so your custom Filter components show up
+      manualFiltering
       enableColumnFilters
+      columnFilters={columnFilters}
+      onColumnFiltersChange={onColumnFiltersChange}
+      // show filters by default
       initialState={{
-        density: 'compact',
-        pagination: { pageSize: 12 },
-        showColumnFilters: true, // show the filter row by default
+        showColumnFilters: true,
       }}
     />
   );

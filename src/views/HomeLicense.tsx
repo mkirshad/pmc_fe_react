@@ -8,45 +8,7 @@ import { useNavigate } from 'react-router-dom';
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
 const flattenObject = (obj) => {
-    // Step 1: Collect remarks from the assignment entries
-    // that have assigned_group === 'APPLICANT'.
-    const applicantAssignments = ((obj.assigned_group === 'APPLICANT' && obj.applicationassignment) || []).filter(
-        (assignment) =>
-        assignment.assigned_group === 'APPLICANT' &&
-        assignment.remarks &&
-        assignment.remarks !== 'undefined'
-    );
-
-    // Map out just the remarks from those assignments
-    const applicantRemarks = applicantAssignments.map((a) => a.remarks);
-
-    // If we want to ALSO include the top-level remarks if this applicant’s
-    // own assigned_group is 'APPLICANT', do something like:
-    // if (obj.assigned_group === 'APPLICANT' && obj.remarks) {
-    //   applicantRemarks.push(obj.remarks);
-    // }
-
-    // Step 2: Combine them or use 'N/A' if none
-    const combinedRemarks =
-        applicantRemarks.length > 0 ? applicantRemarks.join('; ') : 'N/A';
-  
-    // 3) Return your flattened fields + the combined remarks
-    return {
-      id: obj.id,
-      tracking_number: obj.tracking_number,
-      first_name: obj.first_name,
-      last_name: obj.last_name,
-      CNIC: obj.cnic,
-      mobile_no: obj.mobile_no,
-      application_status: obj.application_status,
-      assigned_group: obj.assigned_group,
-      registration_for: obj.registration_for,
-      application_Start_Time: obj.created_at?.substring(0, 16) || 'N/A',
-      application_Submission_Time:
-        obj.submittedapplication?.created_at?.substring(0, 16) || 'N/A',
-      // The new "remarks" field we’ll show in the grid:
-      remarks: combinedRemarks,
-    };
+    return obj;
   };
   
 
@@ -130,17 +92,21 @@ const Home = () => {
     // Extract columns and flattened data
     const extractColumns = (data, hasUserGroup, group) => {
             const allowedColumns = [
-                'first_name',
-                'last_name',
-                'cnic',
-                'mobile_no',
-                'application_status',
-                'tracking_number',
-                'assigned_group',
-                'registration_for',
-                'application_Start_Time',
-                'application_Submission_Time',
-                'remarks',
+                'id',
+                'license_number',
+                'date_of_issue',
+                'license_for',
+                'license_duration',
+                'owner_name',
+                'business_name',
+                'district_name',
+                'tehsil_name',
+                'city_name',
+                'address',
+                'types_of_plastics',
+                'particulars',        
+                'fee_amount',
+                'is_active',
             ]; // List of allowed columns
         
             const flattenedData = sanitizeData(data); // Ensure sanitized data
@@ -160,13 +126,10 @@ const Home = () => {
                                 <span
                                     style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
                                     onClick={() => {
-                                        const id = row.original.id;
-                                        console.log(`Clicked ${key}:`, cell.getValue());
-                                        console.log(`Navigating with ID: ${id}`);
+                                        const license_number = row.original.license_number;
+                                        const date_of_issue = row.original.date_of_issue;
                                         // Perform navigation or other action
-                                        window.location.href = hasUserGroup
-                                            ? `/spuid-review/${id}?group=${group}`
-                                            : `/spuid-signup/${id}`;
+                                        window.location.href = `/generate-license-pdf?license_number=${license_number}&date_of_issue=${date_of_issue}`;
                                     }}
                                 >
                                     {cell.getValue() || '-'}
@@ -222,26 +185,12 @@ const Home = () => {
                 });
     
                 const dataApplicants = response.data;
+                console.log(dataApplicants)
     
                 if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
                     const extracted = extractColumns(dataApplicants, (groupsResponse.length>0), (groupsResponse.map(group => group.name))[0]);
                     setFlattenedData(extracted.flattenedData);
                     setColumns(extracted.columns);
-    
-                    // Debugging: Log the last row
-                    console.log('Flattened Data:', extracted.flattenedData);
-                    const lastRow = extracted.flattenedData[extracted.flattenedData.length - 1];
-                    console.log('Last Row:', lastRow);
-    
-                    if (lastRow && lastRow.id) {
-                        setSelectedRowId(lastRow.id); // Set last row ID as selected
-                        console.log('Last Row ID:', lastRow.id);
-    
-                        const groupIndex = groups.indexOf(lastRow.assigned_group);
-                        if (groupIndex !== -1) {
-                            setStep(groupIndex); // Set the step to match the last row's assigned group
-                        }
-                    }
                 }
                 
             } catch (error) {
@@ -259,31 +208,93 @@ const Home = () => {
 
     }, []); // Run only once on component load
 
-    useEffect(() => {
-        console.log('userGroups:', userGroups)
-        if(userGroups.includes('Super')){
-            navigate('/home-super');
-        }else if(userGroups.includes('Admin')){
-            navigate('/home-admin');
-        }else if(userGroups.includes('DO')){
-            navigate('/home-do');
-        }
-    }, [userGroups, navigate]); // Run only once on component load
-    
+console.log('flattenedData', flattenedData)
     return (
         <div>
 
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        ...columns,
+                        { accessorKey: 'license_number',    header: 'license_number', 
+                                  minSize: 50,
+                                  maxSize: 500,
+                                  size: 150, 
+                        // Create a custom cell that shows an <a> link:
+                            Cell: ({ row }) => {
+                                // row.original contains the full row data
+                                const licenseNumber = row.original.license_number;
+                                const dateOfIssue = row.original.date_of_issue; // e.g. "2025-01-10"
+
+                                const pdfUrl = `/api/pmc/license-pdf?license_number=${licenseNumber}&date_of_issue=${dateOfIssue}`;
+
+                                return (
+                                <a 
+                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                    href={pdfUrl}
+                                    target="_blank"       // open in new tab
+                                    rel="noopener noreferrer"
+                                >
+                                    {licenseNumber}
+                                </a>
+                                );
+                                
+                                }
+                        },
+                        { accessorKey: 'date_of_issue',    header: 'date_of_issue', 
+                        minSize: 50,
+                        maxSize: 500,
+                        size: 150, },
+                        { accessorKey: 'license_for',    header: 'license_for', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 150, },
+                        { accessorKey: 'license_duration',    header: 'license_duration', 
+                        minSize: 50,
+                        maxSize: 500,
+                        size: 150, },
+                        { accessorKey: 'owner_name',    header: 'owner_name', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 200, },
+                        { accessorKey: 'business_name',    header: 'business_name', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 150, },
+                        { accessorKey: 'district_name',    header: 'district_name', 
+                        minSize: 50,
+                        maxSize: 500,
+                        size: 150, },
+                        { accessorKey: 'tehsil_name',    header: 'tehsil_name', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 150, },
+                        { accessorKey: 'city_name',    header: 'city_name', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 150, },
+                        { accessorKey: 'address',    header: 'address', 
+                        minSize: 50,
+                        maxSize: 500,
+                        size: 150, },                
+                        { accessorKey: 'types_of_plastics',    header: 'types_of_plastics', 
+                            minSize: 100,
+                            maxSize: 500,
+                            size: 500, },
+                        { accessorKey: 'particulars',    header: 'particulars', 
+                            minSize: 100,
+                            maxSize: 100,
+                            size: 150, },
+                        { accessorKey: 'fee_amount',    header: 'fee_amount', 
+                            minSize: 50,
+                            maxSize: 500,
+                            size: 150, },
+                        { accessorKey: 'is_active',    header: 'is_active', 
+                        minSize: 50,
+                        maxSize: 500,
+                        size: 150, }, 
                     ]}
                     
-                    data={flattenedData.map((row) => ({
-                        ...row,
-                        assigned_group_title: groupTitles[row.assigned_group] || row.assigned_group, // Add a title for the assigned group
-                    }))} // Include updated data
-                    getRowId={(row) => row.id} // Explicitly set the row ID using the `id` field from your original data
+                    data={flattenedData} // Include updated data
                     initialState={{
                         showColumnFilters: false,
                     }}
