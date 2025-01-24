@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo  } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import 'ol/ol.css';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -7,101 +7,167 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import OSM from 'ol/source/OSM';
 import { Fill, Stroke, Style } from 'ol/style';
+import CircleStyle from 'ol/style/Circle';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { fromLonLat } from 'ol/proj';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { parse } from 'terraformer-wkt-parser';
 import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { motion } from "framer-motion";
-import { Divider } from '@mui/material';
+import { Divider, Select, MenuItem, Box } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 
+// Helper function
+function getCategoryColor(category) {
+  switch (category) {
+    case 'Producer':
+      return '#FB923C'; // matches bg-orange-500 (#FB923C)
+    case 'Distributor':
+      return '#3B82F6'; // matches bg-blue-500 (#3B82F6)
+    case 'Collector':
+      return '#FBBF24'; // <--- matches bg-yellow-500
+    case 'Recycler':
+      return '#22C55E'; // matches bg-green-500 (#22C55E)
+    default:
+      return 'gray';
+  }
+}
 const DistrictMap = ({ onDistrictClick }) => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [vectorLayer, setVectorLayer] = useState(null);
+  const [applicantLayer, setApplicantLayer] = useState(null); // NEW LAYER FOR POINTS
+
   const [selectedDistrictId, setSelectedDistrictId] = useState(null);
+  const [stateDistrictData, setStateDistrictData] = useState(null);
 
-  const [tilesData, setTilesData] = useState([]);
-  const [dataApplicants, setDataApplicants] = useState([]);
-  
-  // ---------- 1) Applicant data + filters ----------
+  // ---------- Applicant data and filters ----------
   const [applicantData, setApplicantData] = useState([]);
-
-  // District selected from the map or from the table filter
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
-
-  // Categories that are *enabled* (Producer, Distributor, Collector, Recycler, etc.)
-  // Initially, all categories are selected. For toggling, we add/remove from this list.
   const [enabledCategories, setEnabledCategories] = useState<string[]>([
     'Producer', 'Distributor', 'Collector', 'Recycler'
   ]);
+  const [hasFetchedDistricts, setHasFetchedDistricts] = useState(false);
+
+  // Define default center/zoom (the same ones you used to initialize the map)
+  const [DEFAULT_CENTER, setDefaultCenter] = useState([8054803.349056441,3623248.3407283584]); 
+  const [DEFAULT_ZOOM, setDefaultZoom] = useState(6.53343814691434);
+  const [RADIUS, setRadius] = useState(4)
   
+
+  // ================ 1) Map Initialization =================
   useEffect(() => {
-    // Initialize the map
     const initialMap = new Map({
       target: mapRef.current,
       layers: [
         new TileLayer({
-          source: new OSM(), // OpenStreetMap tiles
+          source: new OSM(),
         }),
       ],
       view: new View({
-        zoom: 7, // Default zoom level
-        center: [8127130, 3658593], // Coordinates for Lahore in EPSG:3857
+        zoom: 7,
+        center: [8127130, 3658593], // Lahore in EPSG:3857
       }),
     });
 
-    // Add vector layer for GeoJSON data
     const initialVectorLayer = new VectorLayer({
       source: new VectorSource(),
+    });
+
+    // District polygons
+    initialMap.addLayer(initialVectorLayer);
+    setVectorLayer(initialVectorLayer);
+
+    setMapInstance(initialMap);
+
+    return () => initialMap.setTarget(null);
+    
+  }, []);
+
+  // ================ 2) Applicant Layer for Points ===========
+  useEffect(() => {
+    if (!mapInstance) return;
+
+    // Create a vector layer for applicant points
+    const newApplicantLayer = new VectorLayer({
+      source: new VectorSource(),
       style: (feature) => {
-        const isSelected = feature.get('district_id') === selectedDistrictId;
+        const category = feature.get('category'); 
         return new Style({
-          stroke: new Stroke({
-            color: isSelected ? 'red' : 'blue',
-            width: isSelected ? 3 : 2,
-          }),
-          fill: new Fill({
-            color: isSelected ? 'rgba(255, 0, 0, 0.4)' : 'rgba(0, 0, 255, 0.2)',
+          image: new CircleStyle({
+            radius: RADIUS,
+            fill: new Fill({ color: getCategoryColor(category) }),
+            stroke: new Stroke({ color: '#fff', width: 1 }),
           }),
         });
       },
     });
 
-    initialMap.addLayer(initialVectorLayer);
-    setMapInstance(initialMap);
-    setVectorLayer(initialVectorLayer);
+    // Add it to the map
+    mapInstance.addLayer(newApplicantLayer);
+    setApplicantLayer(newApplicantLayer);
+  }, [mapInstance]);
 
-    return () => initialMap.setTarget(null); // Cleanup on unmount
-  }, [selectedDistrictId]);
+  // ================ 3) Fetch Applicant Data ================
+  useEffect(() => {
+    const fetchApplicantData = async () => {
+      try {
+        const resp = await AxiosBase.get('/pmc/applicant-location-public/');
+        setApplicantData(resp.data);
+      } catch (error) {
+        console.error('Error fetching applicant data:', error);
+      }
+    };
+    fetchApplicantData();
+  }, []);
 
+  const districtFilteredData = useMemo(() => {
+      if (!selectedDistrict) return applicantData;
+      return applicantData.filter((item) => item.district_name === selectedDistrict);
+    }, [selectedDistrict, applicantData]);
+    
+    const filteredApplicants = useMemo(() => {
+      return districtFilteredData.filter((item) =>
+        enabledCategories.includes(item.category)
+      );
+    }, [districtFilteredData, enabledCategories]);
 
-    // ---------- 2) On mount, fetch applicant data ----------
-    useEffect(() => {
-      const fetchApplicantData = async () => {
-        try {
-          const resp = await AxiosBase.get('/pmc/applicant-location-public/');
-          // This will be an array of applicant objects
-          setApplicantData(resp.data);
-        } catch (error) {
-          console.error('Error fetching applicant data:', error);
-        }
-      };
+  // ================ 4) When applicantData changes, add features to applicantLayer
   
-      fetchApplicantData();
-    }, []);
 
   useEffect(() => {
-    // Fetch districts and populate the map
-    const fetchData = async () => {
-      const response = await AxiosBase.get('/pmc/districts-public', {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+    if (!applicantLayer) return;
 
-      // Transform the data into GeoJSON
-      const geoJsonFeatures = response.data.map((district) => ({
+    const source = applicantLayer.getSource();
+    source.clear(); // remove old points
+
+    filteredApplicants.forEach((app) => {
+      if (app.latitude && app.longitude) {
+        // convert from lat/lon to map coords
+        const coords = fromLonLat([Number(app.longitude), Number(app.latitude)]);
+        const feature = new Feature({
+          geometry: new Point(coords),
+          category: app.category, // used in layer's style function
+        });
+        source.addFeature(feature);
+      }
+    });
+  }, [filteredApplicants, applicantLayer]);
+
+  // ================ 5) Fetch District Polygons =============
+  useEffect(() => {
+    if (!mapInstance || !vectorLayer || hasFetchedDistricts) return;
+
+    const fetchDistrictGeoms = async () => {
+      let districtData = stateDistrictData;
+      if (!districtData) {
+        const response = await AxiosBase.get('/pmc/districts-public');
+        districtData = response.data.filter((d) => d.geom);
+        // optionally store for later use
+      }
+
+      const geoJsonFeatures = districtData.map((district) => ({
         type: 'Feature',
         geometry: parse(district.geom.replace('SRID=4326;', '')),
         properties: {
@@ -111,185 +177,110 @@ const DistrictMap = ({ onDistrictClick }) => {
         },
       }));
 
-      const geoJson = {
-        type: 'FeatureCollection',
-        features: geoJsonFeatures,
-      };
+      const geoJson = { type: 'FeatureCollection', features: geoJsonFeatures };
+      const vectorSource = vectorLayer.getSource();
+      vectorSource.clear();
+      vectorSource.addFeatures(
+        new GeoJSON().readFeatures(geoJson, { featureProjection: 'EPSG:3857' })
+      );
 
-      if (vectorLayer) {
-        const vectorSource = vectorLayer.getSource();
-        vectorSource.clear();
-        vectorSource.addFeatures(
-          new GeoJSON().readFeatures(geoJson, {
-            featureProjection: 'EPSG:3857', // Match Web Mercator projection
-          })
-        );
+      // Fit map
+      const extent = vectorSource.getExtent();
+      mapInstance.getView().fit(extent, {
+        padding: [50, 50, 50, 50],
+        maxZoom: 10,
+      });
 
-        // Fit the map to the extent of the districts while keeping the base map
-        const extent = vectorSource.getExtent();
-        mapInstance.getView().fit(extent, {
-          padding: [50, 50, 50, 50], // Padding for better visibility
-          maxZoom: 10, // Set a maximum zoom level to avoid over-zooming
-        });
-      }
-
-
-
-
-
-
-      
-      // try{
-      //   const respons = await AxiosBase.get('/pmc/mis-applicant-statistics/', {
-      //           headers: {
-      //           "Content-Type": "multipart/form-data",
-      //           },
-      //       });
-      //     console.log(respons.data)
-    
-      //     const { district_data, registration_statistics, grid_data } = respons.data;
-    
-      //       // Validate district_data
-      //       if (!district_data || !Array.isArray(district_data)) {
-      //         throw new Error('Invalid district_data format');
-      //       }
-    
-      //       // Validate registration_statistics
-      //       if (!registration_statistics || !Array.isArray(registration_statistics)) {
-      //         throw new Error('Invalid registration_statistics format');
-      //       }
-    
-      //       // Validate grid_data
-      //       if (!grid_data || !Array.isArray(grid_data)) {
-      //         throw new Error('Invalid grid_data format');
-      //       }
-    
-      //       // Proceed with data processing...
-          
-    
-      //     const iconMap: Record<string, JSX.Element> = {
-      //       Total: <FaChartBar className="text-white text-3xl" />,
-      //       Producer: <FaIndustry className="text-white text-3xl" />,
-      //       Consumer: <FaUser className="text-white text-3xl" />,
-      //       Recycler: <FaRecycle className="text-white text-3xl" />,
-      //       Collector: <FaTruck className="text-white text-3xl" />,
-      //     };
-      
-      //     const colorMap: Record<string, string> = {
-      //       Producer: 'bg-orange-500',
-      //       Consumer: 'bg-blue-500',
-      //       Recycler: 'bg-green-500',
-      //       Collector: 'bg-yellow-500',
-      //     };
-    
-      //       // Map registration_statistics into tilesData
-      //   // Map registration_statistics into tilesData
-      //   const dynamicTiles = respons.data.registration_statistics.map((stat: any) => ({
-      //     title: stat.registration_for,
-      //     data: [
-      //       { value: stat.Applications, label: 'Applications', title: 'Applications' },
-      //       { value: stat.DO, label: 'DO', title: 'District Officer (Environment)/Assistant/Deputy Director/District In-Charge' },
-      //       { value: stat.PMC, label: 'PMC', title: 'Plastic Management Cell' },
-      //       { value: stat.APPLICANT, label: 'Applicant', title: 'Applicant' },
-      //       { value: stat.Licenses, label: 'Licenses', title: 'Licenses' },
-      //     ],
-      //     color: colorMap[stat.registration_for] || 'bg-gray-500',
-      //     icon: iconMap[stat.registration_for] || null,
-      //   }));
-        
-            
-    
-      //         // Process district-wise statistics for ApexCharts
-      //         const districts = Array.from(new Set(
-      //           district_data
-      //             .map(item => item.businessprofile__district__district_name?.trim() || 'Unknown')
-      //             .filter(name => name !== 'Unknown')
-      //         ));
-    
-      //         const categories = Array.from(new Set(
-      //           district_data
-      //             .map(item => item.registration_for || 'Unknown')
-      //             .filter(category => category !== 'Unknown')
-      //         ));
-    
-      //         const series = categories.map(category => {
-      //           const dataPoints = districts.map(district => {
-      //             const record = respons.data.district_data.find(item => item.registration_for === category && item.businessprofile__district__district_name === district);
-      //             return record ? record.count : 0;
-      //           });
-      //           return { name: category, data: dataPoints };
-      //         });
-    
-
-      //         setTilesData(dynamicTiles);
-              
-    
-      //         // Grid data
-      //         setDataApplicants(respons.data.grid_data);
-      //       }catch(error){
-      //         const errorDetails = {
-      //           status: error.response?.status,
-      //           data: error.response?.data,
-      //           message: error.message,
-      //       };
-    
-      //       navigate('/error', { state: { error: errorDetails } });
-      //       }
-
-
-
-
-
-
-
+      setHasFetchedDistricts(true);
     };
 
-    fetchData();
-  }, [vectorLayer, mapInstance]);
+    fetchDistrictGeoms();
+  }, [mapInstance, vectorLayer, hasFetchedDistricts, stateDistrictData]);
 
-  // Add click interaction
+  // ================ 6) District Style / Click to Select =====
+  // If you want the district layer to highlight selectedDistrictId
+  // either define a style callback on `vectorLayer` or a separate effect:
+  useEffect(() => {
+    if (!vectorLayer) return;
+    vectorLayer.setStyle((feature) => {
+      const isSelected = feature.get('district_id') === selectedDistrictId;
+      return new Style({
+        stroke: new Stroke({
+          color: isSelected ? 'red' : 'blue',
+          width: isSelected ? 3 : 2,
+        }),
+        fill: new Fill({
+          color: isSelected ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 0, 255, 0.1)',
+        }),
+      });
+    });
+  }, [vectorLayer, selectedDistrictId]);
+
+  // ================ 7) Map Click -> District Select ==========
   useEffect(() => {
     if (!mapInstance || !vectorLayer) return;
-
+  
     const handleMapClick = (event) => {
       const features = mapInstance.getFeaturesAtPixel(event.pixel);
+  
       if (features && features.length > 0) {
         const selectedFeature = features[0];
-        const properties = selectedFeature.getProperties();
-        setSelectedDistrictId(properties.district_id);
-        if (onDistrictClick) {
-          onDistrictClick(properties);
+        const props = selectedFeature.getProperties();
+        const clickedDistrictName = props.district_name;
+        
+        if (selectedDistrict === clickedDistrictName) {
+          // 1) Same district clicked again → deselect
+          setSelectedDistrict(null);
+          setSelectedDistrictId(null);
+  
+          // 1a) Go back to the default center/zoom
+          mapInstance.getView().setCenter(DEFAULT_CENTER);
+          mapInstance.getView().setZoom(DEFAULT_ZOOM);
+          setRadius(3);
+        } else {
+          // 2) New district selected → set it
+          setSelectedDistrict(clickedDistrictName);
+          setSelectedDistrictId(props.district_id);
+          setRadius(5);
+          // 2a) Zoom and center on the selected district geometry
+          const geometry = selectedFeature.getGeometry();
+          // Fit the view to that polygon geometry (with optional maxZoom)
+          mapInstance.getView().fit(geometry.getExtent(), {
+            padding: [50, 50, 50, 50],
+            maxZoom: 10, // or any suitable max zoom
+          });
         }
+      } else {
+        // 3) Clicked outside any district → deselect
+        setSelectedDistrict(null);
+        setSelectedDistrictId(null);
+        setRadius(3);
+  
+        // 3a) Reset to default center/zoom
+        mapInstance.getView().setCenter(DEFAULT_CENTER);
+        mapInstance.getView().setZoom(DEFAULT_ZOOM);
       }
     };
-
-    mapInstance.on('click', handleMapClick);
-
-    return () => mapInstance.un('click', handleMapClick); // Cleanup
-  }, [mapInstance, vectorLayer]);
-
-  const filteredApplicants = applicantData.filter((item) => {
-    // If we have a selected district, skip anything that isn’t in that district
-    if (selectedDistrict && item.district_name !== selectedDistrict) {
-      return false;
-    }
-    // If the item's category is not in the enabled categories, skip it
-    if (!enabledCategories.includes(item.category)) {
-      return false;
-    }
-    return true;
-  });
   
-    // Example stats helper
-  function computeCategoryStats(data) {
+    mapInstance.on('click', handleMapClick);
+    return () => mapInstance.un('click', handleMapClick);
+  }, [mapInstance, vectorLayer, selectedDistrict]);
+
+  // ================ 8) Filter + Tiles + Table as before ======
+  // const districtFilteredData = useMemo(() => {
+  //   if (!selectedDistrict) return applicantData;
+  //   return applicantData.filter((item) => item.district_name === selectedDistrict);
+  // }, [selectedDistrict, applicantData]);
+
+  function computeCategoryStats(dataArray) {
     const result = {
-      Total: data.length,
+      Total: dataArray.length,
       Producer: 0,
       Distributor: 0,
       Collector: 0,
       Recycler: 0,
     };
-    data.forEach((item) => {
+    dataArray.forEach((item) => {
       if (item.category === 'Producer') result.Producer++;
       if (item.category === 'Distributor') result.Distributor++;
       if (item.category === 'Collector') result.Collector++;
@@ -297,209 +288,167 @@ const DistrictMap = ({ onDistrictClick }) => {
     });
     return result;
   }
+  const categoryStats = computeCategoryStats(districtFilteredData);
 
-  // 2) Compute stats from the filtered data
-  const categoryStats = computeCategoryStats(filteredApplicants);
+  // const filteredApplicants = useMemo(() => {
+  //   return districtFilteredData.filter((item) =>
+  //     enabledCategories.includes(item.category)
+  //   );
+  // }, [districtFilteredData, enabledCategories]);
 
+  const enabledTotal = enabledCategories.reduce((acc, cat) => acc + categoryStats[cat], 0);
 
+  // Render
   return (
-  
     <div className="banner-container2 grid">
-    
-      <header className="banner-header" >
-        <Link to="/pub" className='transition-all duration-300 ease-in-out transform hover:scale-105'>
+      <header className="banner-header">
+        <Link
+          to="/pub"
+          className="transition-all duration-300 ease-in-out transform hover:scale-105"
+        >
           <div className="logo-section">
-              <img
+            <img
               src="/img/logo/epa_logo-removebg-preview.png"
               alt="GOP Logo"
               className="header-logo"
-              />
-              <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
-              <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
-
-              <span className="header-text">PLMIS</span>
+            />
+            <img
+              src="/img/logo/epccd.png"
+              alt="EPCCD Logo"
+              className="header-logo"
+            />
+            <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
+            <span className="header-text">PLMIS</span>
           </div>
-      </Link>
-      <h6 className="header-text">Public Directory - MIS</h6>
-      <nav className="banner-nav">
-        <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105"
-        style={{paddingLeft:300}}
-        >
-          Login
         </Link>
-      </nav>
-    </header>
-  
-        <CategoryTiles
-          stats={categoryStats}
-          enabledCategories={enabledCategories}
-          setEnabledCategories={setEnabledCategories}
-        />
+        <h6 className="header-text">Public Directory - MIS</h6>
+        <nav className="banner-nav">
+          <Link
+            to="/sign-in"
+            className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105"
+            style={{ paddingLeft: 300 }}
+          >
+            Login
+          </Link>
+        </nav>
+      </header>
 
-      <div>
-        <div ref={mapRef} style={{ height: '600px', width: '500px' }} className='mb-4' />
-      </div>
-       {/* The data grid for filtered applicants */}
-       <MyDataTable
-        data={filteredApplicants}
-        // onDistrictFilterChange and onCategoryFilterChange can be passed here if you want
-        // the table to manipulate the parent’s selectedDistrict / enabledCategories
+      <CategoryTiles
+        stats={categoryStats}
+        enabledCategories={enabledCategories}
+        setEnabledCategories={setEnabledCategories}
+        enabledTotal={enabledTotal}
       />
 
-
-
-
-
-
-
-      <div className="mb-0">
-                <Divider textAlign="left">
-                </Divider>
+      <div className="flex flex-col md:flex-row">
+        <div
+          ref={mapRef}
+          style={{ height: '600px', width: '500px' }}
+          className="mb-4"
+        />
+        <div className="ml-4 flex-grow">
+          <MyDataTable data={filteredApplicants} />
         </div>
-        <footer className="footer-container ">
-            <span className="footer-text">
-                Copyright &copy; {new Date().getFullYear()}{" "}
-                <span className="font-semibold">PLMIS</span> All rights reserved. <br />
-                Plastic Management Cell, Strategic Planning & Implementation Unit,
-                Environmental Protection Agency, and Environment Protection & Climate
-                Change Department, Government of the Punjab.
-            </span>
-        </footer>
-
-  </div>
-  ); // Adjust the width to 50%
-};
-
-
-// Example data table
-const MyDataTable = ({ data }) => {
-  const columns = useMemo(
-    () => [
-      { accessorKey: 'full_name', header: 'Name' },
-      { accessorKey: 'district_name', header: 'District' },
-      { accessorKey: 'category', header: 'Category' },
-      // ...
-    ],
-    []
-  );
-
-  return <MaterialReactTable columns={columns} data={data} />;
-};
-
-interface TileProps {
-  title: string;
-  data: {
-    value: number;
-    label: string;
-  }[];
-  color: string;
-  icon: React.ReactNode;
-}
-
-const Tile: React.FC<TileProps> = ({ title, data, color, icon }) => {
-  return (
-    <div className={`shadow-md rounded p-6 w-full ${color}`}>
-      <div className="flex items-center mb-4">
-        {icon}
-        <h2 className="text-2xl font-bold text-white ml-2">{title}</h2>
-      {data.map((item, index) => (
-          (index === 0 )?
-          <div key={index} className="text-center" title={item.title}> {/* Use item.title for the tooltip */}
-            <p className="text-3xl font-bold text-white ml-3">{item.value}</p>
-          </div>
-          :null
-        ))}
       </div>
+
+      <Divider textAlign="left" />
+
+      <footer className="footer-container">
+        <span className="footer-text">
+          Copyright &copy; {new Date().getFullYear()}
+          {" "}
+          <span className="font-semibold">PLMIS</span> All rights reserved.
+          <br />
+          Plastic Management Cell, Strategic Planning &amp; Implementation Unit,
+          Environmental Protection Agency, and Environment Protection &amp;
+          Climate Change Department, Government of the Punjab.
+        </span>
+      </footer>
     </div>
   );
 };
 
-
+// --------------------- CategoryTiles ---------------------
 const CategoryTiles = ({
-  stats,
-  enabledCategories,
-  setEnabledCategories
+  stats,               // { Total, Producer, Distributor, Collector, Recycler }
+  enabledCategories,   // e.g. ['Producer', 'Distributor', ...]
+  setEnabledCategories,
+  enabledTotal,
 }) => {
-  // We expect stats = { Total, Producer, Distributor, Recycler, Collector }
-  // We'll show them in the order: Total, Producer, Distributor, Collector, Recycler
-
-  // A helper to handle toggling a category:
-  const handleTileClick = (cat: string) => {
+  // Toggle category
+  const handleTileClick = (cat) => {
     if (cat === 'Total') {
-      // Maybe "Total" tile does something special, like toggling ALL categories
+      // If "Total" tile is clicked, maybe toggle all on/off
       if (enabledCategories.length === 4) {
-        // All categories currently enabled → disable them
-        setEnabledCategories([]);
+        setEnabledCategories([]); // disable all
       } else {
-        // Re-enable all categories
         setEnabledCategories(['Producer', 'Distributor', 'Collector', 'Recycler']);
       }
       return;
     }
-    // Otherwise, toggle an individual category
+    // For an individual category, toggle it
     if (enabledCategories.includes(cat)) {
-      // Remove it
       setEnabledCategories(enabledCategories.filter((c) => c !== cat));
     } else {
-      // Add it
       setEnabledCategories([...enabledCategories, cat]);
     }
   };
 
-  // A helper to determine if tile is "faded"
-  const isTileEnabled = (cat: string) => {
-    // "Total" is 'enabled' if not all are turned off
+  // Determine if tile is “enabled” visually
+  const isTileEnabled = (cat) => {
     if (cat === 'Total') {
+      // "Total" is enabled if there's at least one category enabled
       return enabledCategories.length > 0;
     }
     return enabledCategories.includes(cat);
   };
 
-  const tileData = [
-    { key: 'Total', value: stats.Total },
-    { key: 'Producer', value: stats.Producer },
-    { key: 'Distributor', value: stats.Distributor },
-    { key: 'Collector', value: stats.Collector },
-    { key: 'Recycler', value: stats.Recycler },
+  // If the Total tile is *disabled*, show 0.
+  // Otherwise, show the sum of enabled categories.
+  function getTileDisplayValue(cat) {
+    if (cat === 'Total') {
+      if (!isTileEnabled('Total')) {
+        return 0; // If the Total tile is disabled, show 0
+      }
+      // If the Total tile is enabled, show the sum of enabled categories
+      return enabledTotal;
+    }
+    // For categories, always show the “raw” stats
+    return stats[cat] || 0;
+  }
+
+  const tileDefs = [
+    { key: 'Total',       bgColor: 'bg-gray-500',    icon: <FaChartBar className="text-white text-3xl" /> },
+    { key: 'Producer',    bgColor: 'bg-orange-500',  icon: <FaIndustry className="text-white text-3xl" /> },
+    { key: 'Distributor', bgColor: 'bg-blue-500',    icon: <FaUser className="text-white text-3xl" /> },
+    { key: 'Collector',   bgColor: 'bg-yellow-500',  icon: <FaTruck className="text-white text-3xl" /> },
+    { key: 'Recycler',    bgColor: 'bg-green-500',   icon: <FaRecycle className="text-white text-3xl" /> },
   ];
-
-  const iconMap: Record<string, JSX.Element> = {
-    Total: <FaChartBar className="text-white text-3xl" />,
-    Producer: <FaIndustry className="text-white text-3xl" />,
-    Distributor: <FaUser className="text-white text-3xl" />,
-    Recycler: <FaRecycle className="text-white text-3xl" />,
-    Collector: <FaTruck className="text-white text-3xl" />,
-  };
-
-// ,
-// icon =  iconMap[stat.registration_for] || null,
-
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-      {tileData.map(({ key, value }) => {
-        const enabled = isTileEnabled(key);
-
-
+      {tileDefs.map((tile) => {
+        const enabled = isTileEnabled(tile.key);
+        const value = getTileDisplayValue(tile.key);
 
         return (
           <div
-            key={key}
-            onClick={() => handleTileClick(key)}
+            key={tile.key}
+            onClick={() => handleTileClick(tile.key)}
             className={`shadow-md rounded p-6 w-full cursor-pointer transition
-                        ${enabled ? 'opacity-100' : 'opacity-50'}
-                        ${
-                          key === 'Producer' ? 'bg-orange-500'
-                          : key === 'Distributor' ? 'bg-blue-500'
-                          : key === 'Recycler' ? 'bg-green-500'
-                          : key === 'Collector' ? 'bg-yellow-500'
-                          : 'bg-gray-500'
-                        }`}
+              ${enabled ? 'opacity-100' : 'opacity-50'}
+              ${tile.bgColor}
+            `}
           >
-            {iconMap[key] || null}
-            <h2 className="text-2xl font-bold text-white">{key}</h2>
-            <div key={key} className="text-center" title={key}> 
-              <p className="text-3xl font-bold text-white">{value}</p>
+            <div className="flex items-center space-x-2">
+              {tile.icon}
+              {/* Title and number on the same line */}
+              <h2 className="text-2xl font-bold text-white">
+                {tile.key}
+              </h2>
+              <p className="text-2xl font-bold text-white">
+                {value}
+              </p>
             </div>
           </div>
         );
@@ -508,6 +457,213 @@ const CategoryTiles = ({
   );
 };
 
+// --------------------- MyDataTable ---------------------
+const MyDataTable = ({ data }) => {
+  // A helper map from category name to icon
+  const categoryIconMap = {
+    Producer:   <FaIndustry className="text-xl" />, 
+    Distributor:<FaUser className="text-xl" />, 
+    Collector:  <FaTruck className="text-xl" />, 
+    Recycler:   <FaRecycle className="text-xl" />, 
+  };
 
+  // Map from category to Tailwind text color classes
+  const categoryColorClassMap = {
+    Producer:    'text-orange-500',  
+    Distributor: 'text-blue-500',  
+    Collector:   'text-yellow-500',
+    Recycler:    'text-green-500',
+  };
+
+
+  // const columns = useMemo(
+  //   () => [
+  //     { accessorKey: 'district_name',    header: 'District', 
+  //       minSize: 50,
+  //       maxSize: 50,
+  //       size: 50, },
+  //     { accessorKey: 'tehsil_name',    header: 'Tehsil', 
+  //       minSize: 50,
+  //       maxSize: 50,
+  //       size: 50,  },
+  //       {
+  //         accessorKey: 'category',
+  //         header: 'Category',
+  //         // Use a custom Cell to render the icon instead of text
+  //         Cell: ({ cell }) => {
+  //           const categoryValue = cell.getValue(); 
+  //           // e.g. "Producer", "Collector", etc.
+  //           const icon = categoryIconMap[categoryValue];
+  //           const colorClass = categoryColorClassMap[categoryValue] || 'text-gray-500';
+    
+  //           return icon ? (
+  //             <div className={`flex items-center ${colorClass}`}>
+  //               {icon /* The icon itself */}
+  //               <span className="ml-1">
+  //                 {categoryValue /* If you also want text next to the icon */}
+  //               </span>
+  //             </div>
+  //           ) : (
+  //             // fallback if category isn't known
+  //             categoryValue
+  //           );
+  //         },
+  //         minSize: 20,
+  //         maxSize: 20,
+  //         size: 20,
+  //       },
+  //     { accessorKey: 'business_name',    header: 'Business Name', 
+  //       minSize: 50,
+  //       maxSize: 50,
+  //       size: 50,  },
+  //   ],
+  //   []
+  // );
+
+  // return <MaterialReactTable 
+  // columns={columns} 
+  // data={data}
+  // enableRowStriping 
+  // initialState={{
+  //   density: 'compact',
+  //   pagination: { pageSize: 12 }, // set default rows per page to 12
+  // }}
+  // />;
+
+
+  // 1) Gather unique district names for the District filter
+  const districtOptions = useMemo(() => {
+    // Extract unique district names from data
+    const distinct = new Set(data.map((row) => row.district_name).filter(Boolean));
+    return Array.from(distinct).sort(); // convert to array, sort alphabetically
+  }, [data]);
+
+  const columns = useMemo(
+    () => [
+      // District Column with a custom "dropdown" filter
+      {
+        accessorKey: 'district_name',
+        header: 'District',
+        filterFn: 'equals', // or 'includesString' if you want partial matches
+        // Provide a custom Filter component
+        Filter: ({ column, table }) => {
+          const filterValue = column.getFilterValue() || '';
+          return (
+            <Select
+              displayEmpty
+              value={filterValue} // store the filter state
+              onChange={(e) =>
+                column.setFilterValue(e.target.value || undefined)
+              }
+              style={{ width: '100%' }}
+            >
+              <MenuItem value="">
+                <em>All Districts</em>
+              </MenuItem>
+              {districtOptions.map((dist) => (
+                <MenuItem key={dist} value={dist}>
+                  {dist}
+                </MenuItem>
+              ))}
+            </Select>
+          );
+        },
+        // Enable column filtering
+        enableColumnFilter: true,
+        // sizing
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+      },
+      {
+        accessorKey: 'tehsil_name',
+        header: 'Tehsil',
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+      },
+      {
+        accessorKey: 'category',
+        header: 'Category',
+        filterFn: 'equals',
+        enableColumnFilter: true,
+        // Custom Filter for category icons
+        Filter: ({ column }) => {
+          const filterValue = column.getFilterValue() || '';
+
+          return (
+            <Select
+              displayEmpty
+              value={filterValue}
+              onChange={(e) =>
+                column.setFilterValue(e.target.value || undefined)
+              }
+              style={{ width: '100%' }}
+            >
+              <MenuItem value="">
+                <em>All Categories</em>
+              </MenuItem>
+              {Object.keys(categoryIconMap).map((cat) => (
+                <MenuItem key={cat} value={cat}>
+                  <Box
+                    className={`flex items-center ${
+                      categoryColorClassMap[cat] || ''
+                    }`}
+                  >
+                    {categoryIconMap[cat]}
+                    <span style={{ marginLeft: '0.5rem' }}>{cat}</span>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          );
+        },
+        Cell: ({ cell }) => {
+          const categoryValue = cell.getValue();
+          const icon = categoryIconMap[categoryValue];
+          const colorClass = categoryColorClassMap[categoryValue] || 'text-gray-500';
+
+          return icon ? (
+            <div className={`flex items-center ${colorClass}`}>
+              {icon /* The icon itself */}
+              <span className="ml-1">{categoryValue}</span>
+            </div>
+          ) : (
+            categoryValue
+          );
+        },
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+      },
+      {
+        accessorKey: 'business_name',
+        header: 'Business Name',
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+      },
+      // ... any other columns ...
+    ],
+    [districtOptions],
+  );
+
+  return (
+    <MaterialReactTable
+      columns={columns}
+      data={data}
+      enableRowStriping
+      // This enables filtering UI by default
+      // so your custom Filter components show up
+      enableColumnFilters
+      initialState={{
+        density: 'compact',
+        pagination: { pageSize: 12 },
+        showColumnFilters: true, // show the filter row by default
+      }}
+    />
+  );
+
+};
 
 export default DistrictMap;
