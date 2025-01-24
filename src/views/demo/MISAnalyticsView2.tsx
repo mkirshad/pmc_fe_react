@@ -260,7 +260,9 @@ const DistrictMap = ({ onDistrictClick }) => {
       </Link>
       <h6 className="header-text">Public Directory - MIS</h6>
       <nav className="banner-nav">
-        <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+        <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105"
+        style={{paddingLeft:300}}
+        >
           Login
         </Link>
       </nav>

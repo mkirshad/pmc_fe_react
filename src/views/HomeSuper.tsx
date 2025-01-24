@@ -448,7 +448,7 @@ console.log(selectedRowId)
             </div>
 
             <div className='mb-2'>
-                <span>Red colored records needs immediate attention.</span>
+                <span>Records highlighted in red require immediate attention, as they have been returned from a higher authority.</span>
             </div>
 
 
