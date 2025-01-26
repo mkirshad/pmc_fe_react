@@ -835,7 +835,7 @@ console.log('districtOptions', districtOptions)
       initialState={{
         showColumnFilters: false, // Hide column filters by default
         // density: 'compact', // Set compact view
-        pagination: { pageSize: 6 }, // Set 7 rows per page
+        pagination: { pageSize: 5 }, // Set 7 rows per page
       }}
     />
     
