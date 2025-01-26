@@ -813,8 +813,8 @@ console.log('districtOptions', districtOptions)
         accessorKey: 'material_flow_kg_per_day',
         header:'Material Flow (Kg/Day)',
         minSize: 50,
-        maxSize: 50,
-        size: 50,
+        maxSize: 100,
+        size: 100,
       }
       // ... any other columns ...
     ],
@@ -835,7 +835,7 @@ console.log('districtOptions', districtOptions)
       initialState={{
         showColumnFilters: false, // Hide column filters by default
         // density: 'compact', // Set compact view
-        pagination: { pageSize: 7 }, // Set 7 rows per page
+        pagination: { pageSize: 6 }, // Set 7 rows per page
       }}
     />
     
