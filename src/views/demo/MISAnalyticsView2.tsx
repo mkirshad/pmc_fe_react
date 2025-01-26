@@ -823,8 +823,7 @@ console.log('districtOptions', districtOptions)
 
   
 
-  return (<>{ 
-    districtOptions.length > 0 &&
+  return (
     <MaterialReactTable
       columns={columns}
       data={data}
@@ -839,8 +838,6 @@ console.log('districtOptions', districtOptions)
         pagination: { pageSize: 8 }, // Set 7 rows per page
       }}
     />
-  }
-  </>
     
   );
 
