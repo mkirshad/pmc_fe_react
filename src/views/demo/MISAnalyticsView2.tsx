@@ -447,7 +447,10 @@ const DistrictMap = ({ onDistrictClick }) => {
             <span className="header-text">PLMIS</span>
           </div>
         </Link>
-        <h6 className="header-text">Public Directory - MIS</h6>
+        <h6 className="header-text">
+          <span className="font-bold">MIS</span>
+          <span className="text-sm ml-2">Public Directory</span>
+        </h6>
         <nav className="banner-nav">
           <Link
             to="/sign-in"
@@ -698,34 +701,34 @@ console.log('districtOptions', districtOptions)
       {
         accessorKey: 'district_name',
         header: 'District',
-        filterFn: 'equals', // or 'includesString' if you want partial matches
+        // filterFn: 'equals', // or 'includesString' if you want partial matches
         // Provide a custom Filter component
-        Filter: ({ column, table }) => {
-          const filterValue = column.getFilterValue() || '';
-          return (
-            <Select
-              displayEmpty
-              value={filterValue} // store the filter state
-              onChange={(e) => {
-                column.setFilterValue(e.target.value || undefined)
-                // alert('its here')
-              }
-              }
-              style={{ width: '100%' }}
-            >
-              <MenuItem value="">
-                <em>All Districts</em>
-              </MenuItem>
-              {districtOptions.map((dist) => (
-                <MenuItem key={dist} value={dist}>
-                  {dist}
-                </MenuItem>
-              ))}
-            </Select>
-          );
-        },
-        // Enable column filtering
-        enableColumnFilter: true,
+        // Filter: ({ column, table }) => {
+        //   const filterValue = column.getFilterValue() || '';
+        //   return (
+        //     <Select
+        //       displayEmpty
+        //       value={filterValue} // store the filter state
+        //       onChange={(e) => {
+        //         column.setFilterValue(e.target.value || undefined)
+        //         // alert('its here')
+        //       }
+        //       }
+        //       style={{ width: '100%' }}
+        //     >
+        //       <MenuItem value="">
+        //         <em>All Districts</em>
+        //       </MenuItem>
+        //       {districtOptions.map((dist) => (
+        //         <MenuItem key={dist} value={dist}>
+        //           {dist}
+        //         </MenuItem>
+        //       ))}
+        //     </Select>
+        //   );
+        // },
+        // // Enable column filtering
+        // enableColumnFilter: true,
         // sizing
         minSize: 50,
         maxSize: 50,
@@ -741,39 +744,39 @@ console.log('districtOptions', districtOptions)
       {
         accessorKey: 'category',
         header: 'Category',
-        filterFn: 'equals',
-        enableColumnFilter: true,
-        // Custom Filter for category icons
-        Filter: ({ column }) => {
-          const filterValue = column.getFilterValue() || '';
+        // filterFn: 'equals',
+        // enableColumnFilter: true,
+        // // Custom Filter for category icons
+        // Filter: ({ column }) => {
+        //   const filterValue = column.getFilterValue() || '';
 
-          return (
-            <Select
-              displayEmpty
-              value={filterValue}
-              onChange={(e) =>
-                column.setFilterValue(e.target.value || undefined)
-              }
-              style={{ width: '100%' }}
-            >
-              <MenuItem value="">
-                <em>All Categories</em>
-              </MenuItem>
-              {Object.keys(categoryIconMap).map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  <Box
-                    className={`flex items-center ${
-                      categoryColorClassMap[cat] || ''
-                    }`}
-                  >
-                    {categoryIconMap[cat]}
-                    <span style={{ marginLeft: '0.5rem' }}>{cat}</span>
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          );
-        },
+        //   return (
+        //     <Select
+        //       displayEmpty
+        //       value={filterValue}
+        //       onChange={(e) =>
+        //         column.setFilterValue(e.target.value || undefined)
+        //       }
+        //       style={{ width: '100%' }}
+        //     >
+        //       <MenuItem value="">
+        //         <em>All Categories</em>
+        //       </MenuItem>
+        //       {Object.keys(categoryIconMap).map((cat) => (
+        //         <MenuItem key={cat} value={cat}>
+        //           <Box
+        //             className={`flex items-center ${
+        //               categoryColorClassMap[cat] || ''
+        //             }`}
+        //           >
+        //             {categoryIconMap[cat]}
+        //             <span style={{ marginLeft: '0.5rem' }}>{cat}</span>
+        //           </Box>
+        //         </MenuItem>
+        //       ))}
+        //     </Select>
+        //   );
+        // },
         Cell: ({ cell }) => {
           const categoryValue = cell.getValue();
           const icon = categoryIconMap[categoryValue];
@@ -799,6 +802,20 @@ console.log('districtOptions', districtOptions)
         maxSize: 50,
         size: 50,
       },
+      {
+        accessorKey: 'postal_address',
+        header:'Postal Address',
+        minSize: 50,
+        maxSize: 100,
+        size: 100,
+      },
+      {
+        accessorKey: 'material_flow_kg_per_day',
+        header:'Material Flow (Kg/Day)',
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+      }
       // ... any other columns ...
     ],
     [districtOptions],
@@ -811,13 +828,15 @@ console.log('districtOptions', districtOptions)
     <MaterialReactTable
       columns={columns}
       data={data}
-      manualFiltering
-      enableColumnFilters
-      columnFilters={columnFilters}
-      onColumnFiltersChange={onColumnFiltersChange}
+      // manualFiltering
+      // enableColumnFilters
+      // columnFilters={columnFilters}
+      // onColumnFiltersChange={onColumnFiltersChange}
       // show filters by default
       initialState={{
-        showColumnFilters: true,
+        showColumnFilters: false, // Hide column filters by default
+        // density: 'compact', // Set compact view
+        pagination: { pageSize: 8 }, // Set 7 rows per page
       }}
     />
   }
