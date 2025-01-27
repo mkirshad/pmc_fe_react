@@ -33,7 +33,7 @@ function getCategoryColor(category) {
       return 'gray';
   }
 }
-const DistrictMap = ({ onDistrictClick }) => {
+const MISDirectory = ({ onDistrictClick }) => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [vectorLayer, setVectorLayer] = useState(null);
@@ -426,42 +426,7 @@ const DistrictMap = ({ onDistrictClick }) => {
 
   // Render
   return (
-    <div className="banner-container2 grid">
-      <header className="banner-header">
-        <Link
-          to="/pub"
-          className="transition-all duration-300 ease-in-out transform hover:scale-105"
-        >
-          <div className="logo-section">
-            <img
-              src="/img/logo/epa_logo-removebg-preview.png"
-              alt="GOP Logo"
-              className="header-logo"
-            />
-            <img
-              src="/img/logo/epccd.png"
-              alt="EPCCD Logo"
-              className="header-logo"
-            />
-            <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
-            <span className="header-text">PLMIS</span>
-          </div>
-        </Link>
-        <h6 className="header-text">
-          <span className="font-bold">Management Information System</span>
-          <span className="text-sm ml-2">Public Directory</span>
-        </h6>
-        <nav className="banner-nav">
-          <Link
-            to="/sign-in"
-            className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105"
-            style={{ paddingLeft: 300 }}
-          >
-            Login
-          </Link>
-        </nav>
-      </header>
-
+    <div>
       <CategoryTiles
         stats={categoryStats}
         enabledCategories={enabledCategories}
@@ -488,20 +453,6 @@ const DistrictMap = ({ onDistrictClick }) => {
           />
         </div>
       </div>
-
-      <Divider textAlign="left" />
-
-      <footer className="footer-container">
-        <span className="footer-text">
-          Copyright &copy; {new Date().getFullYear()}
-          {" "}
-          <span className="font-semibold">PLMIS</span> All rights reserved.
-          <br />
-          Plastic Management Cell, Strategic Planning &amp; Implementation Unit,
-          Environmental Protection Agency, and Environment Protection &amp;
-          Climate Change Department, Government of the Punjab.
-        </span>
-      </footer>
     </div>
   );
 };
@@ -843,4 +794,4 @@ console.log('districtOptions', districtOptions)
 
 };
 
-export default DistrictMap;
+export default MISDirectory;

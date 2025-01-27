@@ -15,6 +15,12 @@ const authRoute: Routes = [
         authority: [],
     },
     {
+        key: 'pub',
+        path: `/mis/directory`,
+        component: lazy(() => import('@/views/demo/MISDirectory')),
+        authority: [],
+    },
+    {
         key: 'signIn',
         path: `/sign-in`,
         component: lazy(() => import('@/views/auth/SignIn')),

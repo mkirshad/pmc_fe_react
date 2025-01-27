@@ -7,6 +7,12 @@ export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes: Routes = [
     {
+        key: 'pub',
+        path: `/mis-directory`,
+        component: lazy(() => import('@/views/demo/MISAnalyticsView2')),
+        authority: [],
+    },
+    {
         key: 'home',
         path: '/home',
         component: lazy(() => import('@/views/Home')),

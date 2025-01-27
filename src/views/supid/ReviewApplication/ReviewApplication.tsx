@@ -1034,7 +1034,7 @@ const handleChangeManualFields = (fieldName, value) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={`Yes - As per remarks and verification, please proceed for issuance of licence ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
+                label={`Yes - As per remarks and verification, please proceed for issuance of license ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
               />
 
               <FormControlLabel
