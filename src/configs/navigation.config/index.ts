@@ -88,6 +88,37 @@ const navigationConfig: NavigationTree[] = [
             },
         ],
     },
+    {
+        key: 'auth.mis',
+        path: '',
+        title: 'Management Information System',
+        translateKey: 'nav.collapseMenu.analyticsMenu',
+        icon: 'collapseMenu',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: ['Super'],
+        subMenu: [
+            {
+                key: 'auth.mis.directory',
+                path: '/auth/mis/directory',
+                title: 'Public Directory',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['Super'],
+                subMenu: [],
+            },
+            {
+                key: 'auth.mis.recycling-efficency',
+                path: '/auth/mis/recycling-efficency',
+                title: 'Recycling Efficiency',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: '',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['Super'],
+                subMenu: [],
+            }
+        ],
+    },
     // /** Example purpose only, please remove */
     // {
     //     key: 'singleMenuItem',

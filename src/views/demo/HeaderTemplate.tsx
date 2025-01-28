@@ -3,11 +3,7 @@ import 'ol/ol.css';
 import { Link } from 'react-router-dom';
 import { Divider} from '@mui/material';
 
-const HeaderTemplate = ({ children }) => {
-    const [headerText, setHeaderText] = useState(<h6 className="header-text">
-        <span className="font-bold">Management Information System</span>
-        <span className="text-sm ml-2">Public Directory</span>
-      </h6>) 
+const HeaderTemplate = ({ headerText = <></>, children }) => { 
   // Render
   return (
     <div className="banner-container2 grid">
@@ -47,7 +43,7 @@ const HeaderTemplate = ({ children }) => {
         {React.Children.map(children, child => {
             // Ensure the child is a valid React element before cloning
             if (React.isValidElement(child)) {
-            return React.cloneElement(child, { setHeaderText });
+            return React.cloneElement(child);
             }
             return child;
         })}

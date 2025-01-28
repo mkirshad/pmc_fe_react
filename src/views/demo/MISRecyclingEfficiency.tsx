@@ -457,25 +457,22 @@ const MISDirectory = () => {
   );
 };
 
-// --------------------- CategoryTiles ---------------------
 const CategoryTiles = ({
-  stats,               // { Total, Producer, Distributor, Collector, Recycler }
-  enabledCategories,   // e.g. ['Producer', 'Distributor', ...]
+  stats,               
+  enabledCategories,   
   setEnabledCategories,
   enabledTotal,
 }) => {
-  // Toggle category
+  
   const handleTileClick = (cat) => {
-    if (cat === 'Total') {
-      // If "Total" tile is clicked, maybe toggle all on/off
+    if (cat === "Total") {
       if (enabledCategories.length === 4) {
-        setEnabledCategories([]); // disable all
+        setEnabledCategories([]); // Disable all
       } else {
-        setEnabledCategories(['Producer', 'Distributor', 'Collector', 'Recycler']);
+        setEnabledCategories(["Producer", "Distributor", "Collector", "Recycler"]);
       }
       return;
     }
-    // For an individual category, toggle it
     if (enabledCategories.includes(cat)) {
       setEnabledCategories(enabledCategories.filter((c) => c !== cat));
     } else {
@@ -483,68 +480,62 @@ const CategoryTiles = ({
     }
   };
 
-  // Determine if tile is “enabled” visually
   const isTileEnabled = (cat) => {
-    if (cat === 'Total') {
-      // "Total" is enabled if there's at least one category enabled
+    if (cat === "Total") {
       return enabledCategories.length > 0;
     }
     return enabledCategories.includes(cat);
   };
 
-  // If the Total tile is *disabled*, show 0.
-  // Otherwise, show the sum of enabled categories.
   function getTileDisplayValue(cat) {
-    if (cat === 'Total') {
-      if (!isTileEnabled('Total')) {
-        return 0; // If the Total tile is disabled, show 0
-      }
-      // If the Total tile is enabled, show the sum of enabled categories
-      return enabledTotal;
+    if (cat === "Total") {
+      return isTileEnabled("Total") ? enabledTotal : 0;
     }
-    // For categories, always show the “raw” stats
     return stats[cat] || 0;
   }
 
   const tileDefs = [
-    { key: 'Total',       bgColor: 'bg-gray-500',    icon: <FaChartBar className="text-white text-3xl" /> },
-    { key: 'Producer',    bgColor: 'bg-orange-500',  icon: <FaIndustry className="text-white text-3xl" /> },
-    { key: 'Distributor', bgColor: 'bg-blue-500',    icon: <FaUser className="text-white text-3xl" /> },
-    { key: 'Collector',   bgColor: 'bg-yellow-500',  icon: <FaTruck className="text-white text-3xl" /> },
-    { key: 'Recycler',    bgColor: 'bg-green-500',   icon: <FaRecycle className="text-white text-3xl" /> },
+    { key: "Produced", bgColor: "bg-orange-500", icon: <FaIndustry className="text-white text-3xl" /> },
+    { key: "Distributed", bgColor: "bg-blue-500", icon: <FaUser className="text-white text-3xl" /> },
+    { key: "Collected", bgColor: "bg-yellow-500", icon: <FaTruck className="text-white text-3xl" /> },
+    { key: "Recycled", bgColor: "bg-green-500", icon: <FaRecycle className="text-white text-3xl" /> },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-      {tileDefs.map((tile) => {
-        const enabled = isTileEnabled(tile.key);
-        const value = getTileDisplayValue(tile.key);
+    <div className="relative p-6 border border-gray-300 rounded-lg shadow-md">
+      {/* Title Inside Border */}
+      <h2 className="absolute -top-3 left-4 bg-white px-2 text-lg font-semibold text-gray-800">
+        Amount of Plastic
+      </h2>
 
-        return (
-          <div
-            key={tile.key}
-            onClick={() => handleTileClick(tile.key)}
-            className={`shadow-md rounded p-6 w-full cursor-pointer transition
-              ${enabled ? 'opacity-100' : 'opacity-50'}
-              ${tile.bgColor}
-            `}
-          >
-            <div className="flex items-center space-x-2">
-              {tile.icon}
-              {/* Title and number on the same line */}
-              <h2 className="text-2xl font-bold text-white">
-                {tile.key}
-              </h2>
-              <p className="text-2xl font-bold text-white">
-                {value}
-              </p>
+      {/* Tile Grid */}
+      <div className="flex flex-wrap justify-between gap-4 mt-4">
+        {tileDefs.map((tile) => {
+          const enabled = isTileEnabled(tile.key);
+          const value = getTileDisplayValue(tile.key);
+
+          return (
+            <div
+              key={tile.key}
+              onClick={() => handleTileClick(tile.key)}
+              className={`flex items-center justify-start p-4 rounded-lg shadow-md transition cursor-pointer w-1/5
+                ${enabled ? "opacity-100" : "opacity-50"} ${tile.bgColor}`}
+            >
+              {/* Icon */}
+              <div className="mr-3">{tile.icon}</div>
+              {/* Text */}
+              <h2 className="text-lg font-bold text-white">{tile.key} {value}</h2>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
+
+
+
+
 
 // --------------------- MyDataTable ---------------------
 // const MyDataTable = ({ data }) => {

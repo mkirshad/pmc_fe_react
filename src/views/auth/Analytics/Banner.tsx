@@ -5,8 +5,11 @@ import { Divider } from '@mui/material';
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import Input from '@/components/ui/Input';
 import AxiosBase from '../../../services/axios/AxiosBase';
+import { useSearchParams } from "react-router-dom";
 
 const Banner = () => {
+  const [searchParams] = useSearchParams();
+  const paramSuper = searchParams.get("super"); // Replace 'key' with the actual query parameter name
 
     const [trackingPopupOpen, setTrackingPopupOpen] = useState(false); // New state for Thank You popup
     const [trackingPopupType, setTankYouPopupType ] = useState("info");
@@ -137,9 +140,17 @@ const formatTrackingNumber = (value, isBackspace) => {
           <Link onClick={()=>{setTrackingPopupOpen(true); setDialogContent(null); setTankYouPopupType('info');}} to="" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
             Track Application
           </Link>
-          {/* <Link to="/mis-directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            MIS-Directory
-          </Link> */}
+          {
+            paramSuper &&
+            <>
+              <Link to="/mis/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+                Management Information System - Public Directory
+              </Link>
+              <Link to="/mis/recycling-efficiency" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+                Management Information System - Recycling Efficiency
+              </Link>
+            </>
+          }
         </div>
 
         <ConfirmDialog
