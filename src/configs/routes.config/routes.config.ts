@@ -14,7 +14,7 @@ export const protectedRoutes: Routes = [
     },
     {
         key: 'auth.mis.recycling-efficency',
-        path: `/auth/mis/recycling-efficency`,
+        path: `/auth/mis/recycling-efficiency`,
         component: lazy(() => import('@/views/demo/MISRecyclingEfficiency')),
         authority: [],
     },

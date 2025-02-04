@@ -109,7 +109,7 @@ const navigationConfig: NavigationTree[] = [
             },
             {
                 key: 'auth.mis.recycling-efficency',
-                path: '/auth/mis/recycling-efficency',
+                path: '/auth/mis/recycling-efficiency',
                 title: 'Recycling Efficiency',
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: '',

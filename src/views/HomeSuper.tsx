@@ -130,6 +130,12 @@ const Home = () => {
     const [statistics, setStatistics] = useState({});
     const [selectedTile, setSelectedTile] = useState(null); // State for the selected tile
     const [loading, setLoading] = useState(false);
+    const [feeStats, setFeeStats] = useState(
+        [
+           
+
+        ]
+    ); // Store fetched data
 
     console.log(selectedRowId)
     // APPLICANT > LSO > LSM > DO > LSM2 > TL > DEO > Download License
@@ -354,6 +360,23 @@ const Home = () => {
     
     
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await AxiosBase.get(`/pmc/report-fee/`); // API Endpoint
+                setFeeStats(response.data); // Store in state
+            } catch (error) {
+                console.error('Error fetching fee statistics:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchData();
+    }, []);
+
     useEffect(() => {
         
 
@@ -442,6 +465,39 @@ console.log(selectedRowId)
                         </div>
                     ))}
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {feeStats.map((stat, index) => {
+                        const formatAmount = (amount) => {
+                            return new Intl.NumberFormat('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            }).format(amount);
+                        };
+
+                        return (
+                            <div key={index} className="bg-white shadow-md rounded-lg p-4 border border-gray-300">
+                                <h4 className="text-xl font-semibold text-gray-700 text-center">
+                                    Fee amount till {stat.till}
+                                </h4>
+                                <div className="mt-3 flex justify-around text-center">
+                                    <p className="text-sm text-gray-600">
+                                        Received: <br />
+                                        <span className="font-bold text-blue-600">{formatAmount(stat.fee_received)}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        Verified: <br />
+                                        <span className="font-bold text-green-600">{formatAmount(stat.fee_verified)}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        Unverified: <br />
+                                        <span className="font-bold text-red-600">{formatAmount(stat.fee_unverified)}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
 
             <div className='mb-4'>
                 <h3>{userGroups && userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
