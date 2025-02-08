@@ -12,6 +12,25 @@ export const protectedRoutes: Routes = [
         component: lazy(() => import('@/views/demo/MISDirectory')),
         authority: [],
     },
+    
+    {
+        key: 'auth.EPAOperation.AllInspections',
+        path: `/auth/EPAOperations/AllInspections`,
+        component: lazy(() => import('@/views/supid/EPA/InspectionReportsList')),
+        authority: [],
+    },
+    {
+        key: 'auth.EPAOperation.ReportViolation',
+        path: `/auth/EPAOperations/ReportViolation`,
+        component: lazy(() => import('@/views/supid/EPA/InspectionCreate')),
+        authority: [],
+    },
+    {
+        key: 'auth.EPAOperation.Dashboard',
+        path: `/auth/EPAOperation/Dashboard`,
+        component: lazy(() => import('@/views/supid/EPA/InspectionDashboard')),
+        authority: [],
+    },    
     {
         key: 'auth.mis.recycling-efficency',
         path: `/auth/mis/recycling-efficiency`,
