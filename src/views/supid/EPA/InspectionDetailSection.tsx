@@ -26,7 +26,7 @@ const businessTypeList = [
 
 
 const violationTypeList = [
-    { label: 'Plastic shopping bags less than 75 microns', value: 'Plastic shopping bags less than 75 microns' },
+    { label: 'Plastic shopping/carry bags (having thickness less than 75 micron)', value: 'Plastic shopping/carry bags (having thickness less than 75 micron)' },
     { label: 'Other Single Use Plastics', value: 'Other Single Use Plastics' },
 ];
 
@@ -90,21 +90,22 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
     useEffect(() => {
         if (watchActionTaken.includes('Confiscation')) {
             let total = 0;
-
-            // Plastic bags confiscation
+    
+            // Add plastic bags confiscation
             total += parseFloat(plasticBagsConfiscation) || 0;
-
-            // Sum other plastic items
-            Object.values(otherPlasticsConfiscation).forEach((value) => {
-                total += parseFloat(value) || 0;
+    
+            // ✅ Only sum confiscated amounts for selected options
+            selectedOptions.forEach((item) => {
+                if (otherPlasticsConfiscation[item]) {
+                    total += parseFloat(otherPlasticsConfiscation[item]) || 0;
+                }
             });
-
+    
             // Update state and form
             setTotalConfiscation(total);
             setValue("totalConfiscation", total);
         }
-
-    }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue]);
+    }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue, selectedOptions]);
 
     useEffect(() => {
         AxiosBase.get('/pmc/inspection-report/all_other_single_use_plastics/')
@@ -303,7 +304,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             )}
                         />  
                     </FormItem>}
-                    </FormItem>  
+                </FormItem>  
 
                     <FormItem label="Action Taken*">
                         {actionTakenList.map(action => (
@@ -328,8 +329,8 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                     </FormItem>
 
                     {watchActionTaken.includes('Confiscation') && (
-                                watchViolationType.includes('Plastic shopping bags less than 75 microns') && (
-                                        <FormItem label="Plastic shopping bags Confiscation (KG)"
+                                watchViolationType.includes('Plastic shopping/carry bags (having thickness less than 75 micron)') && (
+                                        <FormItem label="Plastic shopping/carry bags (having thickness less than 75 micron) (KG)"
                                         invalid={Boolean(errors.plasticBagsConfiscation)}
                                         errorMessage={errors.plasticBagsConfiscation?.message}
                                         >
@@ -360,27 +361,28 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                                 )
                     )}
                     
+                    {watchActionTaken.includes('Confiscation') && (
+                        <FormItem label="Total Confiscation (KG)">
+                            <Controller
+                                name="totalConfiscation"
+                                control={control}
+                                render={({ field }) => {
+                                    useEffect(() => {
+                                        field.onChange(totalConfiscation); // ✅ Update form state when totalConfiscation changes
+                                    }, [totalConfiscation]); // Dependency ensures re-run on change
 
-                    <FormItem label="Total Confiscation (KG)">
-                        <Controller
-                            name="totalConfiscation"
-                            control={control}
-                            render={({ field }) => {
-                                useEffect(() => {
-                                    field.onChange(totalConfiscation); // ✅ Update form state when totalConfiscation changes
-                                }, [totalConfiscation]); // Dependency ensures re-run on change
-
-                                return (
-                                    <Input
-                                        type="number"
-                                        placeholder="Auto-calculated"
-                                        readOnly
-                                        {...field}
-                                    />
-                                );
-                            }}
-                        />
-                    </FormItem>
+                                    return (
+                                        <Input
+                                            type="number"
+                                            placeholder="Auto-calculated"
+                                            readOnly
+                                            {...field}
+                                        />
+                                    );
+                                }}
+                            />
+                        </FormItem>
+                    )}
 
                         
                 {(watchActionTaken.includes('Fine Imposed'))&&
@@ -442,6 +444,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
                 {(watchActionTaken.includes('De Sealed')) &&
                     (
+                    <>
                     <FormItem label="De Sealed Date">
                         <Controller
                             name="deSealedDate"
@@ -451,6 +454,27 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             )}
                         />
                     </FormItem>
+                    
+                    <FormItem
+                        label="De Seal - Affidavit"
+                        invalid={Boolean(errors.flow_diagram)}
+                        errorMessage={errors.flow_diagram?.message}
+                    >
+                        <Controller
+                            name="affidavit"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="file"
+                                    accept=".pdf,.png,.jpg,.jpeg" // Allow only specific file types
+                                    disabled={readOnly} // Apply the read-only prop
+                                    onChange={(e) => field.onChange(e.target.files[0] || null)} // Correctly set the file without using 'value'
+                                />
+                            )}
+                        />
+                    </FormItem>
+                    
+                    </>
                     )
                 }
             </div>
