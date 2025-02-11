@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form } from '@/components/ui/Form';
 import Container from '@/components/shared/Container';
 import BottomStickyBar from '@/components/template/BottomStickyBar';
@@ -45,23 +45,35 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
 });
 
 const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }: CommonProps) => {
+    console.log('defaultValues2', defaultValues);
     const { handleSubmit, reset, formState: { errors }, control } = useForm<InspectionReportSchema>({
-        defaultValues,
+        defaultValues, // Initial values
         resolver: zodResolver(validationSchema),
     });
 
-    useState(() => {
+    console.log('control:', JSON.stringify(control, null, 2))
+
+    // // ✅ Ensure the form updates when defaultValues change
+    useEffect(() => {
         if (!isEmpty(defaultValues)) {
-            reset(defaultValues);
+            reset(defaultValues); // Update form with new values
         }
-    }, [JSON.stringify(defaultValues)]);
+    }, [JSON.stringify(defaultValues)]); // Runs whenever defaultValues change
+    
+    // useEffect(() => {
+    //     if (!isEmpty(defaultValues)) {
+    //         reset(defaultValues)
+    //     }
+    //     console.log('its in useEffect')
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [JSON.stringify(defaultValues)])
 
     return (
         <Form className="flex w-full h-full" containerClassName="flex flex-col w-full justify-between" onSubmit={handleSubmit(onFormSubmit)}>
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <InspectionDetailSection control={control} errors={errors} readOnly={readOnly} />
+                        <InspectionDetailSection control={control} errors={errors} defaultValues={defaultValues} />
                     </div>
                 </div>
             </Container>

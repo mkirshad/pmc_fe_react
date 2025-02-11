@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Autocomplete, TextField, Chip, Hidden, List } from '@mui/material';
 import OpenLayersLocationPicker from "./OpenLayersLocationPicker";
 import NumericInput from '@/components/shared/NumericInput';
+import AxiosBase from '../../../services/axios/AxiosBase' 
 
 type InspectionDetailSectionProps = {
     control: any;
@@ -35,7 +36,7 @@ const actionTakenList = [
     { label: 'Complaint before Environmental Magistrate', value: 'Complaint before Environmental Magistrate' },
 ];
 
-const InspectionDetailSection = ({ control, errors, readOnly = false }: InspectionDetailSectionProps) => {
+const InspectionDetailSection = ({ control, errors, readOnly = false, defaultValues }: InspectionDetailSectionProps) => {
     const [options, setOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const { setValue, getValues, trigger } = useForm();
@@ -94,6 +95,25 @@ const InspectionDetailSection = ({ control, errors, readOnly = false }: Inspecti
         }
     }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue]);
 
+    useEffect(() => {
+        AxiosBase.get('/pmc/inspection-report/all_other_single_use_plastics/')
+            .then(response => {
+                console.log("API Response:", response.data); // Log entire API response
+                setOptions(response.data.single_use_plastic_items || []); // Ensure it's always an array
+            })
+            .catch(error => {
+                console.error("Error fetching available options:", error);
+            });
+    }, []);
+    
+
+    useEffect(() => {
+        if (defaultValues?.OtherSingleUseItems) {
+            setSelectedOptions(defaultValues.OtherSingleUseItems);
+        }
+    }, [defaultValues?.OtherSingleUseItems]);
+
+    
     const [selectedLocation, setSelectedLocation] = useState({
         lat: null,
         lng: null,
@@ -181,7 +201,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false }: Inspecti
 
             </div>
 
-            <FormItem label="Violation Found*">
+            <FormItem label="Violation Found">
                 <Controller
                     key={"a1"}
                     name="violationFound"

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { MaterialReactTable } from "material-react-table";
+import { IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import AxiosBase from "../../../services/axios/AxiosBase";
+import { useNavigate } from "react-router-dom";
 
 const InspectionReportsList = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -22,6 +26,10 @@ const InspectionReportsList = () => {
     fetchReports();
   }, []);
 
+  const handleEditClick = (row) => {
+    navigate(`/edit-inspection/${row.id}`, { state: { reportData: row } });
+  };
+
   const columns = [
     { accessorKey: "district", header: "District Name", size: 200 },
     { accessorKey: "total_inspections", header: "Total No. of Inspections", size: 200 },
@@ -31,6 +39,16 @@ const InspectionReportsList = () => {
     { accessorKey: "total_firs_registered", header: "Total No. of FIRs registered", size: 200 },
     { accessorKey: "total_premises_sealed", header: "No. of Premises Sealed", size: 200 },
     { accessorKey: "total_complaints_filed", header: "No. of Complaints filed before\nthe Environmental Magistrate", size: 300 },
+    {
+      accessorKey: "edit",
+      header: "Actions",
+      size: 100,
+      Cell: ({ row }) => (
+        <IconButton onClick={() => handleEditClick(row.original)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
