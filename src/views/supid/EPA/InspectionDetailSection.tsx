@@ -21,7 +21,9 @@ const businessTypeList = [
     { label: 'Distributor', value: 'Distributor' },
     { label: 'Recycler', value: 'Recycler' },
     { label: 'Collector', value: 'Collector' },
+    { label: 'Retailer', value: 'Retailer' } // ✅ New Category Added
 ];
+
 
 const violationTypeList = [
     { label: 'Plastic shopping bags less than 75 microns', value: 'Plastic shopping bags less than 75 microns' },
@@ -34,6 +36,8 @@ const actionTakenList = [
     { label: 'Sealing', value: 'Sealing' },
     { label: 'FIR', value: 'FIR' },
     { label: 'Complaint before Environmental Magistrate', value: 'Complaint before Environmental Magistrate' },
+    { label: 'Fine Imposed', value: 'Fine Imposed' },
+    { label: 'De Sealed', value: 'De Sealed' },
 ];
 
 const InspectionDetailSection = ({ control, errors, readOnly = false, defaultValues }: InspectionDetailSectionProps) => {
@@ -57,6 +61,12 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
     const watchActionTaken = useWatch({ control, name: 'actionTaken', defaultValue: [] });
     
+    const watchFineRecoveryStatus = useWatch({
+        control,
+        name: 'fineRecoveryStatus',
+        defaultValue: [], // Ensure it's an array
+    });
+
     const handleChangeSP = (event, newValue) => {
         setSelectedOptions(newValue);
     
@@ -93,6 +103,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
             setTotalConfiscation(total);
             setValue("totalConfiscation", total);
         }
+
     }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue]);
 
     useEffect(() => {
@@ -162,6 +173,17 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
             <h4 className="mb-6">Inspection Report</h4>
             
             <div className="grid md:grid-cols-2 gap-4">
+
+                <FormItem label="Inspection Date">
+                    <Controller
+                        name="inspectionDate"
+                        control={control}
+                        render={({ field }) => (
+                            <Input type="date" {...field} />
+                        )}
+                    />
+                </FormItem>
+
                 <FormItem label="Name of Business*" invalid={Boolean(errors.businessName)} errorMessage={errors.businessName?.message}>
                     <Controller
                         name="businessName"
@@ -182,43 +204,41 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                     />
                 </FormItem>
 
-                 {/* Tracking Number Input */}
-                 <FormItem label="Plastic Application / License Number" invalid={Boolean(errors.businessType)} errorMessage={errors.businessType?.message}>
-                    <Controller
-                        name="licenseNumber"
-                        control={control}
-                        render={({ field }) => (
-                    <Input
-                        value={trackingNumber}
-                        onChange={(e) => setTrackingNumber(formatTrackingNumber(e.target.value, false))}
-                        onKeyDown={handleKeyDown}
-                        placeholder="e.g., LHR-PRO-001"
-                        title="Tracking Number (e.g., LHR-PRO-001)"
+                <FormItem label="Plastic Application / License Number" invalid={Boolean(errors.businessType)} errorMessage={errors.businessType?.message}>
+                        <Controller
+                            name="licenseNumber"
+                            control={control}
+                            render={({ field }) => (
+                        <Input
+                            value={trackingNumber}
+                            onChange={(e) => setTrackingNumber(formatTrackingNumber(e.target.value, false))}
+                            onKeyDown={handleKeyDown}
+                            placeholder="e.g., LHR-PRO-001"
+                            title="Tracking Number (e.g., LHR-PRO-001)"
+                        />
+                    )}
                     />
-                )}
-                />
-            </FormItem>
-
+                </FormItem>
             </div>
 
-            <FormItem label="Violation Found">
-                <Controller
-                    key={"a1"}
-                    name="violationFound"
-                    control={control}
-                    render={({ field }) => (
-                        <Checkbox.Group
-                            value={field.value || []} // Ensure the value is an array
-                            onChange={(selectedValues) => field.onChange(selectedValues)}
-                            className="flex flex-col gap-2 mb-2 ml-2"
-                        >
-                            <Checkbox {...field} value={"Yes"} >
-                                Yes
-                            </Checkbox>
-                        </Checkbox.Group>
-                    )}
-                />
-            </FormItem>
+                <FormItem label="Violation Found">
+                    <Controller
+                        key={"a1"}
+                        name="violationFound"
+                        control={control}
+                        render={({ field }) => (
+                            <Checkbox.Group
+                                value={field.value || []} // Ensure the value is an array
+                                onChange={(selectedValues) => field.onChange(selectedValues)}
+                                className="flex flex-col gap-2 mb-2 ml-2"
+                            >
+                                <Checkbox {...field} value={"Yes"} >
+                                    Yes
+                                </Checkbox>
+                            </Checkbox.Group>
+                        )}
+                    />
+                </FormItem>
 
             {watchViolationFound.includes('Yes') && (
                 <div className="grid md:grid-cols-2 gap-4">
@@ -283,9 +303,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             )}
                         />  
                     </FormItem>}
-                    </FormItem>
-
-                    
+                    </FormItem>  
 
                     <FormItem label="Action Taken*">
                         {actionTakenList.map(action => (
@@ -307,11 +325,10 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             />
                         ))}
 
+                    </FormItem>
 
-                            {watchActionTaken.includes('Confiscation') && (
-                                <div>
-                                    <h4 className="mt-4">Confiscation Details</h4>
-                                    {watchViolationType.includes('Plastic shopping bags less than 75 microns') && (
+                    {watchActionTaken.includes('Confiscation') && (
+                                watchViolationType.includes('Plastic shopping bags less than 75 microns') && (
                                         <FormItem label="Plastic shopping bags Confiscation (KG)"
                                         invalid={Boolean(errors.plasticBagsConfiscation)}
                                         errorMessage={errors.plasticBagsConfiscation?.message}
@@ -324,47 +341,120 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                                                 )}
                                             />
                                         </FormItem>
-                                    )}
-                                    
-                                    {watchViolationType.includes('Other Single Use Plastics') &&
-                                        selectedOptions.map((item, index) => (
-                                            <FormItem key={index} label={`${item} Confiscation (KG)`}>
-                                                <Controller
-                                                    name={`confiscation_otherPlastics.${item}`}
-                                                    control={control}
-                                                    render={({ field }) => (
-                                                        <Input type="number" placeholder="Enter KG" {...field} />
-                                                    )}
-                                                />
-                                            </FormItem>
-                                        ))}
+                                    )
+                    )}
 
-                                <FormItem label="Total Confiscation (KG)">
-                                    <Controller
-                                        name="totalConfiscation"
-                                        control={control}
-                                        render={({ field }) => {
-                                            useEffect(() => {
-                                                field.onChange(totalConfiscation); // ✅ Update form state when totalConfiscation changes
-                                            }, [totalConfiscation]); // Dependency ensures re-run on change
+                    {watchActionTaken.includes('Confiscation') && (            
+                                (watchViolationType.includes('Other Single Use Plastics') &&
+                                    selectedOptions.map((item, index) => (
+                                        <FormItem key={index} label={`${item} Confiscation (KG)`}>
+                                            <Controller
+                                                name={`confiscation_otherPlastics.${item}`}
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input type="number" placeholder="Enter KG" {...field} />
+                                                )}
+                                            />
+                                        </FormItem>
+                                    ))
+                                )
+                    )}
+                    
 
-                                            return (
-                                                <Input
-                                                    type="number"
-                                                    placeholder="Auto-calculated"
-                                                    readOnly
-                                                    {...field}
-                                                />
-                                            );
-                                        }}
+                    <FormItem label="Total Confiscation (KG)">
+                        <Controller
+                            name="totalConfiscation"
+                            control={control}
+                            render={({ field }) => {
+                                useEffect(() => {
+                                    field.onChange(totalConfiscation); // ✅ Update form state when totalConfiscation changes
+                                }, [totalConfiscation]); // Dependency ensures re-run on change
+
+                                return (
+                                    <Input
+                                        type="number"
+                                        placeholder="Auto-calculated"
+                                        readOnly
+                                        {...field}
                                     />
-                                </FormItem>
-                                </div>
-                            )}
-
+                                );
+                            }}
+                        />
                     </FormItem>
-                </div>
-            )}
+
+                        
+                {(watchActionTaken.includes('Fine Imposed'))&&
+                        (
+                        <FormItem label="Fine Amount (PKR)">
+                            <Controller
+                                name="fineAmount"
+                                control={control}
+                                render={({ field }) => (
+                                    <NumericInput placeholder="Enter Fine Amount" {...field} />
+                                )}
+                            />
+                        </FormItem>
+                    )}
+            
+                <FormItem label="Fine Recovery Status">
+                    <Controller
+                        name="fineRecoveryStatus"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                options={[
+                                    { label: 'Pending', value: 'Pending' },
+                                    { label: 'Partial', value: 'Partial' },
+                                    { label: 'Recovered', value: 'Recovered' },
+                                ]}
+                                isDisabled={readOnly}
+                                value={{ label: field.value, value: field.value }}
+                                onChange={(option) => field.onChange(option?.value)}
+                            />
+                        )}
+                    />
+                </FormItem>
+
+
+                {watchFineRecoveryStatus !== 'Pending' && (
+                    <>
+                    <FormItem label="Fine Recovery Date">
+                        <Controller
+                            name="fineRecoveryDate"
+                            control={control}
+                            render={({ field }) => (
+                                <Input type="date" {...field} />
+                            )}
+                        />
+                    </FormItem>
+                    
+                    <FormItem label="Recovery Amount (PKR)">
+                        <Controller
+                            name="recoveryAmount"
+                            control={control}
+                            render={({ field }) => (
+                                <NumericInput placeholder="Enter Recovery Amount" {...field} />
+                            )}
+                        />
+                    </FormItem>
+                    </>
+                )}
+
+                {(watchActionTaken.includes('De Sealed')) &&
+                    (
+                    <FormItem label="De Sealed Date">
+                        <Controller
+                            name="deSealedDate"
+                            control={control}
+                            render={({ field }) => (
+                                <Input type="date" {...field} />
+                            )}
+                        />
+                    </FormItem>
+                    )
+                }
+            </div>
+        )}
 
             <div style={{ padding: "20px" }}>
                 <h1>Select Location</h1>
