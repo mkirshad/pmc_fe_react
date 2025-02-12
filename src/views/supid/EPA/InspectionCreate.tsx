@@ -39,44 +39,6 @@ const CustomerEdit = () => {
     const [thankYouPopupType, setTankYouPopupType ] = useState("success");
     const [inspectionData, setInspectionData] = useState(null);
 
-        // const inspectionData = 
-        //     {
-        //         "id": 6,
-        //         "business_name": "Bio Creative Labs",
-        //         "business_type": "Producer",
-        //         "license_number": null,
-        //         "violation_found": [
-        //             "Yes"
-        //         ],
-        //         "violation_type": [
-        //             "Plastic shopping bags less than 75 microns",
-        //             "Other Single Use Plastics"
-        //         ],
-        //         "action_taken": [
-        //             "Notice issued",
-        //             "Confiscation",
-        //             "Sealing"
-        //         ],
-        //         "plastic_bags_confiscation": 12,
-        //         "confiscation_other_plastics": {
-        //             "test": 23
-        //         },
-        //         "total_confiscation": 35,
-        //         "other_single_use_items": [
-        //             "test"
-        //         ],
-        //         "latitude": 31.4514695,
-        //         "longitude": 74.253135,
-        //         "district": "Lahore",
-        //         "created_at": "2025-02-08T07:20:30.253706+05:00"
-        //     };
-            
-    // useEffect(() => {
-    //     if (inspectionData) {
-    //         reset(inspectionData); // Reset form with fetched data
-    //     }
-    // }, [inspectionData, reset]);
-
     const [loading, setLoading] = useState(false);
     // console.log('inspectionData', inspectionData)
      // Extract ID from query parameters
@@ -108,6 +70,17 @@ const CustomerEdit = () => {
                         latitude: data.latitude ?? null,  // Ensure it can be nullable
                         longitude: data.longitude ?? null,
                         district: data.district || "",
+
+                        // ✅ Newly Added Fields
+                        inspectionDate: data.inspection_date || "",  // Ensure date is correctly formatted
+                        fineAmount: data.fine_amount || 0,
+                        fineRecoveryStatus: data.fine_recovery_status || "Pending",
+                        fineRecoveryDate: data.fine_recovery_date || "",
+                        recoveryAmount: data.recovery_amount || 0,
+                        deSealedDate: data.de_sealed_date || "",
+
+                        // ✅ Handle File for Affidavit (Ensure file handling is done properly)
+                        // affidavit: data.affidavit ? `${process.env.REACT_APP_API_URL}${data.affidavit}` : null,
                     };
     
                     console.log('Formatted Inspection Data:', formattedData);
@@ -161,6 +134,20 @@ const CustomerEdit = () => {
         formData.append("latitude", values.latitude?.toString() || "");
         formData.append("longitude", values.longitude?.toString() || "");
         formData.append("district", values.district || "");
+
+
+        // ✅ New Fields Added
+        if (values.inspectionDate) formData.append("inspection_date", values.inspectionDate);
+        if (values.fineAmount) formData.append("fine_amount", values.fineAmount.toString());
+        if (values.fineRecoveryStatus) formData.append("fine_recovery_status", values.fineRecoveryStatus);
+        if (values.fineRecoveryDate) formData.append("fine_recovery_date", values.fineRecoveryDate);
+        if (values.recoveryAmount) formData.append("recovery_amount", values.recoveryAmount.toString());
+        if (values.deSealedDate) formData.append("de_sealed_date", values.deSealedDate);
+
+        // ✅ Affidavit (File Upload)
+        if (values.affidavit) {
+            formData.append("affidavit", values.affidavit);
+        }
 
         try {
             let response;

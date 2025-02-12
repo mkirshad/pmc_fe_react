@@ -91,10 +91,12 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
         if (watchActionTaken.includes('Confiscation')) {
             let total = 0;
     
-            // Add plastic bags confiscation
-            total += parseFloat(plasticBagsConfiscation) || 0;
+            // ✅ Check if Plastic Bags are selected before adding to total
+            if (watchViolationType.includes('Plastic shopping/carry bags (having thickness less than 75 micron)')) {
+                total += parseFloat(plasticBagsConfiscation) || 0;
+            }
     
-            // ✅ Only sum confiscated amounts for selected options
+            // ✅ Only sum confiscated amounts for selected options in "Other Single Use Plastics"
             selectedOptions.forEach((item) => {
                 if (otherPlasticsConfiscation[item]) {
                     total += parseFloat(otherPlasticsConfiscation[item]) || 0;
@@ -105,12 +107,13 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
             setTotalConfiscation(total);
             setValue("totalConfiscation", total);
         }
-    }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue, selectedOptions]);
+    }, [plasticBagsConfiscation, otherPlasticsConfiscation, watchActionTaken, setValue, selectedOptions, watchViolationType]);
+    
 
     useEffect(() => {
         AxiosBase.get('/pmc/inspection-report/all_other_single_use_plastics/')
             .then(response => {
-                console.log("API Response:", response.data); // Log entire API response
+                // console.log("API Response:", response.data); // Log entire API response
                 setOptions(response.data.single_use_plastic_items || []); // Ensure it's always an array
             })
             .catch(error => {
@@ -133,9 +136,9 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
       });
     
     const handleLocationSelect = (locationData) => {
-    console.log("Selected Location:", locationData);
+    // console.log("Selected Location:", locationData);
     setSelectedLocation(locationData); // Store the selected location
-    console.log(selectedLocation)
+    // console.log(selectedLocation)
     };
 
      // This method is reused from your Banner for backspace handling

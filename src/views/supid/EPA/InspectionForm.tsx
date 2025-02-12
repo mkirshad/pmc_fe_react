@@ -12,46 +12,64 @@ import type { CommonProps } from '@/@types/common';
 import type { InspectionReportSchema } from './types';
 
 const validationSchema: ZodType<InspectionReportSchema> = z.object({
-    businessName: z.string().min(1, { message: "Business name required" }),
-    businessType: z.string().min(1, { message: "Business type required" }),
+        businessName: z.string().min(1, { message: "Business name required" }),
+        businessType: z.string().min(1, { message: "Business type required" }),
 
-    licenseNumber: z.string()
-        .optional(),
+        licenseNumber: z.string()
+            .optional(),
 
-    violationFound: z.array(z.string()).optional(),
-    violationType: z.array(z.string()).optional(),
-    
-    actionTaken: z.array(z.string()).optional(),
+        violationFound: z.array(z.string()).optional(),
+        violationType: z.array(z.string()).optional(),
+        
+        actionTaken: z.array(z.string()).optional(),
 
-    plasticBagsConfiscation: z
-        .coerce.number()
-        .optional(),
+        plasticBagsConfiscation: z
+            .coerce.number()
+            .optional(),
 
-    confiscation_otherPlastics: z
-        .record(z.string(), z.coerce.number())
-        .optional(),
+        confiscation_otherPlastics: z
+            .record(z.string(), z.coerce.number())
+            .optional(),
 
-    totalConfiscation: z
-        .coerce.number()
-        .optional(),
+        totalConfiscation: z
+            .coerce.number()
+            .optional(),
 
-    OtherSingleUseItems: z.array(z.string()).optional(),
+        OtherSingleUseItems: z.array(z.string()).optional(),
 
-     // ✅ Directly adding latitude, longitude, and district
-     latitude: z.coerce.number().nullable(),
-     longitude: z.coerce.number().nullable(),
-     district: z.string().optional(),
-     
+        // ✅ Directly adding latitude, longitude, and district
+        latitude: z.coerce.number().nullable(),
+        longitude: z.coerce.number().nullable(),
+        district: z.string().optional(),
+
+        // ✅ New Fields Added for Validation
+        inspectionDate: z.string().min(1, { message: "Inspection date is required" }),  // Date field
+
+        fineAmount: z.coerce.number().optional(), // Allow numbers
+
+        fineRecoveryStatus: z.enum(["Pending", "Partial", "Recovered"]).optional(), // Dropdown
+
+        fineRecoveryDate: z.string().optional(), // Date field (optional)
+
+        recoveryAmount: z.coerce.number().optional(), // Allow numbers
+
+        deSealedDate: z.string().optional(), // Date field (optional)
+
+        // ✅ Affidavit (File Upload)
+        affidavit: z
+            .instanceof(File, { message: "Must be a valid file" })
+            .optional()
+
 });
 
 const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }: CommonProps) => {
-    console.log('defaultValues2', defaultValues);
+    // console.log('defaultValues2', defaultValues);
     const { handleSubmit, reset, formState: { errors }, control } = useForm<InspectionReportSchema>({
         defaultValues, // Initial values
         resolver: zodResolver(validationSchema),
     });
 
-    console.log('control:', JSON.stringify(control, null, 2))
+    // console.log('control:', JSON.stringify(control, null, 2))
 
     // // ✅ Ensure the form updates when defaultValues change
     useEffect(() => {
@@ -59,14 +77,6 @@ const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }
             reset(defaultValues); // Update form with new values
         }
     }, [JSON.stringify(defaultValues)]); // Runs whenever defaultValues change
-    
-    // useEffect(() => {
-    //     if (!isEmpty(defaultValues)) {
-    //         reset(defaultValues)
-    //     }
-    //     console.log('its in useEffect')
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [JSON.stringify(defaultValues)])
 
     return (
         <Form className="flex w-full h-full" containerClassName="flex flex-col w-full justify-between" onSubmit={handleSubmit(onFormSubmit)}>
