@@ -178,7 +178,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
             
             <div className="grid md:grid-cols-2 gap-4">
 
-                <FormItem label="Inspection Date">
+                <FormItem label="Inspection Date*" invalid={Boolean(errors.inspectionDate)} errorMessage={errors.inspectionDate?.message}>
                     <Controller
                         name="inspectionDate"
                         control={control}
