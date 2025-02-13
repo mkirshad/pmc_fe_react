@@ -57,6 +57,12 @@ export const protectedRoutes: Routes = [
     },
     {
         key: 'home',
+        path: '/home-deo',
+        component: lazy(() => import('@/views/HomeDEO')),
+        authority: [],
+    },
+    {
+        key: 'home',
         path: '/home-admin',
         component: lazy(() => import('@/views/HomeAdmin')),
         authority: [],

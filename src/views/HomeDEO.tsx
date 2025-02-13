@@ -152,17 +152,21 @@ const Home = () => {
     ]
 
     const groupTitles = {
-        APPLICANT: 'Applicant',
-        LSO: 'LSO',
-        LSO1: 'Sana',
-        LSO2: 'Qaisar',
-        LSO3: 'Ameer',
-        LSM: 'LSM',
+        'All-Applications':'All-Applications',
+        'Challan-Downloaded':'Challan-Downloaded',
+        'Submitted':'Submitted',
+        'PMC':'PMC',
+        // APPLICANT: 'Applicant',
+        // LSO: 'LSO',
+        // LSO1: 'Sana',
+        // LSO2: 'Qaisar',
+        // LSO3: 'Ameer',
+        // LSM: 'LSM',
         DO: 'DO',
-        LSM2: 'LSM',
-        TL: 'TL',
+        // LSM2: 'LSM',
+        // TL: 'TL',
         DEO: 'DEO',
-        'Download License': 'Download License',
+        // 'Download License': 'Download License',
     };
 
     const userAuthority = useSessionUser((state) => state.user.authority) || []
@@ -214,7 +218,7 @@ const Home = () => {
             });
             const filteredData = (response.data || []).filter((item) => item.submittedapplication?.id % 3 === moduloValue);
             // Update the table data
-            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            const extracted = extractColumns(filteredData);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
             
@@ -230,7 +234,7 @@ const Home = () => {
             const filteredData = response.data || [];
     
             // Update the table data
-            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            const extracted = extractColumns(filteredData);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
         }
@@ -251,7 +255,7 @@ const Home = () => {
     };
 
     // Extract columns and flattened data
-    const extractColumns = (data, hasUserGroup, group) => {
+    const extractColumns = (data) => {
         const allowedColumns = [
             'first_name',
             'last_name',
@@ -309,7 +313,7 @@ const Home = () => {
                     Cell: ({ cell, row }) => {
                       const id = row.original.id;
                       const assignedBack = row.original.is_assigned_back;
-                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                      const url = `/spuid-review/${id}`; // Adjust URL as needed
                     
                       return (
                         <a
@@ -339,7 +343,7 @@ const Home = () => {
                   Cell: ({ cell, row }) => {
                       const id = row.original.id;
                       const assignedBack = row.original.is_assigned_back;
-                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                      const url = `/spuid-review/${id}`; // Adjust URL as needed
                     
                       return (
                         <a
@@ -388,15 +392,12 @@ const Home = () => {
     useEffect(() => {
         // Find first matching group
         const matchingGroup = groups.find((group) => userAuthority.includes(group));
-        setSelectedTile(matchingGroup); // Set the highlighted tile
+        handleTileClick(matchingGroup); // Set the highlighted tile
     }, [userAuthority]);
 
+    // console.log('userAuthority', userAuthority)
     useEffect(() => {
-        
-
- 
-
-                       
+  
         const fetchData = async () => {
             setLoading(true); // Show the loading spinner
             try {
@@ -462,23 +463,30 @@ const Home = () => {
 
 console.log('selectedRowId:', selectedRowId)
 console.log(selectedRowId)
+
     return (
-        <div>
+            <div>
                 {/* Display Tiles */}
-            <div className="tiles-container">
-                    {Object.entries(statistics).map(([group, count]) => (
-                        <div key={group} className="tile"
-                        style={{ cursor: 'pointer', 
-                                 backgroundColor: selectedTile === group ? '#007BFF' : '#f8f9fa',
-                                 color: selectedTile === group ? '#fff' : '#000', 
-                                }} // Add cursor pointer for interactivity
-                        onClick={() => handleTileClick(group)} // Call the handler with the group
-                        >
-                            <h3>{groupTitles[group] || group}</h3> {/* Use title or fallback to the group key */}
-                            <p>{count}</p>
-                        </div>
-                    ))}
-            </div>
+                <div className="tiles-container">
+                    {Object.entries(statistics)
+                        .filter(([group]) => groupTitles[group]) // Only include groups that exist in groupTitles
+                        .map(([group, count]) => (
+                            <div key={group} 
+                                className="tile"
+                                style={{ 
+                                    cursor: 'pointer', 
+                                    backgroundColor: selectedTile === group ? '#007BFF' : '#f8f9fa',
+                                    color: selectedTile === group ? '#fff' : '#000',
+                                }}
+                                onClick={() => handleTileClick(group)}
+                            >
+                                <h3>{groupTitles[group] || group}</h3>
+                                <p>{count}</p>
+                            </div>
+                        ))
+                    }
+                </div>
+
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     {feeStats.map((stat, index) => {
