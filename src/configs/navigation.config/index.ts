@@ -126,7 +126,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.collapseMenu.analyticsMenu',
         icon: 'FaTools',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: ['TL', 'DO'],
+        authority: ['TL', 'DO', 'DEO'],
         subMenu: [
             {
                 key: 'auth.EPAOperation.ReportViolation',
