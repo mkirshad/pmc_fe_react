@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { MaterialReactTable } from 'material-react-table';
+import {
+    MaterialReactTable,
+    useMaterialReactTable,
+    type MRT_ColumnDef,
+  } from 'material-react-table';
 import AxiosBase from '../services/axios/AxiosBase';
 import { Link } from 'react-router-dom'; // For navigation
 import Steps from '@/components/ui/Steps';
@@ -215,7 +219,7 @@ console.log('flattenedData', flattenedData)
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
-                        { accessorKey: 'license_number',    header: 'license_number', 
+                        { accessorKey: 'license_number',    header: 'License Number', 
                                   minSize: 50,
                                   maxSize: 500,
                                   size: 150, 
@@ -240,69 +244,90 @@ console.log('flattenedData', flattenedData)
                                 
                                 }
                         },
-                        { accessorKey: 'date_of_issue',    header: 'date_of_issue', 
+                        { accessorKey: 'date_of_issue',    header: 'Date Of Issue', 
                         minSize: 50,
                         maxSize: 500,
                         size: 150, },
-                        { accessorKey: 'license_for',    header: 'license_for', 
+                        { accessorKey: 'license_for',    header: 'License For', 
                             minSize: 50,
                             maxSize: 500,
                             size: 150, },
-                        { accessorKey: 'license_duration',    header: 'license_duration', 
+                        { accessorKey: 'license_duration',    header: 'License Duration', 
                         minSize: 50,
                         maxSize: 500,
                         size: 150, },
-                        { accessorKey: 'owner_name',    header: 'owner_name', 
+                        { accessorKey: 'owner_name',    header: 'Owner Name', 
                             minSize: 50,
                             maxSize: 500,
                             size: 200, },
-                        { accessorKey: 'business_name',    header: 'business_name', 
+                        { accessorKey: 'business_name',    header: 'Business Name', 
                             minSize: 50,
                             maxSize: 500,
                             size: 150, },
-                        { accessorKey: 'district_name',    header: 'district_name', 
+                        { accessorKey: 'district_name',    header: 'District Name', 
                         minSize: 50,
                         maxSize: 500,
                         size: 150, },
-                        { accessorKey: 'tehsil_name',    header: 'tehsil_name', 
+                        { accessorKey: 'tehsil_name',    header: 'Tehsil Name', 
                             minSize: 50,
                             maxSize: 500,
                             size: 150, },
-                        { accessorKey: 'city_name',    header: 'city_name', 
+                        { accessorKey: 'city_name',    header: 'City Name', 
                             minSize: 50,
                             maxSize: 500,
                             size: 150, },
-                        { accessorKey: 'address',    header: 'address', 
+                        { accessorKey: 'address',    header: 'Address', 
                         minSize: 50,
                         maxSize: 500,
                         size: 150, },                
-                        { accessorKey: 'types_of_plastics',    header: 'types_of_plastics', 
+                        { accessorKey: 'types_of_plastics',    header: 'Types Of Plastics', 
                             minSize: 100,
                             maxSize: 500,
                             size: 500, },
-                        { accessorKey: 'particulars',    header: 'particulars', 
+                        { accessorKey: 'particulars',    header: 'Particulars', 
                             minSize: 100,
                             maxSize: 100,
                             size: 150, },
-                        { accessorKey: 'fee_amount',    header: 'fee_amount', 
+                        { accessorKey: 'fee_amount',    header: 'Fee Amount', 
                             minSize: 50,
                             maxSize: 500,
                             size: 150, },
-                        { accessorKey: 'is_active',    header: 'is_active', 
+                        { accessorKey: 'is_active',    header: 'Is Active', 
                         minSize: 50,
                         maxSize: 500,
                         size: 150, }, 
                     ]}
                     
                     data={flattenedData} // Include updated data
-                    initialState={{
-                        showColumnFilters: false,
+                    enableColumnFilters
+                    enableSorting
+                    enableStickyHeader
+                    muiTableProps={{
+                        sx: {
+                            border: '1px solid #ddd', // Table border
+                        },
                     }}
-                    defaultColumn={{
-                        maxSize: 420,
-                        minSize: 100,
-                        size: 140, // default size is usually 180
+                    muiTableHeadCellProps={{
+                        sx: {
+                            backgroundColor: '#f5f5f5', // Header background
+                            fontWeight: 'bold',
+                            borderBottom: '2px solid #ccc',
+                            textAlign: 'center',
+                        },
                     }}
+                    muiTableBodyCellProps={{
+                        sx: {
+                            borderRight: '1px solid #ddd', // Column border
+                            padding: '10px',
+                        },
+                    }}
+                    muiTableBodyRowProps={{
+                        sx: {
+                            '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                            '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+                        },
+                    }}
+                    enableZebraStripes={true}
                     enableColumnResizing={true}
                     // columnResizeMode="onChange" // default
                     enableTopToolbar={userGroups.length>0} // Disables the top-right controls entirely
