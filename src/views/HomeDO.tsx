@@ -4,6 +4,7 @@ import AxiosBase from '../services/axios/AxiosBase';
 import { Link } from 'react-router-dom'; // For navigation
 import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
+import { useSessionUser } from '@/store/authStore';
 
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
@@ -93,6 +94,9 @@ const Home = () => {
         DEO: 'DEO',
         'Download License': 'Download License',
     };
+
+    const userAuthority = useSessionUser((state) => state.user.authority) || []
+    
     const downloadFile = async () => {
         // Simulate a file download
         const applicantId = selectedRowId; // Replace with the actual applicant ID
@@ -379,6 +383,12 @@ const Home = () => {
         }
     }, [userGroups, navigate]); // Run only once on component load
     
+    useEffect(() => {
+        // Find first matching group
+        const matchingGroup = Object.keys(groupTitles).find((group) => userAuthority.includes(group));
+        handleTileClick(matchingGroup); // Set the highlighted tile
+    }, [userAuthority]);
+
 console.log('selectedRowId:', selectedRowId)
 console.log(selectedRowId)
     return (

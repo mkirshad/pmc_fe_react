@@ -391,7 +391,7 @@ const Home = () => {
 
     useEffect(() => {
         // Find first matching group
-        const matchingGroup = groups.find((group) => userAuthority.includes(group));
+        const matchingGroup = Object.keys(groupTitles).find((group) => userAuthority.includes(group));
         handleTileClick(matchingGroup); // Set the highlighted tile
     }, [userAuthority]);
 

@@ -80,7 +80,7 @@ const _Notification = ({ className }: { className?: string }) => {
                 locationLabel: '',                 // not used
                 status: '',                        // not used
                 readed: false,                     // default as "unread"
-                link:`/spuid-signup/${String(item.applicant_id)}/`
+                link:item.url_sub_part
               }))
             );
             setNoResult(false);
