@@ -346,6 +346,8 @@ const handleChangeManualFields = (fieldName, value) => {
                 <span className="text-normal break-words">
                   {typeof value === "object" && value !== null
                     ? JSON.stringify(value, null, 2)
+                    : key === "licenseType" && value === "Consumer"
+                    ? "Stockist/Distributor/Supplier"
                     : value}
                 </span>
               </div>
