@@ -31,6 +31,7 @@ const ReviewAndSavePage = ({ groupList, children }) => {
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [remarks, setRemarks] = useState("");
 
   const [documentType, setDocumentType] = useState(
     "Fee Verification from Treasury/District Accounts Office"
@@ -78,6 +79,12 @@ const ReviewAndSavePage = ({ groupList, children }) => {
   const isAuthorizedLSM2 = userAuthority.some(
     group => group === 'LSM2'
   );
+  const isAuthorizedDEO = userAuthority.some(
+    group => group === 'DEO'
+  );
+  const isAuthorizedDG = userAuthority.some(
+    group => group === 'DG'
+  );
 
   const {
     control,
@@ -121,6 +128,51 @@ useEffect(() => {
 
 }, [manualFields])
 
+// Start 20250218
+const handleChangeRemarks = (event) => {
+  setRemarks(event.target.value);
+  const data_applicantDetail = { remarks: event.target.value };
+  updateApplicantDetail(data_applicantDetail);
+};
+
+const handleCheckboxChange = (event) => {
+  const { name, checked } = event.target;
+
+  // Ensure only one checkbox is selected at a time
+  const updatedState = {
+    previousStage: name === "previousStage" ? checked : false,
+    nextStage: name === "nextStage" ? checked : false,
+  };
+
+  setCheckboxState(updatedState);
+
+  let updatedRemarks = "";
+  let updatedGroup = null;
+  let data_applicantDetail = {};
+
+  if (name === "previousStage" && checked) {
+    updatedGroup = groupList[0]?.value;
+    data_applicantDetail = { assignedGroup2: updatedGroup };
+    updatedRemarks = `As per the verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc.`;
+  } else if (name === "nextStage" && checked) {
+    updatedGroup = groupList[2]?.value;
+    data_applicantDetail = { assignedGroup2: updatedGroup };
+    updatedRemarks = isAuthorizedDEO
+      ? "As per the verification, all codal formalities for the issuance of the license have been fulfilled."
+      : isAuthorizedDG
+      ? "License has been issued."
+      : `As per the verification, please proceed for issuance of the license.`;
+  }
+
+  // Update selected group and applicant details
+  if (checked) {
+    setSelectedGroup(updatedGroup);
+    updateApplicantDetail(data_applicantDetail);
+    setRemarks(updatedRemarks); // Update remarks only if a checkbox is checked
+  }
+};
+
+// End 20250218
 const loadApplicantResponses = async (applicantId) => {
   try {
       const transformedResponses = applicantDetail.field_responses.reduce((acc, item) => {
@@ -203,31 +255,12 @@ const handleChangeManualFields = (fieldName, value) => {
 
   console.log(applicantDetail)
 
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
 
-    const updatedState = {
-      previousStage: name === "previousStage" ? checked : false,
-      nextStage: name === "nextStage" ? checked : false,
-    };
 
-    setCheckboxState(updatedState);
-
-    if (name === "previousStage" && checked) {
-      setSelectedGroup(groupList[0]?.value);
-      const data_applicantDetail = { assignedGroup2: groupList[0]?.value };
-      updateApplicantDetail(data_applicantDetail);
-    } else if (name === "nextStage" && checked) {
-      const data_applicantDetail = { assignedGroup2: groupList[2]?.value };
-      updateApplicantDetail(data_applicantDetail);
-      setSelectedGroup(groupList[2]?.value);
-    }
-  };
-
-  const handleChangeRemarks = (event) => {
-    const data_applicantDetail = { remarks: event.target.value };
-    updateApplicantDetail(data_applicantDetail);
-  };
+  // const handleChangeRemarks = (event) => {
+  //   const data_applicantDetail = { remarks: event.target.value };
+  //   updateApplicantDetail(data_applicantDetail);
+  // };
 
   const keyToTitleMapping = {
     firstName: "First Name",
@@ -899,7 +932,7 @@ const handleChangeManualFields = (fieldName, value) => {
         )}
       </CardContent>
     </Card>
-    
+
     {!disabled_lsm &&
     <Card sx={manualFieldStyles}>
 <CardContent>
@@ -1014,46 +1047,59 @@ const handleChangeManualFields = (fieldName, value) => {
   
         {isAuthorized &&
         <>
-        <Card sx={{ marginBottom: "20px" }}>
-          <CardContent>
-            <FormControl fullWidth>
-              <TextField
-                id="Remarks"
-                label="Remarks"
-                variant="outlined"
-                onChange={handleChangeRemarks}
-              />
-            </FormControl>
-          </CardContent>
-        </Card>
+        {/* Remarks TextField */}
+          <Card sx={{ marginBottom: "20px" }}>
+            <CardContent>
+              <FormControl fullWidth>
+                <TextField
+                  id="Remarks"
+                  label="Remarks"
+                  variant="outlined"
+                  value={remarks}
+                  onChange={handleChangeRemarks}
+                />
+              </FormControl>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent>
-            <FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="nextStage"
-                    checked={checkboxState.nextStage}
-                    onChange={handleCheckboxChange}
-                  />
-                }
-                label={`Yes - As per remarks and verification, please proceed for issuance of license ${groupList[1]?.label === 'DO'? '': '(' + groupList[2]?.label + ')'} `}
-              />
+          {/* Checkboxes for selection */}
+          <Card>
+            <CardContent>
+              <FormControl>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="nextStage"
+                      checked={checkboxState.nextStage}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label={isAuthorizedDEO
+                  ? "Yes - As per the remarks and verification, all codal formalities for the issuance of the license have been fulfilled."
+                  : isAuthorizedDG
+                  ? "Yes - License has been issued."
+                  : `Yes - As per the remarks and verification, please proceed for issuance of the license ${
+                      groupList[1]?.label === "DO" ? "" : "(" + groupList[2]?.label + ")"
+                    }`}
+                />
 
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="previousStage"
-                    checked={checkboxState.previousStage}
-                    onChange={handleCheckboxChange}
-                  />
-                }
-                label={`No - As per remarks and verification, please proceed to previous stage for preliminary scrutiny/ data entry etc. ${groupList[1]?.label === 'DO'? '': '(' + groupList[0]?.label + ')' } `}
-              />
-            </FormControl>
-          </CardContent>
-        </Card>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="previousStage"
+                      checked={checkboxState.previousStage}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label={
+                    `No - As per the remarks and verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc. ${
+                      groupList[1]?.label === "DO" ? "" : "(" + groupList[0]?.label + ")"
+                    }`
+                  }
+                />
+              </FormControl>
+            </CardContent>
+          </Card>
       </>}
       </div>
 
