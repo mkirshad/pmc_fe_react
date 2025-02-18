@@ -160,7 +160,7 @@ const handleCheckboxChange = (event) => {
     updatedRemarks = isAuthorizedDEO
       ? "As per the verification, all codal formalities for the issuance of the license have been fulfilled."
       : isAuthorizedDG
-      ? "License has been issued."
+      ? "Approved. License has been issued."
       : `As per the verification, please proceed for issuance of the license.`;
   }
 
@@ -1077,7 +1077,7 @@ const handleChangeManualFields = (fieldName, value) => {
                   label={isAuthorizedDEO
                   ? "Yes - As per the remarks and verification, all codal formalities for the issuance of the license have been fulfilled."
                   : isAuthorizedDG
-                  ? "Yes - License has been issued."
+                  ? "Yes - Approved. License has been issued."
                   : `Yes - As per the remarks and verification, please proceed for issuance of the license ${
                       groupList[1]?.label === "DO" ? "" : "(" + groupList[2]?.label + ")"
                     }`}
