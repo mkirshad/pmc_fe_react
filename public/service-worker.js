@@ -11,7 +11,7 @@ const CACHE_FILES = [
 ];
 
 // Install event - caching assets
-self.addEventListener("install", (event: ExtendableEvent) => {
+self.addEventListener("install", (event) => {
     console.log("Service Worker installing.");
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -21,7 +21,7 @@ self.addEventListener("install", (event: ExtendableEvent) => {
 });
 
 // Fetch event - serve cached assets if available
-self.addEventListener("fetch", (event: FetchEvent) => {
+self.addEventListener("fetch", (event) => {
     console.log("Service Worker fetching:", event.request.url);
     event.respondWith(
         caches.match(event.request).then((response) => {
@@ -31,7 +31,7 @@ self.addEventListener("fetch", (event: FetchEvent) => {
 });
 
 // Activate event - clean old caches
-self.addEventListener("activate", (event: ExtendableEvent) => {
+self.addEventListener("activate", (event) => {
     console.log("Service Worker activating.");
     event.waitUntil(
         caches.keys().then((cacheNames) =>
