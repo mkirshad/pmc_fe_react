@@ -108,6 +108,7 @@ const Home = () => {
         'LSM2',
         'TL',
         'DEO',
+        'DG',
         'Download License'
     ]
 
@@ -122,6 +123,7 @@ const Home = () => {
         LSM2: 'LSM',
         TL: 'TL',
         DEO: 'DEO',
+        DG: 'DG',
         'Download License': 'Download License',
     };
     const downloadFile = async () => {

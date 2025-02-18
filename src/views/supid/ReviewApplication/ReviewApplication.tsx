@@ -899,7 +899,8 @@ const handleChangeManualFields = (fieldName, value) => {
         )}
       </CardContent>
     </Card>
-
+    
+    {!disabled_lsm &&
     <Card sx={manualFieldStyles}>
 <CardContent>
   <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
@@ -953,6 +954,7 @@ const handleChangeManualFields = (fieldName, value) => {
 
     </CardContent>
     </Card>
+  }
     </>
   );
   
