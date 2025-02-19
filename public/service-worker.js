@@ -1,29 +1,74 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v5"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v6"; // Increment version to force cache update
+const API_CACHE_NAME = "api-cache"; // Separate cache for API requests
+const STORE_NAME = "offline-requests"; // IndexedDB Store for offline requests
+
 const CACHE_FILES = [
     "/",
     "/index.html",
     "/img/logo/icon-192x192.png",
     "/img/logo/icon-512x512.png",
     "/favicon.ico",
+    "/manifest.json"
 ];
 
-// Install event - Precache assets
+// ✅ IndexedDB Helper Functions for Offline Storage
+async function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("OfflineDB", 1);
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+            }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function saveToDB(data) {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).add(data);
+}
+
+async function getCachedResponse(url) {
+    const db = await openDB();
+    return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.get(url);
+        request.onsuccess = () => resolve(request.result ? request.result.response : null);
+        request.onerror = () => resolve(null);
+    });
+}
+
+async function clearStoredRequests() {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).clear();
+}
+
+// ✅ Install Event - Cache Static Assets
 self.addEventListener("install", (event) => {
     console.log("Service Worker installing...");
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(CACHE_FILES);
-        })
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_FILES))
     );
-    self.skipWaiting(); // Activate new SW immediately
+    self.skipWaiting(); // Activate immediately
 });
 
-// Fetch event - Cache assets & serve from cache when offline
+// ✅ Fetch Event - Cache API & Serve Offline
 self.addEventListener("fetch", (event) => {
     const requestUrl = new URL(event.request.url);
+
+    // Exclude service worker itself from caching
+    if (requestUrl.pathname.includes("service-worker.js")) {
+        return;
+    }
 
     // Always fetch latest `version.json` from network
     if (requestUrl.pathname.includes("version.json")) {
@@ -31,85 +76,68 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // Exclude service-worker.js from being cached
-    if (requestUrl.pathname.includes("service-worker.js")) {
-        return;
-    }
-
     console.log("Service Worker fetching:", event.request.url);
 
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request)
-                .then((networkResponse) => {
-                    // Cache dynamically loaded assets
-                    if (event.request.url.includes("/assets/")) {
-                        return caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone());
-                            return networkResponse;
-                        });
+    if (event.request.method === "GET") {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return (
+                    cachedResponse ||
+                    fetch(event.request)
+                        .then((networkResponse) => {
+                            return caches.open(API_CACHE_NAME).then((cache) => {
+                                cache.put(event.request, networkResponse.clone());
+                                return networkResponse;
+                            });
+                        })
+                        .catch(() => caches.match("/index.html")) // Serve fallback when offline
+                );
+            })
+        );
+    } else if (event.request.method === "POST" && !navigator.onLine) {
+        console.log("[📡 Offline] Saving POST Request for Later:", event.request.url);
+        event.waitUntil(saveToDB({ url: event.request.url, method: "post", body: event.request.clone() }));
+        event.respondWith(
+            new Response(JSON.stringify({ message: "Saved Offline - Will Sync Later" }), {
+                status: 201,
+                headers: { "Content-Type": "application/json" },
+            })
+        );
+    }
+});
+
+// ✅ Sync Stored Requests When Online
+self.addEventListener("sync", async (event) => {
+    if (event.tag === "sync-posts") {
+        event.waitUntil(
+            (async () => {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const getAllRequests = store.getAll();
+
+                getAllRequests.onsuccess = async () => {
+                    for (const request of getAllRequests.result) {
+                        try {
+                            console.log("[📤 Syncing]:", request.url);
+                            const body = await request.body.json(); // Ensure JSON format
+                            await fetch(request.url, {
+                                method: "POST",
+                                body: JSON.stringify(body),
+                                headers: { "Content-Type": "application/json" },
+                            });
+                        } catch (err) {
+                            console.error("[❌ Failed to Sync]:", request.url, err);
+                        }
                     }
-                    return networkResponse;
-                })
-                .catch(() => {
-                    // If offline, return fallback page
-                    if (event.request.mode === "navigate") {
-                        return caches.match("/index.html");
-                    }
-                });
-        })
-    );
-});
-
-// Check for new version and notify clients
-async function checkForUpdates() {
-    try {
-        const latestVersionResponse = await fetch("/version.json", { cache: "no-store" });
-        const latestVersion = await latestVersionResponse.json();
-
-        const cache = await caches.open(CACHE_NAME);
-        const cachedVersionResponse = await cache.match("/version.json");
-
-        if (cachedVersionResponse) {
-            const cachedVersion = await cachedVersionResponse.json();
-
-            if (cachedVersion.version !== latestVersion.version) {
-                console.log("New version detected:", latestVersion.version);
-
-                self.registration.showNotification("Update Available", {
-                    body: "A new version is available. Refresh to update.",
-                    icon: "/img/logo/icon-192x192.png",
-                });
-
-                // Notify all open clients (tabs)
-                self.clients.matchAll().then((clients) => {
-                    clients.forEach((client) => client.postMessage({ type: "NEW_VERSION" }));
-                });
-            }
-        }
-
-        // Cache latest version.json
-        cache.put("/version.json", latestVersionResponse.clone());
-    } catch (error) {
-        console.error("Error checking version:", error);
-    }
-}
-
-// Periodic check for updates
-self.addEventListener("periodicsync", (event) => {
-    if (event.tag === "check-updates") {
-        event.waitUntil(checkForUpdates());
+                    await clearStoredRequests();
+                };
+            })()
+        );
     }
 });
 
-// Force update when a new service worker is installed
-self.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "SKIP_WAITING") {
-        self.skipWaiting();
-    }
-});
-
-// Activate event - Clean old caches and apply new version
+// ✅ Activate Event - Clean Old Caches
 self.addEventListener("activate", (event) => {
     console.log("Service Worker activating...");
     event.waitUntil(
@@ -125,4 +153,11 @@ self.addEventListener("activate", (event) => {
         )
     );
     self.clients.claim(); // Take control of open pages
+});
+
+// ✅ Notify Clients When New Version is Available
+self.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "SKIP_WAITING") {
+        self.skipWaiting();
+    }
 });
