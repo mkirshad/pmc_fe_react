@@ -5,9 +5,9 @@ import './index.css'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
+    // <React.StrictMode>
         <App />
-    </React.StrictMode>,
+    // </React.StrictMode>,
 )
 
 // Register the service worker
