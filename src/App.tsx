@@ -15,7 +15,7 @@ if (appConfig.enableMock) {
 function App() {
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const deferredPrompt: MutableRefObject<null | any> = useRef(null);
-
+    const deferredPromptRef = useRef<Event | null>(null);
     useEffect(() => {
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/service-worker.js").then((registration) => {
@@ -36,13 +36,14 @@ function App() {
             event.preventDefault();
             deferredPrompt.current = event as any;
             setShowInstallPrompt(true);
+            deferredPromptRef.current = event;
+
         };
 
         window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-        return () => {
-            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-        };
+        return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
     }, []);
 
     return (
@@ -52,7 +53,7 @@ function App() {
                     <Layout>
                         <>
                             <Views />
-                            {showInstallPrompt && <InstallPWA deferredPrompt={deferredPrompt.current} />}
+                            {showInstallPrompt && <InstallPWA deferredPrompt={deferredPromptRef.current} />}
                         </>
                     </Layout>
                 </AuthProvider>
