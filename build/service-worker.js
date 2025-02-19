@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v6"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v7"; // Increment version to force cache update
 const API_CACHE_NAME = "api-cache"; // Separate cache for API requests
 const STORE_NAME = "offline-requests"; // IndexedDB Store for offline requests
 
