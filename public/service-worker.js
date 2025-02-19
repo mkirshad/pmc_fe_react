@@ -19,7 +19,7 @@ async function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("OfflineDB", 1);
         request.onupgradeneeded = (event) => {
-            const db = (event.target as IDBOpenDBRequest).result;
+            const db = event.target.result; // ✅ Fix ESLint error by removing explicit IDBOpenDBRequest type
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
             }
@@ -103,6 +103,9 @@ self.addEventListener("fetch", (event) => {
                 headers: { "Content-Type": "application/json" },
             })
         );
+
+        // Register background sync to retry when online
+        self.registration.sync.register("sync-posts").catch((err) => console.error("Sync registration failed:", err));
     }
 });
 
