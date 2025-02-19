@@ -5,6 +5,7 @@ import OauthSignIn from './components/OauthSignIn'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import { useThemeStore } from '@/store/themeStore'
+import { Link } from "react-router-dom";
 
 type SignInProps = {
     signUpUrl?: string
@@ -24,7 +25,9 @@ export const SignInBase = ({
     return (
         <>
             <div className="mb-8">
-                <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+                <Link to="/">
+                    <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+                </Link>
             </div>
             <div className="mb-10">
                 <h2 className="mb-2">Welcome back!</h2>

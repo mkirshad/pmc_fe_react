@@ -3,6 +3,7 @@ import Alert from '@/components/ui/Alert';
 import ResetPasswordForm from './components/ResetPasswordForm2';
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage';
 import { useThemeStore } from '@/store/themeStore';
+import { Link } from "react-router-dom";
 
 type ResetPasswordProps = {
     backToDashboardUrl?: string;
@@ -21,7 +22,9 @@ export const ResetPasswordBase = ({
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
                 <div className="mb-6">
+                <Link to="/">
                     <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+                </Link>
                 </div>
                 <h2 className="text-2xl font-bold text-center text-gray-800">Reset Your Password</h2>
                 <p className="mt-2 mb-6 text-center text-gray-600">
