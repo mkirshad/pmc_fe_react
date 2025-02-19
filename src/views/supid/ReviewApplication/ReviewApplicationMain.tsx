@@ -779,6 +779,7 @@ const groups = [
     'LSM2',
     'TL',
     'DEO',
+    'DG',
     'Download License'
     ]
 

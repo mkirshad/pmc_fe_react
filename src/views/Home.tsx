@@ -281,7 +281,7 @@ const Home = () => {
 
     useEffect(() => {
         console.log('userGroups:', userGroups)
-        if(userGroups.includes('DEO')){
+        if(userGroups.includes('DEO') || userGroups.includes('DG')){
             navigate('/home-deo');
         }else if(userGroups.includes('Admin')){
             navigate('/home-admin');

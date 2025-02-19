@@ -59,7 +59,7 @@ export const protectedRoutes: Routes = [
         key: 'home',
         path: '/home-deo',
         component: lazy(() => import('@/views/HomeDEO')),
-        authority: ['DEO'],
+        authority: ['DEO', 'DG'],
     },
     {
         key: 'home',

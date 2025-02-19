@@ -451,7 +451,7 @@ console.log('chartData', chartData)
             <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
             <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
 
-            <span className="header-text">PLMIS</span>
+            <span className="header-text">PMIS</span>
         </div>
     </Link>
       <nav className="banner-nav">
@@ -507,7 +507,7 @@ console.log('chartData', chartData)
         <footer className="footer-container ">
             <span className="footer-text">
                 Copyright &copy; {new Date().getFullYear()}{" "}
-                <span className="font-semibold">PLMIS</span> All rights reserved. <br />
+                <span className="font-semibold">PMIS</span> All rights reserved. <br />
                 Plastic Management Cell, Strategic Planning & Implementation Unit,
                 Environmental Protection Agency, and Environment Protection & Climate
                 Change Department, Government of the Punjab.

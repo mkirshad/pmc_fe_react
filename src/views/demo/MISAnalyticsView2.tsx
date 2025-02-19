@@ -444,7 +444,7 @@ const DistrictMap = ({ onDistrictClick }) => {
               className="header-logo"
             />
             <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
-            <span className="header-text">PLMIS</span>
+            <span className="header-text">PMIS</span>
           </div>
         </Link>
         <h6 className="header-text">
@@ -495,7 +495,7 @@ const DistrictMap = ({ onDistrictClick }) => {
         <span className="footer-text">
           Copyright &copy; {new Date().getFullYear()}
           {" "}
-          <span className="font-semibold">PLMIS</span> All rights reserved.
+          <span className="font-semibold">PMIS</span> All rights reserved.
           <br />
           Plastic Management Cell, Strategic Planning &amp; Implementation Unit,
           Environmental Protection Agency, and Environment Protection &amp;

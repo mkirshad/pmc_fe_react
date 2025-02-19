@@ -9,7 +9,7 @@ import { useSessionUser } from '@/store/authStore';
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
 const flattenObject = (obj) => {
-    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'Download License'];
+    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'DG', 'Download License'];
   
     // Step 1: Determine if assigned group is moving backward
     const currentGroupIndex = groupOrder.indexOf(obj.assigned_group);
@@ -81,6 +81,7 @@ const Home = () => {
         'LSM2',
         'TL',
         'DEO',
+        'DG',
         'Download License'
     ]
 
@@ -92,6 +93,7 @@ const Home = () => {
         LSM2: 'LSM',
         TL: 'TL',
         DEO: 'DEO',
+        DG: 'DG',
         'Download License': 'Download License',
     };
 

@@ -10,7 +10,7 @@ import { useSessionUser } from '@/store/authStore';
 // Utility function to flatten nested objects and handle remarks
 const flattenObject = (obj) => {
 
-    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'Download License'];
+    const groupOrder = ['APPLICANT', 'LSO', 'LSM', 'DO', 'LSM2', 'TL', 'DEO', 'DG', 'Download License'];
   
     // Step 1: Determine if assigned group is moving backward
     const currentGroupIndex = groupOrder.indexOf(obj.assigned_group);
@@ -148,6 +148,7 @@ const Home = () => {
         'LSM2',
         'TL',
         'DEO',
+        'DG',
         'Download License'
     ]
 
@@ -162,6 +163,7 @@ const Home = () => {
         LSM2: 'LSM',
         TL: 'TL',
         DEO: 'DEO',
+        DG: 'DG',
         'Download License': 'Download License',
     };
 
@@ -198,7 +200,7 @@ const Home = () => {
     };
     
     const handleTileClick = async (group) => {
-    
+        console.log('matched group', group)
         try {
             setLoading(true);
             setSelectedTile(group); // Update selected tile state
@@ -214,7 +216,7 @@ const Home = () => {
             });
             const filteredData = (response.data || []).filter((item) => item.submittedapplication?.id % 3 === moduloValue);
             // Update the table data
-            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            const extracted = extractColumns(filteredData);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
             
@@ -230,7 +232,7 @@ const Home = () => {
             const filteredData = response.data || [];
     
             // Update the table data
-            const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
+            const extracted = extractColumns(filteredData);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
         }
@@ -251,7 +253,7 @@ const Home = () => {
     };
 
     // Extract columns and flattened data
-    const extractColumns = (data, hasUserGroup, group) => {
+    const extractColumns = (data) => {
         const allowedColumns = [
             'first_name',
             'last_name',
@@ -309,7 +311,7 @@ const Home = () => {
                     Cell: ({ cell, row }) => {
                       const id = row.original.id;
                       const assignedBack = row.original.is_assigned_back;
-                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                      const url = `/spuid-review/${id}`; // Adjust URL as needed
                     
                       return (
                         <a
@@ -339,7 +341,7 @@ const Home = () => {
                   Cell: ({ cell, row }) => {
                       const id = row.original.id;
                       const assignedBack = row.original.is_assigned_back;
-                      const url = `/spuid-review/${id}?group=${group}`; // Adjust URL as needed
+                      const url = `/spuid-review/${id}`; // Adjust URL as needed
                     
                       return (
                         <a
@@ -458,7 +460,12 @@ const Home = () => {
                 navigate('/home');
             }
         }, [userGroups, navigate]); // Run only once on component load
-
+   
+    useEffect(() => {
+        // Find first matching group
+        const matchingGroup = Object.keys(groupTitles).find((group) => userAuthority.includes(group));
+        handleTileClick(matchingGroup); // Set the highlighted tile
+    }, [userAuthority]);
 
 console.log('selectedRowId:', selectedRowId)
 console.log(selectedRowId)

@@ -117,7 +117,7 @@ const formatTrackingNumber = (value, isBackspace) => {
           <img src="/img/logo/epccd.png" alt="EPCCD Logo" className="header-logo" />
           <img src="/img/logo/gop.png" alt="GOP Logo" className="header-logo" />
 
-          <span className="header-text">PLMIS</span>
+          <span className="header-text">PMIS</span>
         </div>
         <nav className="banner-nav">
           <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
@@ -128,7 +128,7 @@ const formatTrackingNumber = (value, isBackspace) => {
 
       <div className="banner-content">
         <motion.div className="banner-text" variants={textVariants}>
-          <h1>Plastic License Management Information System</h1>
+          <h1>Plastic Management Information System</h1>
         </motion.div>
         <div className="banner-links">
           <Link to="/sign-up?redirectUrl=/spuid-signup" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
@@ -203,7 +203,7 @@ const formatTrackingNumber = (value, isBackspace) => {
       <footer className="footer-container">
         <span className="footer-text">
           Copyright &copy; {new Date().getFullYear()}{" "}
-          <span className="font-semibold">PLMIS</span> All rights reserved. <br />
+          <span className="font-semibold">PMIS</span> All rights reserved. <br />
           Plastic Management Cell, Strategic Planning & Implementation Unit,
           Environmental Protection Agency, and Environment Protection & Climate
           Change Department, Government of the Punjab.
