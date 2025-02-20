@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v68"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v69"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -234,22 +234,22 @@ self.addEventListener("install", async (event) => {
 self.addEventListener("fetch", (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // ✅ Check for dynamic routes like /spuid-signup/:id or /spuid-review/:id
-    if (requestUrl.pathname.startsWith("/spuid-signup/") || requestUrl.pathname.startsWith("/spuid-review/")) {
-        event.respondWith(
-            caches.match("/spuid-signup") // Serve the base cached page
-                .then((response) => response || fetch(event.request))
-                .catch(() => caches.match("/index.html")) // Fallback to index.html if needed
-        );
+    // ✅ Skip API requests (Zustand handles API data)
+    if (requestUrl.pathname.startsWith("/pmc/inspection-report")) {
         return;
     }
 
-    // ✅ Normal caching logic for other routes
+    // ✅ Block caching for non-GET requests (POST, PATCH, DELETE, PUT)
+    if (event.request.method !== "GET") {
+        return;
+    }
+
+    // ✅ Serve from cache for static assets (GET requests only)
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             return cachedResponse || fetch(event.request)
                 .then((networkResponse) => {
-                    return caches.open(API_CACHE_NAME).then((cache) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
                     });
@@ -258,5 +258,6 @@ self.addEventListener("fetch", (event) => {
         })
     );
 });
+
 
 
