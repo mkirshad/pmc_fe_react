@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v57"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v58"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -158,32 +158,41 @@ self.addEventListener("fetch", (event) => {
 // ✅ Retry Stored Requests When Online
 
 // ✅ Sync Stored Requests When Online
-self.addEventListener("sync", async (event) => {
-    console.log('its in sync')
+self.addEventListener("sync", (event) => {
+    console.log("[🔄 Sync Event Triggered]:", event.tag);
+
     if (event.tag === "sync-posts") {
         event.waitUntil(
             (async () => {
-                const db = await openDB();
-                const tx = db.transaction(STORE_NAME, "readonly");
-                const store = tx.objectStore(STORE_NAME);
-                const getAllRequests = store.getAll();
+                const storedRequests = await getStoredRequests();
 
-                getAllRequests.onsuccess = async () => {
-                    for (const request of getAllRequests.result) {
-                        try {
-                            console.log("[📤 Syncing]:", request.url);
-                            const body = await request.body.json(); // Ensure JSON format
-                            await fetch(request.url, {
-                                method: "POST",
-                                body: JSON.stringify(body),
-                                headers: { "Content-Type": "application/json" },
+                for (const request of storedRequests) {
+                    try {
+                        console.log("[📤 Syncing]:", request.url);
+
+                        // ✅ Convert stored string back to JSON
+                        const body = request.body ? JSON.parse(request.body) : null;
+
+                        // ✅ Use AxiosBase instead of fetch()
+                        let response;
+                        if (request.method === "PATCH") {
+                            response = await AxiosBase.patch(request.url, body, {
+                                headers: request.headers,
                             });
-                        } catch (err) {
-                            console.error("[❌ Failed to Sync]:", request.url, err);
+                        } else {
+                            response = await AxiosBase.post(request.url, body, {
+                                headers: request.headers,
+                            });
                         }
+
+                        console.log("[✅ Sync Successful]:", request.url, response.data);
+
+                    } catch (err) {
+                        console.error("[❌ Failed to Sync]:", request.url, err);
                     }
-                    await clearStoredRequests();
-                };
+                }
+
+                await clearStoredRequests();
             })()
         );
     }
