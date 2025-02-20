@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v51"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v53"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -145,19 +145,33 @@ self.addEventListener("fetch", (event) => {
 
 
 // ✅ Retry Stored Requests When Online
+
+// ✅ Sync Stored Requests When Online
 self.addEventListener("sync", async (event) => {
     if (event.tag === "sync-posts") {
         event.waitUntil(
             (async () => {
-                const storedRequests = await getStoredRequests();
-                for (const request of storedRequests) {
-                    try {
-                        await fetch(request.url, { method: request.method, body: JSON.stringify(request.body) });
-                    } catch (err) {
-                        console.error("[❌ Failed to Sync]:", request.url, err);
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const getAllRequests = store.getAll();
+
+                getAllRequests.onsuccess = async () => {
+                    for (const request of getAllRequests.result) {
+                        try {
+                            console.log("[📤 Syncing]:", request.url);
+                            const body = await request.body.json(); // Ensure JSON format
+                            await fetch(request.url, {
+                                method: "POST",
+                                body: JSON.stringify(body),
+                                headers: { "Content-Type": "application/json" },
+                            });
+                        } catch (err) {
+                            console.error("[❌ Failed to Sync]:", request.url, err);
+                        }
                     }
-                }
-                await clearStoredRequests();
+                    await clearStoredRequests();
+                };
             })()
         );
     }
