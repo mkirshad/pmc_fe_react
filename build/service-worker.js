@@ -121,7 +121,7 @@ self.addEventListener("fetch", (event) => {
 
     // ✅ Handle Offline POST/PATCH Requests (Store in IndexedDB for Sync)
     if ((request.method === "POST" || request.method === "PATCH") && !navigator.onLine) {
-        console.warn("[⚠️ Offline] Saving request for later:", request.url);
+        console.warn("[⚠️ Offline] Saving request for later:", request.url, request.method);
 
         event.waitUntil(
             request.clone().text().then(async (bodyText) => {
@@ -157,43 +157,43 @@ self.addEventListener("fetch", (event) => {
 
 // ✅ Retry Stored Requests When Online
 
-// ✅ Sync Stored Requests When Online
-self.addEventListener("online", (event) => {
-    console.log("[🔄 Sync Event Triggered]:", event.tag);
+// // ✅ Sync Stored Requests When Online
+// self.addEventListener("online", (event) => {
+//     console.log("[🔄 Sync Event Triggered]:", event.tag);
 
-    if (event.tag === "sync-posts") {
-        event.waitUntil(
-            (async () => {
-                const storedRequests = await getStoredRequests();
+//     if (event.tag === "sync-posts") {
+//         event.waitUntil(
+//             (async () => {
+//                 const storedRequests = await getStoredRequests();
 
-                for (const request of storedRequests) {
-                    try {
-                        console.log("[📤 Syncing]:", request.url);
+//                 for (const request of storedRequests) {
+//                     try {
+//                         console.log("[📤 Syncing]:", request.url);
 
-                        // ✅ Convert stored string back to JSON
-                        const body = request.body ? JSON.parse(request.body) : null;
+//                         // ✅ Convert stored string back to JSON
+//                         const body = request.body ? JSON.parse(request.body) : null;
 
-                        // ✅ Use AxiosBase instead of fetch()
-                        let response;
-                        if (request.method === "PATCH") {
-                            response = await AxiosBase.patch(request.url, body, {
-                                headers: request.headers,
-                            });
-                        } else {
-                            response = await AxiosBase.post(request.url, body, {
-                                headers: request.headers,
-                            });
-                        }
+//                         // ✅ Use AxiosBase instead of fetch()
+//                         let response;
+//                         if (request.method === "PATCH") {
+//                             response = await AxiosBase.patch(request.url, body, {
+//                                 headers: request.headers,
+//                             });
+//                         } else {
+//                             response = await AxiosBase.post(request.url, body, {
+//                                 headers: request.headers,
+//                             });
+//                         }
 
-                        console.log("[✅ Sync Successful]:", request.url, response.data);
+//                         console.log("[✅ Sync Successful]:", request.url, response.data);
 
-                    } catch (err) {
-                        console.error("[❌ Failed to Sync]:", request.url, err);
-                    }
-                }
+//                     } catch (err) {
+//                         console.error("[❌ Failed to Sync]:", request.url, err);
+//                     }
+//                 }
 
-                await clearStoredRequests();
-            })()
-        );
-    }
-});
+//                 await clearStoredRequests();
+//             })()
+//         );
+//     }
+// });
