@@ -169,15 +169,39 @@ const CustomerEdit = () => {
             navigate("/auth/EPAOperations/AllInspections");
             // onNext();
         } catch (error) {
-            console.error("Error in POST request:", error.response || error.message);
+            console.error("❌ Error in POST request:", error);
+
             setIsSubmiting(false);
-    
+        
             const errorDetails = {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message,
+                status: error.response?.status || "Unknown",
+                data: error.response?.data || "No response data",
+                message: error.message || "Unknown error",
             };
-    
+        
+            if (typeof window !== "undefined" && !navigator.onLine) {
+                console.warn("[⚠️ Offline Mode] Request will be retried later.");
+                alert("You are offline. The request will be retried when you are back online.");
+                return;
+            }
+        
+            if (error.response?.status === 500) {
+                console.error("[🔥 Server Error] The server encountered an issue.");
+                alert("Server is experiencing issues. Please try again later.");
+            } else if (error.response?.status === 400) {
+                console.warn("[⚠️ Client Error] Invalid request.");
+                alert("There was an issue with the request. Please check your data.");
+            } else if (error.response?.status === 404) {
+                console.error("[🔎 Not Found] The API endpoint was not found.");
+                alert("Requested data not found.");
+            } else if (error.code === "ECONNABORTED") {
+                console.warn("[⏳ Timeout] The request took too long to complete.");
+                alert("The request took too long. Please check your internet connection and retry.");
+            } else {
+                console.error("[❌ Unexpected Error]:", error);
+                alert("An unexpected error occurred. Please try again.");
+            }
+        
             navigate("/error", { state: { error: errorDetails } });
         }
     };
