@@ -55,13 +55,35 @@ async function clearStoredRequests() {
 }
 
 // ✅ Install Event - Cache Static Assets
-self.addEventListener("install", (event) => {
+self.addEventListener("install", async (event) => {
     console.log("🚀 Service Worker installing...");
+
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_FILES))
+        (async () => {
+            try {
+                const cache = await caches.open(CACHE_NAME);
+                const cachePromises = CACHE_FILES.map(async (file) => {
+                    try {
+                        const response = await fetch(file, { cache: "no-store" });
+                        if (!response.ok) throw new Error(`Failed to fetch ${file}`);
+                        await cache.put(file, response);
+                    } catch (error) {
+                        console.error(`[❌ Cache Error] Could not cache: ${file}`, error.message);
+                    }
+                });
+
+                await Promise.all(cachePromises);
+                console.log("✅ All files cached successfully!");
+
+            } catch (err) {
+                console.error("[❌ Service Worker Install Failed]", err.message);
+            }
+        })()
     );
+
     self.skipWaiting();
 });
+
 
 // ✅ Fetch Event - Handle API Requests & Serve Offline
 self.addEventListener("fetch", (event) => {
