@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v50"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v51"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -10,7 +10,8 @@ const API_CACHE_NAME = "api-cache";
 const CACHE_FILES = [
     "/",
     "/index.html",
-    "/img/",
+    "/img/logo/icon-192x192.png",
+    "/img/logo/icon-512x512.png",
     "/assets/",
     "/favicon.ico",
     "/manifest.json"
@@ -84,39 +85,64 @@ self.addEventListener("install", async (event) => {
     self.skipWaiting();
 });
 
-
 // ✅ Fetch Event - Handle API Requests & Serve Offline
 self.addEventListener("fetch", (event) => {
     const { request } = event;
     const requestUrl = new URL(request.url);
 
+    // ✅ Skip service worker file itself
     if (requestUrl.pathname.includes("service-worker.js")) return;
 
+    // ✅ Handle GET Requests - Use Cache First, Then Network Fallback
     if (request.method === "GET") {
         event.respondWith(
-            fetch(request)
-                .then((networkResponse) => {
-                    return caches.open(API_CACHE_NAME).then((cache) => {
-                        cache.put(request, networkResponse.clone());
-                        return networkResponse;
-                    });
+            caches.match(request)
+                .then((cachedResponse) => {
+                    if (cachedResponse) {
+                        console.log("[📂 Serving from Cache]:", request.url);
+                        return cachedResponse;
+                    }
+
+                    console.log("[🌐 Fetching from Network]:", request.url);
+                    return fetch(request)
+                        .then((networkResponse) => {
+                            return caches.open(API_CACHE_NAME).then((cache) => {
+                                cache.put(request, networkResponse.clone());
+                                return networkResponse;
+                            });
+                        })
+                        .catch(() => {
+                            console.warn("[❌ Offline] No cache available for:", request.url);
+                            return caches.match("/index.html"); // Fallback to the index page
+                        });
                 })
-                .catch(() => caches.match(request).then((cachedResponse) => {
-                    return cachedResponse || caches.match("/index.html");
-                }))
         );
+        return;
     }
 
+    // ✅ Handle Offline POST/PATCH Requests (Store in IndexedDB for Sync)
     if ((request.method === "POST" || request.method === "PATCH") && !navigator.onLine) {
-        console.log("[📡 Offline] Saving request for later:", request.url);
-        event.waitUntil(saveToDB({ url: request.url, method: request.method, body: request.clone() }));
+        console.warn("[⚠️ Offline] Saving request for later:", request.url);
 
-        event.respondWith(new Response(JSON.stringify({ message: "Saved Offline - Will Retry Later" }), {
-            status: 201,
-            headers: { "Content-Type": "application/json" },
-        }));
+        event.waitUntil(
+            request.clone().text().then((bodyText) => {
+                saveToDB({
+                    url: request.url,
+                    method: request.method,
+                    body: bodyText, // Convert to JSON string
+                    headers: Object.fromEntries(request.headers.entries()), // Convert headers to object
+                });
+            })
+        );
+
+        event.respondWith(new Response(
+            JSON.stringify({ message: "Saved Offline - Will Retry Later" }),
+            { status: 201, headers: { "Content-Type": "application/json" } }
+        ));
+        return;
     }
 });
+
 
 // ✅ Retry Stored Requests When Online
 self.addEventListener("sync", async (event) => {
