@@ -401,15 +401,15 @@ const Home = () => {
                        
         const fetchData = async () => {
             setLoading(true); // Show the loading spinner
-            try {
-                const response = await AxiosBase.get(`/pmc/ping/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                navigate('/error');
-            }
+            // try {
+            //     const response = await AxiosBase.get(`/pmc/ping/`, {
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //     });
+            // } catch (error) {
+            //     navigate('/error');
+            // }
 
             try {
                 let groupsResponse = [];

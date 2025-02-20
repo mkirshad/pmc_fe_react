@@ -1,25 +1,27 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v23"; // Increment version to force cache update
-const API_CACHE_NAME = "api-cache"; // Separate cache for API requests
-const STORE_NAME = "offline-requests"; // IndexedDB Store for offline requests
+const CACHE_NAME = "pwa-cache-v45"; // Increment version to force cache update
+const STORE_NAME = "offline-requests";
+const DB_NAME = "OfflineDB";
+const API_CACHE_NAME = "api-cache";
 
+// ✅ Files to Cache for Offline Support
 const CACHE_FILES = [
     "/",
     "/index.html",
-    "/img/logo/icon-192x192.png",
-    "/img/logo/icon-512x512.png",
+    "/img/",
+    "/assets/",
     "/favicon.ico",
     "/manifest.json"
 ];
 
-// ✅ IndexedDB Helper Functions for Offline Storage
+// ✅ IndexedDB Helper Functions
 async function openDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open("OfflineDB", 1);
+        const request = indexedDB.open(DB_NAME, 1);
         request.onupgradeneeded = (event) => {
-            const db = event.target.result; // ✅ Fix ESLint error by removing explicit IDBOpenDBRequest type
+            const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
             }
@@ -35,14 +37,14 @@ async function saveToDB(data) {
     tx.objectStore(STORE_NAME).add(data);
 }
 
-async function getCachedResponse(url) {
+async function getStoredRequests() {
     const db = await openDB();
     return new Promise((resolve) => {
         const tx = db.transaction(STORE_NAME, "readonly");
         const store = tx.objectStore(STORE_NAME);
-        const request = store.get(url);
-        request.onsuccess = () => resolve(request.result ? request.result.response : null);
-        request.onerror = () => resolve(null);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => resolve([]);
     });
 }
 
@@ -54,113 +56,61 @@ async function clearStoredRequests() {
 
 // ✅ Install Event - Cache Static Assets
 self.addEventListener("install", (event) => {
-    console.log("Service Worker installing...");
+    console.log("🚀 Service Worker installing...");
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_FILES))
     );
-    self.skipWaiting(); // Activate immediately
+    self.skipWaiting();
 });
 
-// ✅ Fetch Event - Cache API & Serve Offline
+// ✅ Fetch Event - Handle API Requests & Serve Offline
 self.addEventListener("fetch", (event) => {
-    const requestUrl = new URL(event.request.url);
+    const { request } = event;
+    const requestUrl = new URL(request.url);
 
-    // Exclude service worker itself from caching
-    if (requestUrl.pathname.includes("service-worker.js")) {
-        return;
+    if (requestUrl.pathname.includes("service-worker.js")) return;
+
+    if (request.method === "GET") {
+        event.respondWith(
+            fetch(request)
+                .then((networkResponse) => {
+                    return caches.open(API_CACHE_NAME).then((cache) => {
+                        cache.put(request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                })
+                .catch(() => caches.match(request).then((cachedResponse) => {
+                    return cachedResponse || caches.match("/index.html");
+                }))
+        );
     }
 
-    // Always fetch latest `version.json` from network
-    if (requestUrl.pathname.includes("version.json")) {
-        event.respondWith(fetch(event.request, { cache: "no-store" }));
-        return;
-    }
+    if ((request.method === "POST" || request.method === "PATCH") && !navigator.onLine) {
+        console.log("[📡 Offline] Saving request for later:", request.url);
+        event.waitUntil(saveToDB({ url: request.url, method: request.method, body: request.clone() }));
 
-    console.log("Service Worker fetching:", event.request.url);
-
-    if (event.request.method === "GET") {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                return (
-                    cachedResponse ||
-                    fetch(event.request)
-                        .then((networkResponse) => {
-                            return caches.open(API_CACHE_NAME).then((cache) => {
-                                cache.put(event.request, networkResponse.clone());
-                                return networkResponse;
-                            });
-                        })
-                        .catch(() => caches.match("/index.html")) // Serve fallback when offline
-                );
-            })
-        );
-    } else if (event.request.method === "POST" && !navigator.onLine) {
-        console.log("[📡 Offline] Saving POST Request for Later:", event.request.url);
-        event.waitUntil(saveToDB({ url: event.request.url, method: "post", body: event.request.clone() }));
-        event.respondWith(
-            new Response(JSON.stringify({ message: "Saved Offline - Will Sync Later" }), {
-                status: 201,
-                headers: { "Content-Type": "application/json" },
-            })
-        );
-
-        // Register background sync to retry when online
-        self.registration.sync.register("sync-posts").catch((err) => console.error("Sync registration failed:", err));
+        event.respondWith(new Response(JSON.stringify({ message: "Saved Offline - Will Retry Later" }), {
+            status: 201,
+            headers: { "Content-Type": "application/json" },
+        }));
     }
 });
 
-// ✅ Sync Stored Requests When Online
+// ✅ Retry Stored Requests When Online
 self.addEventListener("sync", async (event) => {
     if (event.tag === "sync-posts") {
         event.waitUntil(
             (async () => {
-                const db = await openDB();
-                const tx = db.transaction(STORE_NAME, "readonly");
-                const store = tx.objectStore(STORE_NAME);
-                const getAllRequests = store.getAll();
-
-                getAllRequests.onsuccess = async () => {
-                    for (const request of getAllRequests.result) {
-                        try {
-                            console.log("[📤 Syncing]:", request.url);
-                            const body = await request.body.json(); // Ensure JSON format
-                            await fetch(request.url, {
-                                method: "POST",
-                                body: JSON.stringify(body),
-                                headers: { "Content-Type": "application/json" },
-                            });
-                        } catch (err) {
-                            console.error("[❌ Failed to Sync]:", request.url, err);
-                        }
+                const storedRequests = await getStoredRequests();
+                for (const request of storedRequests) {
+                    try {
+                        await fetch(request.url, { method: request.method, body: JSON.stringify(request.body) });
+                    } catch (err) {
+                        console.error("[❌ Failed to Sync]:", request.url, err);
                     }
-                    await clearStoredRequests();
-                };
+                }
+                await clearStoredRequests();
             })()
         );
-    }
-});
-
-// ✅ Activate Event - Clean Old Caches
-self.addEventListener("activate", (event) => {
-    console.log("Service Worker activating...");
-    event.waitUntil(
-        caches.keys().then((cacheNames) =>
-            Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log("Deleting old cache:", cache);
-                        return caches.delete(cache);
-                    }
-                })
-            )
-        )
-    );
-    self.clients.claim(); // Take control of open pages
-});
-
-// ✅ Notify Clients When New Version is Available
-self.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "SKIP_WAITING") {
-        self.skipWaiting();
     }
 });

@@ -105,25 +105,25 @@ const {
     const isWritable = applicantDetail.assignedGroup === 'APPLICANT';
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await AxiosBase.get(`/pmc/ping/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                    // Extract serializable error details
-                const errorDetails = {
-                    status: error.response?.status,
-                    data: error.response?.data,
-                    message: error.message,
-                };
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await AxiosBase.get(`/pmc/ping/`, {
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //             });
+    //         } catch (error) {
+    //                 // Extract serializable error details
+    //             const errorDetails = {
+    //                 status: error.response?.status,
+    //                 data: error.response?.data,
+    //                 message: error.message,
+    //             };
 
-                navigate('/error', { state: { error: errorDetails } });
-            }
-    }
-    fetchData()
+    //             navigate('/error', { state: { error: errorDetails } });
+    //         }
+    // }
+    // fetchData()
 
         if (id && id !== '0') {
             loadData(id);
