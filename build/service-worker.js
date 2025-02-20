@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v53"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v54"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -12,7 +12,6 @@ const CACHE_FILES = [
     "/index.html",
     "/img/logo/icon-192x192.png",
     "/img/logo/icon-512x512.png",
-    "/assets/",
     "/favicon.ico",
     "/manifest.json"
 ];
