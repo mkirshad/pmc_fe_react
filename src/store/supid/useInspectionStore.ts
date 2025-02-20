@@ -86,28 +86,47 @@ const useInspectionStore = create<InspectionStore>()(
             syncReports: async () => {
                 const { reports } = get();
                 const updatedReports = reports.filter((report) => report.syncStatus);
-
+            
                 if (updatedReports.length === 0) {
                     console.log("No unsynced reports. Fetching fresh data...");
-                    // get().fetchReports(); // ✅ Fetch data after sync
+                    get().fetchReports(); // ✅ Fetch fresh data after sync
                     return;
                 }
-
+            
                 for (const report of updatedReports) {
                     try {
                         let response;
+                        let requestData = report;
+                        let headers = {}; // ✅ Default to empty headers
+            
+                        // ✅ Convert to FormData if it contains a file
+                        if (report.hasFileUpload) {
+                            const formData = new FormData();
+                            formData.append("id", report.id);
+                            formData.append("business_name", report.businessName);
+                            formData.append("license_number", report.licenseNumber || "");
+                            
+                            if (report.file) {
+                                formData.append("file", report.file);
+                            }
+            
+                            requestData = formData;
+                            headers = { "Content-Type": "multipart/form-data" };
+                        }
+            
                         if (report.syncStatus === "post") {
-                            response = await AxiosBase.post("/pmc/inspection-report/", report);
+                            response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
                             report.id = response.data.id; // Assign new ID
                         } else if (report.syncStatus === "patch") {
                             response = await AxiosBase.patch(
                                 `/pmc/inspection-report/${report.id}/`,
-                                report
+                                requestData,
+                                { headers }
                             );
                         }
-
+            
                         console.log("[✅ Synced]:", response.status, report.id);
-
+            
                         // ✅ Remove syncStatus after syncing
                         set((state) => ({
                             reports: state.reports.map((r) =>
@@ -118,9 +137,6 @@ const useInspectionStore = create<InspectionStore>()(
                         console.error("[❌ Sync Failed]:", report.id, error);
                     }
                 }
-
-                // ✅ Fetch Fresh Data After Sync
-                get().fetchReports();
             },
 
             // ✅ Reset Store (Optional)
