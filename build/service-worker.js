@@ -147,6 +147,7 @@ self.addEventListener("fetch", (event) => {
 
 // ✅ Sync Stored Requests When Online
 self.addEventListener("sync", async (event) => {
+    console.log('its in sync')
     if (event.tag === "sync-posts") {
         event.waitUntil(
             (async () => {
