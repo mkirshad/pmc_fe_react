@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v56"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v57"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -124,13 +124,24 @@ self.addEventListener("fetch", (event) => {
         console.warn("[⚠️ Offline] Saving request for later:", request.url);
 
         event.waitUntil(
-            request.clone().text().then((bodyText) => {
-                saveToDB({
+            request.clone().text().then(async (bodyText) => {
+                await saveToDB({
                     url: request.url,
                     method: request.method,
                     body: bodyText, // Convert to JSON string
                     headers: Object.fromEntries(request.headers.entries()), // Convert headers to object
                 });
+
+                // ✅ Register Sync Event
+                if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                    navigator.serviceWorker.ready.then((registration) => {
+                        registration.sync.register("sync-posts").catch((err) => {
+                            console.error("[❌ Sync Registration Failed]", err);
+                        });
+                    });
+                } else {
+                    console.warn("[⚠️ Background Sync Not Supported]");
+                }
             })
         );
 
@@ -140,6 +151,7 @@ self.addEventListener("fetch", (event) => {
         ));
         return;
     }
+
 });
 
 
