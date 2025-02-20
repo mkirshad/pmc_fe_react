@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v69"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v70"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -240,16 +240,17 @@ self.addEventListener("fetch", (event) => {
     }
 
     // ✅ Block caching for non-GET requests (POST, PATCH, DELETE, PUT)
-    if (event.request.method !== "GET") {
+    if (event.request.method === "GET" || event.request.method === "POST") {
         return;
     }
 
-    // ✅ Serve from cache for static assets (GET requests only)
+
+    // ✅ Normal caching logic for other routes
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             return cachedResponse || fetch(event.request)
                 .then((networkResponse) => {
-                    return caches.open(CACHE_NAME).then((cache) => {
+                    return caches.open(API_CACHE_NAME).then((cache) => {
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
                     });
@@ -258,6 +259,3 @@ self.addEventListener("fetch", (event) => {
         })
     );
 });
-
-
-
