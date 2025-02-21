@@ -234,23 +234,43 @@ self.addEventListener("install", async (event) => {
 self.addEventListener("fetch", (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // ✅ Skip API requests (Zustand handles API data)
-    // if (requestUrl.pathname.startsWith("/pmc/inspection-report")) {
-    //     return;
-    // }
+    // ✅ Allow serving JS, CSS, images, fonts from cache when offline
+    const allowedStaticTypes = [".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".woff2", ".woff", ".ttf"];
+    const isStaticFile = allowedStaticTypes.some((ext) => requestUrl.pathname.endsWith(ext));
 
-    // ✅ Block caching for non-GET requests (POST, PATCH, DELETE, PUT)
-    if (event.request.method === "GET" || event.request.method === "POST") {
-        return;
+    // ✅ Block PATCH & POST when offline
+    if ((event.request.method === "PATCH" || event.request.method === "POST" || event.request.method === "GET") && !navigator.onLine && !isStaticFile) {
+        if (requestUrl.pathname.startsWith("/pmc/inspection-report")){
+            throw new Error([❌ Offline Request Blocked] ${event.request.method} request to ${requestUrl.href} failed because the user is offline.);
+        }
+        else {
+            return
+        }
     }
 
+    // ✅ Serve JS files and other assets from cache when offline
+    if (isStaticFile) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request)
+                    .then((networkResponse) => {
+                        return caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        });
+                    })
+                    .catch(() => caches.match("/index.html")); // Fallback when offline
+            })
+        );
+        return;
+    }
 
     // ✅ Normal caching logic for other routes
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             return cachedResponse || fetch(event.request)
                 .then((networkResponse) => {
-                    return caches.open(API_CACHE_NAME).then((cache) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
                     });
@@ -259,7 +279,6 @@ self.addEventListener("fetch", (event) => {
         })
     );
 });
-
 
 self.addEventListener("activate", (event) => {
     console.log("Service Worker activating...");
