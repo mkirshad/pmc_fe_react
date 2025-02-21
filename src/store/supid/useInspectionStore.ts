@@ -43,7 +43,7 @@ const useInspectionStore = create<InspectionStore>()(
                 const hasUnsyncedData = get().reports.some((report) => report.syncStatus);
                 if (hasUnsyncedData) {
                     console.warn("Skipping fetch: Unsynced data exists");
-                    useInspectionStore.getState().syncReports(); // ✅ Now syncs automatically when online
+                    // useInspectionStore.getState().syncReports(); // ✅ Now syncs automatically when online
                 }
 
                 set({ loading: true, error: null });
@@ -70,7 +70,7 @@ const useInspectionStore = create<InspectionStore>()(
                             : report
                     ),
                 }));
-                useInspectionStore.getState().syncReports(); // ✅ Now syncs
+                // useInspectionStore.getState().syncReports(); // ✅ Now syncs
             },
 
             // ✅ Add a New Report (Offline Mode)
@@ -134,17 +134,18 @@ const useInspectionStore = create<InspectionStore>()(
                         console.log("[✅ Synced]:", response.status, report.id);
             
                         // ✅ Remove syncStatus after syncing
-                        if(navigator.onLine){
-                            set((state) => ({
-                                reports: state.reports.map((r) =>
-                                    r.id === report.id ? { ...r, syncStatus: undefined } : r
-                                ),
-                            }));
-                    }
+                       
+                        set((state) => ({
+                            reports: state.reports.map((r) =>
+                                r.id === report.id ? { ...r, syncStatus: undefined } : r
+                            ),
+                        }));
+                
                     } catch (error) {
                         console.error("[❌ Sync Failed]:", report.id, error);
                     }
                 }
+                useInspectionStore.getState().fetchReports(); // ✅ Now syncs automatically when online
             },
 
             // ✅ Reset Store (Optional)

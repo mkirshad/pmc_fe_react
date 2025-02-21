@@ -32,7 +32,7 @@ const convertKeysToCamelCase = (data) => {
 const CustomerEdit = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { reports, fetchReports, updateReport, addNewReport } = useInspectionStore(); // ✅ Zustand store
+    const { reports, fetchReports, updateReport, addNewReport, syncReports } = useInspectionStore(); // ✅ Zustand store
 
     const [discardConfirmationOpen, setDiscardConfirmationOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
