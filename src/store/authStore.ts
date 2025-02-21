@@ -66,6 +66,7 @@ export const useSessionUser = create<AuthState & AuthAction>()(
             // New action to fetch user groups and store them in authority
             fetchUserGroups: async () => {
                 try {
+                if(navigator.onLine){
                     const response = await AxiosBase.get('/pmc/user-groups/', {
                         headers: { 'Content-Type': 'application/json' },
                     })
@@ -76,6 +77,9 @@ export const useSessionUser = create<AuthState & AuthAction>()(
                             authority: groups.length > 0? groups.map(group => group.name) : [''], // Assign groups to authority
                         },
                     }))
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
                 } catch (error) {
                     console.error('Error fetching user groups:', error)
                     set((state) => ({

@@ -131,10 +131,14 @@ const Home = () => {
         const applicantId = selectedRowId; // Replace with the actual applicant ID
         
         try {
-            // Send request to fetch the PDF
-            const response = await AxiosBase.get(`/pmc/generate-license-pdf?applicant_id=${applicantId}`, {
-                responseType: 'blob', // Important to get the data as a Blob
-            });
+            if(navigator.onLine){
+                // Send request to fetch the PDF
+                const response = await AxiosBase.get(`/pmc/generate-license-pdf?applicant_id=${applicantId}`, {
+                    responseType: 'blob', // Important to get the data as a Blob
+                });
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
 
             // Create a blob URL for the downloaded file
             const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
@@ -162,11 +166,15 @@ const Home = () => {
         if (group === 'LSO1' || group === 'LSO2' || group === 'LSO3') {
             const moduloValue = group === 'LSO1' ? 1 : group === 'LSO2' ? 2 : 0;
 
-            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
-                params: {
-                    assigned_group: "LSO",
-                },
-            });
+            if(navigator.onLine){
+                const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+                    params: {
+                        assigned_group: "LSO",
+                    },
+                });
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
             const filteredData = (response.data || []).filter((item) => item.submittedapplication?.id % 3 === moduloValue);
             // Update the table data
             const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
@@ -174,14 +182,17 @@ const Home = () => {
             setColumns(extracted.columns);
             
         } else {
-
-            // Fetch filtered data from the backend
-            const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
-                params: {
-                    assigned_group: group !== "All-Applications" && group !== "Challan-Downloaded" ? group : undefined,
-                    application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
-                },
-            });
+            if(navigator.onLine){
+                // Fetch filtered data from the backend
+                const response = await AxiosBase.get('/pmc/applicant-detail-main-list/', {
+                    params: {
+                        assigned_group: group !== "All-Applications" && group !== "Challan-Downloaded" ? group : undefined,
+                        application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
+                    },
+                });
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
             const filteredData = response.data || [];
     
             // Update the table data
@@ -284,11 +295,15 @@ const Home = () => {
             try {
                 let groupsResponse = [];
                 try {
-                    const response = await AxiosBase.get(`/pmc/user-groups/`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
+                    if(navigator.onLine){
+                        const response = await AxiosBase.get(`/pmc/user-groups/`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+                    }else{
+                        throw new Error("Application is offline. Cannot fetch data.");
+                    }
                     groupsResponse = response.data || [];
                     setUserGroups(groupsResponse.map(group => group.name));
                 } catch (error) {
@@ -298,12 +313,16 @@ const Home = () => {
                 }
                 console.log('groupsResponse', groupsResponse)
     
-                // Fetch statistics for groups
-                const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
-                    headers: {
-                    "Content-Type": "multipart/form-data",
-                    },
-                });
+                if(navigator.onLine){
+                    // Fetch statistics for groups
+                    const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
+                        headers: {
+                        "Content-Type": "multipart/form-data",
+                        },
+                    });
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
                 setStatistics(statsResponse.data); // Save statistics to state
                 
             } catch (error) {

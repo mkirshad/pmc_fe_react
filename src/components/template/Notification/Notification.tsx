@@ -131,8 +131,12 @@ const _Notification = ({ className }: { className?: string }) => {
 
 const apiGetApplicantAlerts = async () => {
   try {
-    const response = await AxiosBase.get('/pmc/applicant-alerts/');
-    return response.data;
+    if(navigator.onLine){
+        const response = await AxiosBase.get('/pmc/applicant-alerts/');
+        return response.data;
+    }else{
+        throw new Error("Application is offline. Cannot fetch data.");
+    }
   } catch (error) {
     console.error('Error fetching applicant alerts:', error);
     return []; // or throw error

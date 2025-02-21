@@ -143,6 +143,7 @@ const {
     // get application data
 
     const loadData = (id) =>{
+        if(navigator.onLine){
         const response = AxiosBase.get(`/pmc/applicant-detail/${id}/`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -165,6 +166,7 @@ const {
                 assignedGroup:response.data.assigned_group,
                 is_downloaded_fee_challan:response.data.is_downloaded_fee_challan,
             }
+            
              updateApplicantDetail(data_applicantDetail);
 
              
@@ -289,7 +291,8 @@ const {
         .catch((error) => {
             console.error('Error:', error);
             // Handle the error
-        });;
+        });
+        }
     }
 
     const handleApplicantDetailFormSubmit = async (values: ApplicantDetailFormSchema) => {
@@ -982,10 +985,14 @@ console.log('values.existingFileId', values.existingFileId)
                 updateApplicantDetail({applicationStatus: "Submitted"})
                         
                 // Download Fee Challan
-                try{            
-                    const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
-                        responseType: 'blob', // Important to get the data as a Blob
-                    }); 
+                try{
+                    if(navigator.onLine){            
+                        const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+                            responseType: 'blob', // Important to get the data as a Blob
+                        }); 
+                    }else{
+                        throw new Error("Application is offline. Cannot fetch data.");
+                    }
                 // Create a blob URL for the downloaded file
                 const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
