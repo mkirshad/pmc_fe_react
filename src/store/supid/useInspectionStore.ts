@@ -32,7 +32,7 @@ interface InspectionStore {
 
 // ✅ Create Zustand Store with TypeScript
 const useInspectionStore = create<InspectionStore>()(
-    // persist(
+    persist(
         (set, get) => ({
             reports: [],
             loading: false,
@@ -141,13 +141,12 @@ const useInspectionStore = create<InspectionStore>()(
 
             // ✅ Reset Store (Optional)
             resetReports: () => set({ reports: [] }),
-        })
-        // ,
-        // {
-        //     name: "inspection-reports",
-        //     getStorage: () => localStorage,
-        // }
-    // )
+        }),
+        {
+            name: "inspection-reports",
+            getStorage: () => localStorage,
+        }
+    )
 );
 
 // ✅ Add Event Listener for Syncing When Online

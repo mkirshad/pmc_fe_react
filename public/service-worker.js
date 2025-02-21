@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v72"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v73"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -235,9 +235,9 @@ self.addEventListener("fetch", (event) => {
     const requestUrl = new URL(event.request.url);
 
     // ✅ Skip API requests (Zustand handles API data)
-    if (requestUrl.pathname.startsWith("/pmc/inspection-report")) {
-        return;
-    }
+    // if (requestUrl.pathname.startsWith("/pmc/inspection-report")) {
+    //     return;
+    // }
 
     // ✅ Block caching for non-GET requests (POST, PATCH, DELETE, PUT)
     if (event.request.method === "GET" || event.request.method === "POST") {
@@ -258,4 +258,26 @@ self.addEventListener("fetch", (event) => {
                 .catch(() => caches.match("/index.html")); // Fallback when offline
         })
     );
+});
+
+
+self.addEventListener("activate", (event) => {
+    console.log("Service Worker activating...");
+    event.waitUntil(
+        caches.keys().then((cacheNames) =>
+            Promise.all(
+                cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                        console.log("Deleting old cache:", cache);
+                        return caches.delete(cache);
+                    }
+                })
+            )
+        )
+    );
+
+    self.clients.claim(); // ✅ Take control of open pages
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => client.navigate(client.url)); // ✅ Force reload on activation
+    });
 });
