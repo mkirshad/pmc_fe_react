@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v75"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v76"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -240,12 +240,7 @@ self.addEventListener("fetch", (event) => {
 
     // ✅ Block PATCH & POST when offline
     if ((event.request.method === "PATCH" || event.request.method === "POST" || event.request.method === "GET") && !navigator.onLine && !isStaticFile) {
-        if (requestUrl.pathname.startsWith("/pmc/inspection-report")){
             throw new Error([❌ Offline Request Blocked] ${event.request.method} request to ${requestUrl.href} failed because the user is offline.);
-        }
-        else {
-            return
-        }
     }
 
     // ✅ Serve JS files and other assets from cache when offline
