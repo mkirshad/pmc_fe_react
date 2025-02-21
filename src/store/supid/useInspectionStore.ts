@@ -48,8 +48,10 @@ const useInspectionStore = create<InspectionStore>()(
 
                 set({ loading: true, error: null });
                 try {
-                    const response = await AxiosBase.get<InspectionReport[]>("/pmc/inspection-report/");
-                    set({ reports: response.data });
+                    if(navigator.onLine){
+                        const response = await AxiosBase.get<InspectionReport[]>("/pmc/inspection-report/");
+                        set({ reports: response.data });
+                    }
                 } catch (error) {
                     console.error("Error fetching reports:", error);
                     set({ error: "Failed to fetch reports" });
@@ -115,24 +117,30 @@ const useInspectionStore = create<InspectionStore>()(
                         }
             
                         if (report.syncStatus === "post") {
-                            response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
-                            report.id = response.data.id; // Assign new ID
+                            if(navigator.onLine){
+                                response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
+                                report.id = response.data.id; // Assign new ID
+                            }
                         } else if (report.syncStatus === "patch") {
-                            response = await AxiosBase.patch(
-                                `/pmc/inspection-report/${report.id}/`,
-                                requestData,
-                                { headers }
-                            );
+                            if(navigator.onLine){
+                                response = await AxiosBase.patch(
+                                    `/pmc/inspection-report/${report.id}/`,
+                                    requestData,
+                                    { headers }
+                                );
+                        }
                         }
             
                         console.log("[✅ Synced]:", response.status, report.id);
             
                         // ✅ Remove syncStatus after syncing
-                        set((state) => ({
-                            reports: state.reports.map((r) =>
-                                r.id === report.id ? { ...r, syncStatus: undefined } : r
-                            ),
-                        }));
+                        if(navigator.onLine){
+                            set((state) => ({
+                                reports: state.reports.map((r) =>
+                                    r.id === report.id ? { ...r, syncStatus: undefined } : r
+                                ),
+                            }));
+                    }
                     } catch (error) {
                         console.error("[❌ Sync Failed]:", report.id, error);
                     }

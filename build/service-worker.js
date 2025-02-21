@@ -239,8 +239,12 @@ self.addEventListener("fetch", (event) => {
     const isStaticFile = allowedStaticTypes.some((ext) => requestUrl.pathname.endsWith(ext));
 
     // ✅ Block PATCH & POST when offline
-    if ((event.request.method === "PATCH" || event.request.method === "POST" || event.request.method === "GET") && !navigator.onLine && !isStaticFile) {
-            throw new Error([❌ Offline Request Blocked] ${event.request.method} request to ${requestUrl.href} failed because the user is offline.);
+    // if ((event.request.method === "PATCH" || event.request.method === "POST" || event.request.method === "GET") && !navigator.onLine && !isStaticFile) {
+    //         return
+    // }
+
+    if (event.request.method === "PATCH" || event.request.method === "POST") {
+            return
     }
 
     // ✅ Serve JS files and other assets from cache when offline
