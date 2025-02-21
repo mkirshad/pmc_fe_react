@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v76"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v77"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -243,7 +243,7 @@ self.addEventListener("fetch", (event) => {
     //         return
     // }
 
-    if (event.request.method === "PATCH" || event.request.method === "POST") {
+    if (event.request.method === "PATCH" || event.request.method === "POST"|| event.request.method === "PUT") {
             return
     }
 
@@ -265,18 +265,18 @@ self.addEventListener("fetch", (event) => {
     }
 
     // ✅ Normal caching logic for other routes
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request)
-                .then((networkResponse) => {
-                    return caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    });
-                })
-                .catch(() => caches.match("/index.html")); // Fallback when offline
-        })
-    );
+    // event.respondWith(
+    //     caches.match(event.request).then((cachedResponse) => {
+    //         return cachedResponse || fetch(event.request)
+    //             .then((networkResponse) => {
+    //                 return caches.open(CACHE_NAME).then((cache) => {
+    //                     cache.put(event.request, networkResponse.clone());
+    //                     return networkResponse;
+    //                 });
+    //             })
+    //             .catch(() => caches.match("/index.html")); // Fallback when offline
+    //     })
+    // );
 });
 
 self.addEventListener("activate", (event) => {

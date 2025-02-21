@@ -15,13 +15,12 @@ const formatJsonColumn = (jsonData) => {
 
 const InspectionReportsList = () => {
   const navigate = useNavigate();
-  const { reports, fetchReports, loading } = useInspectionStore(); // ✅ Zustand store
+  const { reports, fetchReports, loading, syncReports } = useInspectionStore(); // ✅ Zustand store
 
   useEffect(() => {
-    if (reports.length === 0) {
+      syncReports();
       fetchReports();
-    }
-  }, [reports, fetchReports]);
+  }, []);
 
   // ✅ Define Table Columns
   const columns = [
