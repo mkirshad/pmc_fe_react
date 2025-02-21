@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v77"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v78"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -237,13 +237,8 @@ self.addEventListener("fetch", (event) => {
     // ✅ Allow serving JS, CSS, images, fonts from cache when offline
     const allowedStaticTypes = [".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".woff2", ".woff", ".ttf"];
     const isStaticFile = allowedStaticTypes.some((ext) => requestUrl.pathname.endsWith(ext));
-
-    // ✅ Block PATCH & POST when offline
-    // if ((event.request.method === "PATCH" || event.request.method === "POST" || event.request.method === "GET") && !navigator.onLine && !isStaticFile) {
-    //         return
-    // }
-
-    if (event.request.method === "PATCH" || event.request.method === "POST"|| event.request.method === "PUT") {
+    console.log('test path name', requestUrl.pathname)
+    if (event.request.method === "PATCH" || event.request.method === "POST"|| event.request.method === "PUT" || requestUrl.pathname.startsWith("/api/pmc/inspection-report/")) {
             return
     }
 
@@ -265,18 +260,18 @@ self.addEventListener("fetch", (event) => {
     }
 
     // ✅ Normal caching logic for other routes
-    // event.respondWith(
-    //     caches.match(event.request).then((cachedResponse) => {
-    //         return cachedResponse || fetch(event.request)
-    //             .then((networkResponse) => {
-    //                 return caches.open(CACHE_NAME).then((cache) => {
-    //                     cache.put(event.request, networkResponse.clone());
-    //                     return networkResponse;
-    //                 });
-    //             })
-    //             .catch(() => caches.match("/index.html")); // Fallback when offline
-    //     })
-    // );
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            return cachedResponse || fetch(event.request)
+                .then((networkResponse) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                })
+                .catch(() => caches.match("/index.html")); // Fallback when offline
+        })
+    );
 });
 
 self.addEventListener("activate", (event) => {
