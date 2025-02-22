@@ -62,10 +62,12 @@ const useInspectionStore = create<InspectionStore>()(
 
             // ✅ Update an Existing Report (Offline Mode)
             updateReport: (id, updatedData) => {
-                console.log('its in update state')
+                console.log('its in update state');
+                console.log(id);
+                console.log(updatedData);
                 set((state) => ({
                     reports: state.reports.map((report) =>
-                        report.id === id
+                        report.id == id
                             ? { ...report, ...updatedData, syncStatus: "patch" }
                             : report
                     ),
@@ -86,12 +88,13 @@ const useInspectionStore = create<InspectionStore>()(
 
             // ✅ Sync Offline Updates to Server
             syncReports: async () => {
+                console.log('sync started:')
                 const { reports } = get();
                 const updatedReports = reports.filter((report) => report.syncStatus);
             
                 if (updatedReports.length === 0) {
                     console.log("No unsynced reports. Fetching fresh data...");
-                    get().fetchReports(); // ✅ Fetch fresh data after sync
+                    // get().fetchReports(); // ✅ Fetch fresh data after sync
                     return;
                 }
             
@@ -145,7 +148,7 @@ const useInspectionStore = create<InspectionStore>()(
                         console.error("[❌ Sync Failed]:", report.id, error);
                     }
                 }
-                useInspectionStore.getState().fetchReports(); // ✅ Now syncs automatically when online
+                // useInspectionStore.getState().fetchReports(); // ✅ Now syncs automatically when online
             },
 
             // ✅ Reset Store (Optional)
