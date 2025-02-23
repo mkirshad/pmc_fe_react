@@ -224,11 +224,11 @@ const Home = () => {
                                 'Content-Type': 'application/json',
                             },
                         });
+                        groupsResponse = response.data || [];
+                        setUserGroups(groupsResponse.map(group => group.name));
                     }else{
                         throw new Error("Application is offline. Cannot fetch data.");
-                    }
-                    groupsResponse = response.data || [];
-                    setUserGroups(groupsResponse.map(group => group.name));
+                    }                
                 } catch (error) {
                     console.error('Error fetching user groups:', error);
                     // Set user groups to an empty array if an error occurs
@@ -241,9 +241,7 @@ const Home = () => {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                }else{
-                    throw new Error("Application is offline. Cannot fetch data.");
-                }
+                
                 const dataApplicants = response.data;
     
                 if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
@@ -267,6 +265,10 @@ const Home = () => {
                     }
                 }
 
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
+
                 if(navigator.onLine){
                 // Fetch statistics for groups
                     const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
@@ -274,10 +276,12 @@ const Home = () => {
                         "Content-Type": "multipart/form-data",
                         },
                     });
+                
+                setStatistics(statsResponse.data); // Save statistics to state
+
                 }else{
                     throw new Error("Application is offline. Cannot fetch data.");
                 }
-                setStatistics(statsResponse.data); // Save statistics to state
                 
             } catch (error) {
                 console.error('Error fetching data:', error);

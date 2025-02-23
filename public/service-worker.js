@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v170"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v173"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -109,20 +109,33 @@ self.addEventListener("fetch", (event) => {
 
     // ✅ Normal caching logic for other routes
     event.respondWith(
-        fetch(event.request)
-            .then((networkResponse) => {
-                return caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone()); // Store the response in cache
-                    return networkResponse;
-                });
-            })
-            .catch(() => {
-                // If network fails, return from cache
+        self.clients.matchAll().then((clients) => {
+            // Check if at least one client is online
+            const isOnline = clients.some(client => client.visibilityState === "visible");
+    
+            if (isOnline) {
+                return fetch(event.request)
+                    .then((networkResponse) => {
+                        return caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, networkResponse.clone()); // Store in cache
+                            return networkResponse;
+                        });
+                    })
+                    .catch(() => {
+                        // If network fails, try to return from cache
+                        return caches.match(event.request).then((cachedResponse) => {
+                            return cachedResponse || caches.match("/index.html"); // Fallback
+                        });
+                    });
+            } else {
+                // If offline, directly return from cache
                 return caches.match(event.request).then((cachedResponse) => {
-                    return cachedResponse || caches.match("/index.html"); // Fallback to index.html if nothing is cached
+                    return cachedResponse || caches.match("/index.html"); // Fallback
                 });
-            })
+            }
+        })
     );
+    
 });
 
 self.addEventListener("activate", (event) => {

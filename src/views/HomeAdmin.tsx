@@ -136,9 +136,7 @@ const Home = () => {
                 const response = await AxiosBase.get(`/pmc/generate-license-pdf?applicant_id=${applicantId}`, {
                     responseType: 'blob', // Important to get the data as a Blob
                 });
-            }else{
-                throw new Error("Application is offline. Cannot fetch data.");
-            }
+
 
             // Create a blob URL for the downloaded file
             const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
@@ -152,6 +150,9 @@ const Home = () => {
 
             // Clean up
             document.body.removeChild(link);
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
         } catch (error) {
             console.error('Error downloading the PDF:', error);
         }
@@ -172,15 +173,17 @@ const Home = () => {
                         assigned_group: "LSO",
                     },
                 });
-            }else{
-                throw new Error("Application is offline. Cannot fetch data.");
-            }
+            
             const filteredData = (response.data || []).filter((item) => item.submittedapplication?.id % 3 === moduloValue);
             // Update the table data
             const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
             
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
+
         } else {
             if(navigator.onLine){
                 // Fetch filtered data from the backend
@@ -190,15 +193,17 @@ const Home = () => {
                         application_status: group === "Challan-Downloaded" ? "Fee Challan" : undefined,
                     },
                 });
-            }else{
-                throw new Error("Application is offline. Cannot fetch data.");
-            }
+            
             const filteredData = response.data || [];
     
             // Update the table data
             const extracted = extractColumns(filteredData, !!userGroups.length, userGroups[0]);
             setFlattenedData(extracted.flattenedData);
             setColumns(extracted.columns);
+
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
         }
         } catch (error) {
             console.error("Error fetching filtered data:", error);
@@ -301,11 +306,12 @@ const Home = () => {
                                 'Content-Type': 'application/json',
                             },
                         });
+
+                    groupsResponse = response.data || [];
+                    setUserGroups(groupsResponse.map(group => group.name));
                     }else{
                         throw new Error("Application is offline. Cannot fetch data.");
                     }
-                    groupsResponse = response.data || [];
-                    setUserGroups(groupsResponse.map(group => group.name));
                 } catch (error) {
                     console.error('Error fetching user groups:', error);
                     // Set user groups to an empty array if an error occurs
@@ -320,11 +326,12 @@ const Home = () => {
                         "Content-Type": "multipart/form-data",
                         },
                     });
+                setStatistics(statsResponse.data); // Save statistics to state
+                
                 }else{
                     throw new Error("Application is offline. Cannot fetch data.");
                 }
-                setStatistics(statsResponse.data); // Save statistics to state
-                
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally{

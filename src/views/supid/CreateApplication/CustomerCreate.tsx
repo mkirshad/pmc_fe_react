@@ -990,9 +990,7 @@ console.log('values.existingFileId', values.existingFileId)
                         const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
                             responseType: 'blob', // Important to get the data as a Blob
                         }); 
-                    }else{
-                        throw new Error("Application is offline. Cannot fetch data.");
-                    }
+
                 // Create a blob URL for the downloaded file
                 const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -1008,7 +1006,9 @@ console.log('values.existingFileId', values.existingFileId)
                 setThankYouPopupMessage("Application is submitted successfully!")
                 setTankYouPopupType("success")
                 // const formData = new FormData();
-            
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                     // Extract serializable error details
