@@ -113,13 +113,13 @@ const OpenLayersLocationPicker = ({ onLocationSelect }) => {
   const fetchDistrict = async (lon, lat) => {
     try {
       onLocationSelect({ lat, lng: lon, district: '' });
-      const response = await AxiosBase.get(`/pmc/DistrictByLatLon?lat=${lat}&lon=${lon}`);
-      if (response.data && response.data.district_name) {
-        setDistrict(response.data.district_name);
-        onLocationSelect({ lat, lng: lon, district: response.data.district_name });
-      } else {
-        setDistrict("District not found");
-      }
+      // const response = await AxiosBase.get(`/pmc/DistrictByLatLon?lat=${lat}&lon=${lon}`);
+      // if (response.data && response.data.district_name) {
+      //   setDistrict(response.data.district_name);
+      //   onLocationSelect({ lat, lng: lon, district: response.data.district_name });
+      // } else {
+      //   setDistrict("District not found");
+      // }
     } catch (error) {
       console.error("Error fetching district:", error);
       setDistrict("Error fetching district");

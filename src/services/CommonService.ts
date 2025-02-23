@@ -39,8 +39,12 @@ export async function apiGetApplicantAlerts() {
     try {
       // This calls your new DRF endpoint returning
       // remarks for the current user’s applications
-      const response = await AxiosBase.get('/pmc/applicant-alerts/');
-      return response.data; // An array of { id, applicant_id, tracking_number, remarks, created_at, ... }
+      if(navigator.onLine){
+        const response = await AxiosBase.get('/pmc/applicant-alerts/');
+        return response.data; // An array of { id, applicant_id, tracking_number, remarks, created_at, ... }
+      }else{
+        throw new Error("Application is offline. Cannot fetch data.");
+    }
     } catch (error) {
       console.error('Error fetching applicant alerts:', error);
       return []; // Return an empty array if an error occurs

@@ -4,6 +4,7 @@ import SignUpForm from './components/SignUpForm'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import { useThemeStore } from '@/store/themeStore'
+import { Link } from "react-router-dom";
 
 type SignUpProps = {
     disableSubmit?: boolean
@@ -21,7 +22,9 @@ export const SignUpBase = ({
     return (
         <>
             <div className="mb-8">
-                <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+                <Link to="/">
+                    <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+                </Link>
             </div>
             <div className="mb-8">
                 <h3 className="mb-1">Sign Up</h3>

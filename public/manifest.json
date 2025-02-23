@@ -1,0 +1,23 @@
+{
+    "short_name": "PMIS",
+    "name": "Plastic Management Information System",
+    "version": "1.1",
+    "icons": [
+      {
+        "src": "/img/logo/icon-192x192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/img/logo/icon-512x512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "/",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#000000"
+  }
+  

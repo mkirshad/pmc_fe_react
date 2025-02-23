@@ -4,6 +4,7 @@ import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AxiosBase from "../../../services/axios/AxiosBase";
 import { useNavigate } from "react-router-dom";
+import { useSessionUser } from '@/store/authStore';
 
 const InspectionReportsList = () => {
   const [reports, setReports] = useState([]);
@@ -25,6 +26,9 @@ const InspectionReportsList = () => {
 
     fetchReports();
   }, []);
+
+  const district_id = useSessionUser((state) => state.user.district_id) || null
+  const district_name = useSessionUser((state) => state.user.district_name) || ''
 
   const handleEditClick = (row) => {
     navigate(`/edit-inspection/${row.id}`, { state: { reportData: row } });
@@ -53,7 +57,7 @@ const InspectionReportsList = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4">Inspection Reports</h2>
+      <h2 className="text-lg font-bold mb-4">Inspection Reports {district_name!==''?' - ':''} {district_name}</h2>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
@@ -67,6 +71,28 @@ const InspectionReportsList = () => {
           enableColumnResizing
           enablePagination
           initialState={{ showColumnFilters: false }}
+          
+          muiTableHeadCellProps={{
+              sx: {
+                  backgroundColor: '#f5f5f5', // Header background
+                  fontWeight: 'bold',
+                  borderBottom: '2px solid #ccc',
+                  textAlign: 'center',
+              },
+          }}
+          muiTableBodyCellProps={{
+              sx: {
+                  borderRight: '1px solid #ddd', // Column border
+                  padding: '10px',
+              },
+          }}
+          muiTableBodyRowProps={{
+              sx: {
+                  '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                  '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+              },
+          }}
+          enableZebraStripes={true}
         />
       )}
     </div>

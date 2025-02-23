@@ -6,6 +6,7 @@ import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
 import Tabs from '@/components/ui/Tabs'
 import { HiOutlineHome, HiOutlineUser, HiOutlinePhone, HiViewList, HiDocumentDownload } from 'react-icons/hi'
+import { useSessionUser } from '@/store/authStore';
 
 const { TabNav, TabList, TabContent } = Tabs
 
@@ -99,28 +100,34 @@ const Home = () => {
         DEO: 'DEO',
         'Download License': 'Download License',
     };
+    const userAuthority = useSessionUser((state) => state.user.authority) || []
+    console.log('user authority:', userAuthority)
     const downloadFile = async () => {
         // Simulate a file download
         const applicantId = selectedRowId; // Replace with the actual applicant ID
         
         try {
-            // Send request to fetch the PDF
-            const response = await AxiosBase.get(`/pmc/generate-license-pdf?applicant_id=${applicantId}`, {
-                responseType: 'blob', // Important to get the data as a Blob
-            });
+            if(navigator.onLine){
+                // Send request to fetch the PDF
+                const response = await AxiosBase.get(`/pmc/generate-license-pdf?applicant_id=${applicantId}`, {
+                    responseType: 'blob', // Important to get the data as a Blob
+                });
 
-            // Create a blob URL for the downloaded file
-            const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = urlBlob;
+                // Create a blob URL for the downloaded file
+                const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = urlBlob;
 
-            // Set filename for the downloaded file
-            link.setAttribute('download', `license_${applicantId}.pdf`);
-            document.body.appendChild(link);
-            link.click();
+                // Set filename for the downloaded file
+                link.setAttribute('download', `license_${applicantId}.pdf`);
+                document.body.appendChild(link);
+                link.click();
 
-            // Clean up
-            document.body.removeChild(link);
+                // Clean up
+                document.body.removeChild(link);
+            }else{
+                throw new Error("Application is offline. Cannot fetch data.");
+            }
         } catch (error) {
             console.error('Error downloading the PDF:', error);
         }
@@ -198,39 +205,43 @@ const Home = () => {
         const fetchData = async () => {
             setLoading(true); // Show the loading spinner
 
-            try {
-                const response = await AxiosBase.get(`/pmc/ping/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                navigate('/error');
-            }
+            // try {
+            //     const response = await AxiosBase.get(`/pmc/ping/`, {
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //     });
+            // } catch (error) {
+            //     navigate('/error');
+            // }
 
             try {
                 let groupsResponse = [];
                 try {
-                    const response = await AxiosBase.get(`/pmc/user-groups/`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    groupsResponse = response.data || [];
-                    setUserGroups(groupsResponse.map(group => group.name));
+                    if(navigator.onLine){
+                        const response = await AxiosBase.get(`/pmc/user-groups/`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+                        groupsResponse = response.data || [];
+                        setUserGroups(groupsResponse.map(group => group.name));
+                    }else{
+                        throw new Error("Application is offline. Cannot fetch data.");
+                    }                
                 } catch (error) {
                     console.error('Error fetching user groups:', error);
                     // Set user groups to an empty array if an error occurs
                     setUserGroups([]);
                 }
                 console.log('groupsResponse', groupsResponse)
-    
-                const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-    
+                if(navigator.onLine){
+                    const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                
                 const dataApplicants = response.data;
     
                 if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
@@ -254,13 +265,23 @@ const Home = () => {
                     }
                 }
 
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
+
+                if(navigator.onLine){
                 // Fetch statistics for groups
-                const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
-                    headers: {
-                    "Content-Type": "multipart/form-data",
-                    },
-                });
+                    const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
+                        headers: {
+                        "Content-Type": "multipart/form-data",
+                        },
+                    });
+                
                 setStatistics(statsResponse.data); // Save statistics to state
+
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
                 
             } catch (error) {
                 console.error('Error fetching data:', error);

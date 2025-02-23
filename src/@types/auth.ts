@@ -43,6 +43,8 @@ export type User = {
     userName?: string | null
     email?: string | null
     authority?: string[]
+    district_id?: number | null  // Adding district_id as a number (or null if not assigned)
+    district_name?: string | null  // Adding district_name as a string (or null if not assigned)
 }
 
 export type Token = {

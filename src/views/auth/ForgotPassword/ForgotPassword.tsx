@@ -10,6 +10,7 @@ import InputMask from 'react-input-mask';
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage';
 import ActionLink from '@/components/shared/ActionLink'
 import AxiosBase from '../../../services/axios/AxiosBase';
+import { Link } from "react-router-dom";
 
 export const ForgotPasswordBase = () => {
     const [step, setStep] = useState(0);
@@ -125,7 +126,9 @@ export const ForgotPasswordBase = () => {
         <div className="flex items-center justify-center bg-gray-50">
             <div className="w-full max-w-lg p-8 bg-white shadow-2xl rounded-lg">
                 <div className="mb-6 text-center">
+                <Link to="/">
                     <Logo type="streamline" imgClass="mx-auto" logoWidth={60} />
+                </Link>
                 </div>
                 <Steps current={step} className="mb-6">
                     <Steps.Item title="Find User" />

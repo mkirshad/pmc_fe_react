@@ -157,15 +157,15 @@ const Home = () => {
                        
         const fetchData = async () => {
 
-            try {
-                const response = await AxiosBase.get(`/pmc/ping/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                navigate('/error');
-            }
+            // try {
+            //     const response = await AxiosBase.get(`/pmc/ping/`, {
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //     });
+            // } catch (error) {
+            //     navigate('/error');
+            // }
 
             try {
                 let groupsResponse = [];

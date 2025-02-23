@@ -55,6 +55,16 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
 
         deSealedDate: z.string().optional(), // Date field (optional)
 
+        // ✅ **Handles `null` values by defaulting to an empty array**
+        fineRecoveryBreakup: z.array(
+            z.object({
+                date: z.string().min(1, { message: "Date is required" }),  
+                amount: z.coerce.number().min(0, { message: "Amount must be a number and at least 0" }),
+                isNew: z.boolean().optional(),
+            })
+        ).default([]),  // **🚀 Default to an empty array to avoid `null` issue**
+
+        
         // ✅ Affidavit (File Upload)
         affidavit: z
             .instanceof(File, { message: "Must be a valid file" })
@@ -65,13 +75,14 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
 const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }: CommonProps) => {
     // console.log('defaultValues2', defaultValues);
     const { handleSubmit, reset, formState: { errors }, control } = useForm<InspectionReportSchema>({
-        defaultValues, // Initial values
+        defaultValues: {
+            fineRecoveryBreakup: defaultValues?.fineRecoveryBreakup ?? [], // ✅ Ensures it's never null
+        },
         resolver: zodResolver(validationSchema),
     });
 
-    // console.log('control:', JSON.stringify(control, null, 2))
 
-    // // ✅ Ensure the form updates when defaultValues change
+    // ✅ Ensure the form updates when defaultValues change
     useEffect(() => {
         if (!isEmpty(defaultValues)) {
             reset(defaultValues); // Update form with new values
@@ -83,7 +94,7 @@ const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="gap-4 flex flex-col flex-auto">
-                        <InspectionDetailSection control={control} errors={errors} defaultValues={defaultValues} />
+                        <InspectionDetailSection control={control} errors={errors} defaultValues={defaultValues} readOnly={readOnly} />
                     </div>
                 </div>
             </Container>

@@ -105,25 +105,25 @@ const {
     const isWritable = applicantDetail.assignedGroup === 'APPLICANT';
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await AxiosBase.get(`/pmc/ping/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                    // Extract serializable error details
-                const errorDetails = {
-                    status: error.response?.status,
-                    data: error.response?.data,
-                    message: error.message,
-                };
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await AxiosBase.get(`/pmc/ping/`, {
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //             });
+    //         } catch (error) {
+    //                 // Extract serializable error details
+    //             const errorDetails = {
+    //                 status: error.response?.status,
+    //                 data: error.response?.data,
+    //                 message: error.message,
+    //             };
 
-                navigate('/error', { state: { error: errorDetails } });
-            }
-    }
-    fetchData()
+    //             navigate('/error', { state: { error: errorDetails } });
+    //         }
+    // }
+    // fetchData()
 
         if (id && id !== '0') {
             loadData(id);
@@ -143,6 +143,7 @@ const {
     // get application data
 
     const loadData = (id) =>{
+        if(navigator.onLine){
         const response = AxiosBase.get(`/pmc/applicant-detail/${id}/`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -165,6 +166,7 @@ const {
                 assignedGroup:response.data.assigned_group,
                 is_downloaded_fee_challan:response.data.is_downloaded_fee_challan,
             }
+            
              updateApplicantDetail(data_applicantDetail);
 
              
@@ -289,7 +291,8 @@ const {
         .catch((error) => {
             console.error('Error:', error);
             // Handle the error
-        });;
+        });
+        }
     }
 
     const handleApplicantDetailFormSubmit = async (values: ApplicantDetailFormSchema) => {
@@ -982,10 +985,12 @@ console.log('values.existingFileId', values.existingFileId)
                 updateApplicantDetail({applicationStatus: "Submitted"})
                         
                 // Download Fee Challan
-                try{            
-                    const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
-                        responseType: 'blob', // Important to get the data as a Blob
-                    }); 
+                try{
+                    if(navigator.onLine){            
+                        const response = await AxiosBase.get(`/pmc/receipt-pdf?ApplicantId=${applicantDetail.id}`, {
+                            responseType: 'blob', // Important to get the data as a Blob
+                        }); 
+
                 // Create a blob URL for the downloaded file
                 const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -1001,7 +1006,9 @@ console.log('values.existingFileId', values.existingFileId)
                 setThankYouPopupMessage("Application is submitted successfully!")
                 setTankYouPopupType("success")
                 // const formData = new FormData();
-            
+                }else{
+                    throw new Error("Application is offline. Cannot fetch data.");
+                }
             } catch (error) {
                 console.error('Error in POST request:', error.response || error.message);
                     // Extract serializable error details
