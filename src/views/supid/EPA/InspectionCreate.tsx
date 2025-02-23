@@ -15,17 +15,33 @@ const convertKeysToCamelCase = (data) => {
     if (!data) return null;
 
     return {
-        id: data.id,
-        businessName: data.business_name,
-        businessType: data.business_type,
-        licenseNumber: data.license_number || '',
-        violationFound: data.violation_found || [],
-        violationType: data.violation_type || [],
-        actionTaken: data.action_taken || [],
-        totalConfiscation: data.total_confiscation || 0,
-        district: data.district || '',
-        createdAt: data.created_at || '',
-        syncStatus: data.syncStatus || undefined,
+            id: data.id,
+            businessName: data.business_name,
+            businessType: data.business_type,
+            licenseNumber: data.license_number || '',
+            violationFound: data.violation_found || [],
+            violationType: data.violation_type || [],
+            actionTaken: data.action_taken || [],
+            
+            plasticBagsConfiscation: data.plastic_bags_confiscation ?? 0,
+            confiscationOtherPlastics: data.confiscation_other_plastics || {},
+        
+            totalConfiscation: data.total_confiscation || 0,
+            OtherSingleUseItems: data.other_single_use_items || [],
+        
+            latitude: data.latitude ?? null,
+            longitude: data.longitude ?? null,
+            district: data.district || '',
+        
+            inspectionDate: data.inspection_date || null,
+            fineAmount: data.fine_amount ?? 0,
+            fineRecoveryStatus: data.fine_recovery_status || undefined,
+            fineRecoveryDate: data.fine_recovery_date || '',
+            recoveryAmount: data.recovery_amount ?? 0,
+            deSealedDate: data.de_sealed_date || '',
+            fineRecoveryBreakup: data.fine_recovery_breakup || null,
+            // affidavit: data.affidavit || null,  // Assuming it's a file upload
+            syncStatus: data.syncStatus || undefined,  // Tracks offline edits
     };
 };
 
@@ -42,10 +58,12 @@ const CustomerEdit = () => {
     console.log(reports)
 
     // ✅ Find and Convert Report Data in Zustand Store
-    const inspectionData = useMemo(() => {
+    let inspectionData = useMemo(() => {
         const report = reports.find((report) => report.id == id);
         return report ? convertKeysToCamelCase(report) : null;
     }, [reports, id]);
+
+    inspectionData = { ...inspectionData, inspectionDate:inspectionData?.inspectionDate || new Date().toISOString().split("T")[0]}
     
     // // ✅ Fetch Reports If Not Present
     useEffect(() => {
@@ -64,11 +82,30 @@ const CustomerEdit = () => {
             business_name: values.businessName,
             business_type: values.businessType,
             license_number: values.licenseNumber || '',
+        
             violation_found: values.violationFound || [],
             violation_type: values.violationType || [],
             action_taken: values.actionTaken || [],
+        
+            plastic_bags_confiscation: values.plasticBagsConfiscation ?? 0,
+            confiscation_other_plastics: values.confiscationOtherPlastics || {},
+        
             total_confiscation: values.totalConfiscation || 0,
+            other_single_use_items: values.OtherSingleUseItems || [],
+        
+            latitude: values.latitude ?? null,
+            longitude: values.longitude ?? null,
             district: values.district || '',
+        
+            inspection_date: values.inspectionDate || null,
+            fine_amount: values.fineAmount ?? 0,
+            fine_recovery_status: values.fineRecoveryStatus || undefined,
+            fine_recovery_date: values.fineRecoveryDate || null,
+            recovery_amount: values.recoveryAmount ?? 0,
+            de_sealed_date: values.deSealedDate || null,
+            fine_recovery_breakup: values.fineRecoveryBreakup || null,
+            affidavit: values.affidavit || null,  // Assuming it's a file upload
+        
             syncStatus: id ? 'patch' : 'post', // ✅ Mark as "patch" or "post"
         };
 
@@ -108,7 +145,7 @@ const CustomerEdit = () => {
                         newCustomer
                         defaultValues={inspectionData} // ✅ Use constant directly
                         onFormSubmit={handleInspectionReportSubmit}
-                        readOnly={false}
+                        readOnly={id !== null}
                     >
                         <Container>
                             <div className="flex items-center justify-between px-8">

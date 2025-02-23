@@ -18,8 +18,7 @@ const InspectionReportsList = () => {
   const { reports, fetchReports, loading, syncReports } = useInspectionStore(); // ✅ Zustand store
 
   useEffect(() => {
-      syncReports();
-      fetchReports();
+    syncReports().then(() => fetchReports());
   }, []);
 
   // ✅ Define Table Columns
@@ -44,6 +43,17 @@ const InspectionReportsList = () => {
         </a>
       ),
     },
+    {
+      accessorKey: "inspection_date",
+      header: "Inspection Date",
+      size: 200,
+      Cell: ({ row }) => (
+        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
+          {row.original.inspection_date}
+        </a>
+      ),
+    },
+    
     {
       accessorKey: "business_type",
       header: "Business Type",
@@ -97,7 +107,31 @@ const InspectionReportsList = () => {
           <p className="mt-4 text-lg font-medium text-gray-600">Loading data, please wait...</p>
         </div>
       ) : (
-        <MaterialReactTable columns={columns} data={reports} enableColumnResizing enablePagination initialState={{ showColumnFilters: false }} />
+        <MaterialReactTable columns={columns} data={reports} enableColumnResizing enablePagination initialState={{ showColumnFilters: false }} 
+        
+        muiTableHeadCellProps={{
+          sx: {
+              backgroundColor: '#f5f5f5', // Header background
+              fontWeight: 'bold',
+              borderBottom: '2px solid #ccc',
+              textAlign: 'center',
+          },
+      }}
+      muiTableBodyCellProps={{
+          sx: {
+              borderRight: '1px solid #ddd', // Column border
+              padding: '10px',
+          },
+      }}
+      muiTableBodyRowProps={{
+          sx: {
+              '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+              '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+          },
+      }}
+      enableZebraStripes={true}
+        
+        />
       )}
     </div>
   );

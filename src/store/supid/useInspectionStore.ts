@@ -5,15 +5,26 @@ import AxiosBase from "../../services/axios/AxiosBase";
 // ✅ Define Report Type
 interface InspectionReport {
     id: string | number;
-    business_name: string;
-    business_type: string;
-    license_number: string;
-    violation_found: string;
-    violation_type: string;
-    action_taken: string;
-    total_confiscation?: number;
-    district: string;
-    created_at: string;
+    businessName: string;
+    businessType: string;
+    licenseNumber?: string;
+    violationFound?: string[];
+    violationType?: string[];
+    actionTaken?: string[];
+    plasticBagsConfiscation?: number;
+    confiscationOtherPlastics?: Record<string, number>;
+    totalConfiscation?: number;
+    OtherSingleUseItems?: string[];
+    latitude?: number | null;
+    longitude?: number | null;
+    district?: string;
+    inspectionDate: string;
+    fineAmount?: number;
+    fineRecoveryStatus?: "Pending" | "Partial" | "Recovered";
+    fineRecoveryDate?: string;
+    recoveryAmount?: number;
+    deSealedDate?: string;
+    affidavit?: File | null;
     syncStatus?: "post" | "patch"; // Tracks offline edits
 }
 
@@ -87,69 +98,70 @@ const useInspectionStore = create<InspectionStore>()(
             },
 
             // ✅ Sync Offline Updates to Server
-            syncReports: async () => {
-                console.log('sync started:')
-                const { reports } = get();
-                const updatedReports = reports.filter((report) => report.syncStatus);
-            
-                if (updatedReports.length === 0) {
-                    console.log("No unsynced reports. Fetching fresh data...");
-                    // get().fetchReports(); // ✅ Fetch fresh data after sync
-                    return;
-                }
-            
-                for (const report of updatedReports) {
-                    try {
-                        let response;
-                        let requestData = report;
-                        let headers = {}; // ✅ Default to empty headers
-            
-                        // ✅ Convert to FormData if it contains a file
-                        if (report.hasFileUpload) {
-                            const formData = new FormData();
-                            formData.append("id", report.id);
-                            formData.append("business_name", report.businessName);
-                            formData.append("license_number", report.licenseNumber || "");
-                            
-                            if (report.file) {
-                                formData.append("file", report.file);
+                      // ✅ Sync Offline Updates to Server
+                      syncReports: async () => {
+                        console.log("Syncing reports...");
+                        const { reports } = get();
+                        const updatedReports = reports.filter((report) => report.syncStatus);
+        
+                        if (updatedReports.length === 0) {
+                            console.log("No unsynced reports. Fetching fresh data...");
+                            get().fetchReports();
+                            return;
+                        }
+        
+                        for (const report of updatedReports) {
+                            try {
+                                let response;
+                                let requestData: any = report;
+                                let headers = { "Content-Type": "application/json" };
+        
+                                // ✅ Convert to FormData if a file (affidavit) is present
+                                if (report.affidavit) {
+                                    const formData = new FormData();
+                                    Object.keys(report).forEach((key) => {
+                                        if (key === "affidavit" && report.affidavit instanceof File) {
+                                            formData.append(key, report.affidavit);
+                                        } else if (report[key] !== undefined) {
+                                            formData.append(key, String(report[key]));
+                                        }
+                                    });
+                                    requestData = formData;
+                                    headers = { "Content-Type": "multipart/form-data" };
+                                }
+        
+                                // ✅ Post or Patch based on syncStatus
+                                if (report.syncStatus === "post") {
+                                    if (navigator.onLine) {
+                                        response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
+                                        report.id = response.data.id;
+                                    }
+                                } else if (report.syncStatus === "patch") {
+                                    if (navigator.onLine) {
+                                        response = await AxiosBase.patch(
+                                            `/pmc/inspection-report/${report.id}/`,
+                                            requestData,
+                                            { headers }
+                                        );
+                                    }
+                                }
+        
+                                console.log("[✅ Synced]:", response?.status, report.id);
+        
+                                // ✅ Remove syncStatus after syncing
+                                if (navigator.onLine) {
+                                    set((state) => ({
+                                        reports: state.reports.map((r) =>
+                                            r.id === report.id ? { ...r, syncStatus: undefined } : r
+                                        ),
+                                    }));
+                                }
+                            } catch (error) {
+                                console.error("[❌ Sync Failed]:", report.id, error);
                             }
-            
-                            requestData = formData;
-                            headers = { "Content-Type": "multipart/form-data" };
                         }
-            
-                        if (report.syncStatus === "post") {
-                            if(navigator.onLine){
-                                response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
-                                report.id = response.data.id; // Assign new ID
-                            }
-                        } else if (report.syncStatus === "patch") {
-                            if(navigator.onLine){
-                                response = await AxiosBase.patch(
-                                    `/pmc/inspection-report/${report.id}/`,
-                                    requestData,
-                                    { headers }
-                                );
-                        }
-                        }
-            
-                        console.log("[✅ Synced]:", response.status, report.id);
-            
-                        // ✅ Remove syncStatus after syncing
-                       
-                        set((state) => ({
-                            reports: state.reports.map((r) =>
-                                r.id === report.id ? { ...r, syncStatus: undefined } : r
-                            ),
-                        }));
-                
-                    } catch (error) {
-                        console.error("[❌ Sync Failed]:", report.id, error);
-                    }
-                }
-                // useInspectionStore.getState().fetchReports(); // ✅ Now syncs automatically when online
-            },
+        
+                    },
 
             // ✅ Reset Store (Optional)
             resetReports: () => set({ reports: [] }),
