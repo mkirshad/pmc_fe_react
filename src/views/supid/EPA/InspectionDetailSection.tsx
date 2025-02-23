@@ -10,6 +10,7 @@ import OpenLayersLocationPicker from "./OpenLayersLocationPicker";
 import NumericInput from '@/components/shared/NumericInput';
 import AxiosBase from '../../../services/axios/AxiosBase' 
 import { Button } from "@/components/ui/Button";
+import { useSessionUser } from '@/store/authStore';
 
 type InspectionDetailSectionProps = {
     control: any;
@@ -246,9 +247,12 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
     console.log('fineRecoveryBreakup:', defaultValues?.fineRecoveryBreakup)
     
     console.log('readOnly', readOnly)
+    const district_id = useSessionUser((state) => state.user.district_id) || null
+    const district_name = useSessionUser((state) => state.user.district_name) || ''
+    console.log('district_name:', district_name)
     return (
         <Card>
-            <h4 className="mb-6">Inspection Report3</h4>
+            <h4 className="mb-6">Inspection Report - {district_name}</h4>
             
             <div className="grid md:grid-cols-2 gap-4">
 
@@ -729,7 +733,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                     </FormItem> */}
 
                     </div>
-                    </div>
+                </div>
                 )}
             </div>
         </Card>

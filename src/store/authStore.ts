@@ -63,37 +63,49 @@ export const useSessionUser = create<AuthState & AuthAction>()(
                         ...payload,
                     },
                 })),
-            // New action to fetch user groups and store them in authority
+            // Fetch user groups along with district details
             fetchUserGroups: async () => {
                 try {
-                if(navigator.onLine){
-                    const response = await AxiosBase.get('/pmc/user-groups/', {
-                        headers: { 'Content-Type': 'application/json' },
-                    })
-                    const groups = response.data || []
-                    set((state) => ({
-                        user: {
-                            ...state.user,
-                            authority: groups.length > 0? groups.map(group => group.name) : [''], // Assign groups to authority
-                        },
-                    }))
-                }else{
-                    throw new Error("Application is offline. Cannot fetch data.");
-                }
+                    if (navigator.onLine) {
+                        const response = await AxiosBase.get('/pmc/user-groups/', {
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                        const groups = response.data || [];
+                        
+                        // Extract district information from the first group (all groups will have the same district)
+                        const districtInfo = groups.length > 0 ? {
+                            district_id: groups[0].district_id,
+                            district_name: groups[0].district_name,
+                        } : { district_id: null, district_name: '' };
+
+                        set((state) => ({
+                            user: {
+                                ...state.user,
+                                authority: groups.length > 0 ? groups.map(group => group.name) : [''],
+                                district_id: districtInfo.district_id,  // Store district_id
+                                district_name: districtInfo.district_name,  // Store district_name
+                            },
+                        }));
+                    } else {
+                        throw new Error("Application is offline. Cannot fetch data.");
+                    }
                 } catch (error) {
-                    console.error('Error fetching user groups:', error)
+                    console.error('Error fetching user groups:', error);
                     set((state) => ({
                         user: {
                             ...state.user,
-                            authority: [], // Set empty authority on error
+                            authority: [],
+                            district_id: null,  // Reset on error
+                            district_name: '',  // Reset on error
                         },
-                    }))
+                    }));
                 }
-            },    
+            },
         }),
         { name: 'sessionUser', storage: createJSONStorage(() => localStorage) },
     ),
-)
+);
+
 
 export const useToken = () => {
     const storage = getPersistStorage()

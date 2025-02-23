@@ -7,7 +7,7 @@ import {
     PiBagSimpleDuotone
 } from 'react-icons/pi'
 
-import { FaHome, FaChartPie, FaUserPlus, FaTools, FaClipboardList, FaDatabase, FaAddressBook, FaChartLine } from 'react-icons/fa';
+import { FaHome, FaChartPie, FaUserPlus, FaTools, FaClipboardList, FaDatabase, FaAddressBook, FaChartLine, FaUserShield } from 'react-icons/fa';
 import { MdAnalytics, MdDownload, MdOutlineTrackChanges, MdReportProblem, MdDashboard, MdRecycling, MdFactCheck, MdAssignmentTurnedIn } from 'react-icons/md';
 
 export type NavigationIcons = Record<string, JSX.Element>
@@ -32,7 +32,8 @@ const navigationIcon: NavigationIcons = {
     FaChartLine:<FaChartLine/>,
     MdAnalytics:<MdAnalytics/>,
     MdFactCheck:<MdFactCheck/>, 
-    MdAssignmentTurnedIn:<MdAssignmentTurnedIn/>
+    MdAssignmentTurnedIn:<MdAssignmentTurnedIn/>,
+    FaUserShield:<FaUserShield />
 }
 
 export default navigationIcon

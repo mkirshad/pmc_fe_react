@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { TbTrash } from 'react-icons/tb';
 import { BiSave } from 'react-icons/bi';
 import useInspectionStore from '../../../store/supid/useInspectionStore'; // ✅ Zustand Store
+import { useSessionUser } from '@/store/authStore';
 
 // ✅ Helper Function to Convert snake_case to camelCase
 const convertKeysToCamelCase = (data) => {
@@ -72,6 +73,9 @@ const CustomerEdit = () => {
         }
     }, [inspectionData, fetchReports]);
 
+    const district_id = useSessionUser((state) => state.user.district_id) || null
+    const district_name = useSessionUser((state) => state.user.district_name) || ''
+    
     // ✅ Handle Form Submission
     const handleInspectionReportSubmit = async (values) => {
         console.log('Submitting Data:', values);

@@ -126,7 +126,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.collapseMenu.analyticsMenu',
         icon: 'FaTools',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: ['TL', 'DO', 'DEO', 'DG', 'Admin'],
+        authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
         subMenu: [
             {
                 key: 'auth.EPAOperation.ReportViolation',
@@ -135,7 +135,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.ReportViolation',
                 icon: 'MdAssignmentTurnedIn',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
                 subMenu: [],
             },
             {
@@ -145,7 +145,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.AllInspections',
                 icon: 'MdFactCheck',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
                 subMenu: [],
             },
             {
@@ -155,7 +155,17 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'MdDashboard',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
+                subMenu: [],
+            },
+            {
+                key: 'auth.EPAOperation.UserProfile',
+                path: '/auth/EPAOperation/UserProfile',
+                title: 'User Profile - Field Inspectors',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: 'FaUserShield',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['DO'],
                 subMenu: [],
             }
         ],

@@ -4,6 +4,7 @@ import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import useInspectionStore from "../../../store/supid/useInspectionStore"; // ✅ Import Zustand Store
+import { useSessionUser } from '@/store/authStore';
 
 // ✅ Helper Function to Format JSON
 const formatJsonColumn = (jsonData) => {
@@ -16,6 +17,9 @@ const formatJsonColumn = (jsonData) => {
 const InspectionReportsList = () => {
   const navigate = useNavigate();
   const { reports, fetchReports, loading, syncReports } = useInspectionStore(); // ✅ Zustand store
+
+  const district_id = useSessionUser((state) => state.user.district_id) || null
+  const district_name = useSessionUser((state) => state.user.district_name) || ''
 
   useEffect(() => {
     syncReports().then(() => fetchReports());
@@ -99,7 +103,7 @@ const InspectionReportsList = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4">Inspection Reports</h2>
+      <h2 className="text-lg font-bold mb-4">Inspection Reports {district_name!==''?' - ':''} {district_name}</h2>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">

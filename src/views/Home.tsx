@@ -6,6 +6,7 @@ import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
 import Tabs from '@/components/ui/Tabs'
 import { HiOutlineHome, HiOutlineUser, HiOutlinePhone, HiViewList, HiDocumentDownload } from 'react-icons/hi'
+import { useSessionUser } from '@/store/authStore';
 
 const { TabNav, TabList, TabContent } = Tabs
 
@@ -99,6 +100,8 @@ const Home = () => {
         DEO: 'DEO',
         'Download License': 'Download License',
     };
+    const userAuthority = useSessionUser((state) => state.user.authority) || []
+    console.log('user authority:', userAuthority)
     const downloadFile = async () => {
         // Simulate a file download
         const applicantId = selectedRowId; // Replace with the actual applicant ID
