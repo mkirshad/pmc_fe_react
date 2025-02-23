@@ -71,6 +71,28 @@ const InspectionReportsList = () => {
           enableColumnResizing
           enablePagination
           initialState={{ showColumnFilters: false }}
+          
+          muiTableHeadCellProps={{
+              sx: {
+                  backgroundColor: '#f5f5f5', // Header background
+                  fontWeight: 'bold',
+                  borderBottom: '2px solid #ccc',
+                  textAlign: 'center',
+              },
+          }}
+          muiTableBodyCellProps={{
+              sx: {
+                  borderRight: '1px solid #ddd', // Column border
+                  padding: '10px',
+              },
+          }}
+          muiTableBodyRowProps={{
+              sx: {
+                  '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                  '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+              },
+          }}
+          enableZebraStripes={true}
         />
       )}
     </div>
