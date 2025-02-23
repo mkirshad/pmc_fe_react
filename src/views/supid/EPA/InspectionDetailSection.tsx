@@ -27,7 +27,7 @@ const businessTypeList = [
 
 
 const violationTypeList = [
-    { label: 'Plastic shopping/carry bags (having thickness less than 75 micron)', value: 'Plastic shopping/carry bags (having thickness less than 75 micron)' },
+    { label: 'Plastic shopping/carry bags (having thickness less than 75 micron or less than 12 x 16 inch in size)', value: 'Plastic shopping/carry bags (having thickness less than 75 micron)' },
     { label: 'Other Single Use Plastics', value: 'Other Single Use Plastics' },
 ];
 
