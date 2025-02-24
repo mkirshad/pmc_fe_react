@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v174"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v175"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -86,7 +86,7 @@ self.addEventListener("fetch", (event) => {
     const allowedStaticTypes = [".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".woff2", ".woff", ".ttf"];
     const isStaticFile = allowedStaticTypes.some((ext) => requestUrl.pathname.endsWith(ext));
     // console.log('test path name', requestUrl.pathname)
-    if (event.request.method === "PATCH" || event.request.method === "POST"|| event.request.method === "PUT" || requestUrl.pathname.startsWith("/api/pmc/inspection-report/") || requestUrl.pathname.startsWith("api/pmc/media/")) {
+    if (event.request.method === "PATCH" || event.request.method === "POST"|| event.request.method === "PUT" || requestUrl.pathname.startsWith("/api/pmc/inspection-report/") || requestUrl.pathname.startsWith("/api/pmc/media/")) {
             return
     }
 
