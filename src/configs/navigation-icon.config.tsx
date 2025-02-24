@@ -9,6 +9,7 @@ import {
 
 import { FaHome, FaChartPie, FaUserPlus, FaTools, FaClipboardList, FaDatabase, FaAddressBook, FaChartLine, FaUserShield } from 'react-icons/fa';
 import { MdAnalytics, MdDownload, MdOutlineTrackChanges, MdReportProblem, MdDashboard, MdRecycling, MdFactCheck, MdAssignmentTurnedIn } from 'react-icons/md';
+import { HiOutlineUserGroup, HiOutlineUserAdd, HiOutlineDocumentText } from "react-icons/hi";
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -33,7 +34,8 @@ const navigationIcon: NavigationIcons = {
     MdAnalytics:<MdAnalytics/>,
     MdFactCheck:<MdFactCheck/>, 
     MdAssignmentTurnedIn:<MdAssignmentTurnedIn/>,
-    FaUserShield:<FaUserShield />
+    FaUserShield:<FaUserShield />,
+    HiOutlineDocumentText:<HiOutlineDocumentText />
 }
 
 export default navigationIcon

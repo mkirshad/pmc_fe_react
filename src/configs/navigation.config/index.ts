@@ -167,6 +167,16 @@ const navigationConfig: NavigationTree[] = [
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: ['DO'],
                 subMenu: [],
+            },
+            {
+                key: 'auth.EPAOperation.DocumentDashboard',
+                path: '/auth/EPAOperation/DocumentsDashboard',
+                title: 'District Documents Dashboard',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: 'HiOutlineDocumentText',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['DO', 'TL', 'DEO', 'DG', 'Admin'],
+                subMenu: [],
             }
         ],
     },

@@ -36,6 +36,12 @@ export const protectedRoutes: Routes = [
         path: `/auth/EPAOperation/UserProfile`,
         component: lazy(() => import('@/views/supid/EPA/FieldInspectors')),
         authority: [],
+    },
+    {
+        key: 'auth.EPAOperation.DocumentDashboard',
+        path: `/auth/EPAOperation/DocumentsDashboard`,
+        component: lazy(() => import('@/views/supid/EPA/DocumentDashboard')),
+        authority: ['DO', 'TL', 'DEO', 'DG', 'Admin'],
     },    
     {
         key: 'auth.mis.recycling-efficency',

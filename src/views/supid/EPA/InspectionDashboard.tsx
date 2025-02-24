@@ -43,15 +43,26 @@ const InspectionReportsList = () => {
     { accessorKey: "total_firs_registered", header: "Total No. of FIRs registered", size: 200 },
     { accessorKey: "total_premises_sealed", header: "No. of Premises Sealed", size: 200 },
     { accessorKey: "total_complaints_filed", header: "No. of Complaints filed before\nthe Environmental Magistrate", size: 300 },
+    // ✅ New KPIs added
+    { accessorKey: "total_fine_amount", header: "Total Fine Amount (PKR)", size: 200 },
+    { accessorKey: "total_fine_recovered", header: "Total Fine Recovered (PKR)", size: 200 },
+    { accessorKey: "pending_fine_amount", header: "Pending Fine Amount (PKR)", size: 200 },
+
+    { accessorKey: "total_fines_pending", header: "Total Fines Pending", size: 200 },
+    { accessorKey: "total_fines_partial", header: "Total Partially Paid Fines", size: 200 },
+    { accessorKey: "total_fines_recovered", header: "Total Recovered Fines", size: 200 },
+
+    { accessorKey: "total_de_sealed_premises", header: "Total De-Sealed Premises", size: 200 },
+
     {
-      accessorKey: "edit",
-      header: "Actions",
-      size: 100,
-      Cell: ({ row }) => (
-        <IconButton onClick={() => handleEditClick(row.original)}>
-          <EditIcon />
-        </IconButton>
-      ),
+        accessorKey: "edit",
+        header: "Actions",
+        size: 100,
+        Cell: ({ row }) => (
+            <IconButton onClick={() => handleEditClick(row.original)}>
+                <EditIcon />
+            </IconButton>
+        ),
     },
   ];
 
