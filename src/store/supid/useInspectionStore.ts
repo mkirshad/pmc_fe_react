@@ -131,7 +131,7 @@ const useInspectionStore = create<InspectionStore>()(
                                 }
         
                                 // ✅ Post or Patch based on syncStatus
-                                if (report.syncStatus === "post") {
+                                if (report.syncStatus === "post" || String(report.id).startsWith("temp-")) {
                                     if (navigator.onLine) {
                                         response = await AxiosBase.post("/pmc/inspection-report/", requestData, { headers });
                                         report.id = response.data.id;
