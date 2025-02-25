@@ -200,10 +200,9 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
         }
     }, [defaultValues?.OtherSingleUseItems]);
 
-    
     const [selectedLocation, setSelectedLocation] = useState({
-        lat: null,
-        lng: null,
+        lat: defaultValues.latitude,
+        lng: defaultValues.longitude,
         district: "",
       });
     
@@ -250,6 +249,13 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
     const district_id = useSessionUser((state) => state.user.district_id) || null
     const district_name = useSessionUser((state) => state.user.district_name) || ''
     console.log('district_name:', district_name)
+    console.log('location:', defaultValues?.location)
+    console.log('defaultValues:', defaultValues)
+
+    const { latitude, longitude } = defaultValues;
+
+    const savedLocation = latitude && longitude ? { lat: latitude, lng: longitude } : null;
+
     return (
         <Card>
             <h4 className="mb-6">Inspection Report - {district_name}</h4>
@@ -640,7 +646,11 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
             <div style={{ padding: "20px" }}>
                 <h1>Select Location</h1>
-                <OpenLayersLocationPicker onLocationSelect={handleLocationSelect} />
+                <OpenLayersLocationPicker
+                    onLocationSelect={handleLocationSelect}
+                    savedLocation={savedLocation} // Pass saved location if available
+                    isEditing={!!defaultValues?.id} // If ID exists, it’s in edit mode
+                />
 
                 {/* Display Selected Location */}
                 {selectedLocation.lat && selectedLocation.lng && (

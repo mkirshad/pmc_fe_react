@@ -14,24 +14,22 @@ import { Modify } from "ol/interaction";
 import AxiosBase from "../../../services/axios/AxiosBase";
 import { parse } from "terraformer-wkt-parser";
 
-const OpenLayersLocationPicker = ({ onLocationSelect }) => {
+const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [markerFeature, setMarkerFeature] = useState(null);
-  const [district, setDistrict] = useState("Fetching...");
-  const [districtLayer, setDistrictLayer] = useState(null);
   const [location, setLocation] = useState({ lat: null, lng: null });
 
   useEffect(() => {
-    // ✅ Vector Source for district polygons
-    const districtSource = new VectorSource();
-
     const vectorSource = new VectorSource();
+    const initialCoords = savedLocation && isEditing
+      ? fromLonLat([savedLocation.lng, savedLocation.lat]) // Use saved location if editing
+      : fromLonLat([74.3436, 31.5497]); // Default location (Lahore)
+
     const marker = new Feature({
-      geometry: new Point(fromLonLat([74.3436, 31.5497])), // Default location (Lahore)
+      geometry: new Point(initialCoords),
     });
 
-    // ✅ Style for the Marker
     marker.setStyle(
       new Style({
         image: new Circle({
@@ -47,61 +45,45 @@ const OpenLayersLocationPicker = ({ onLocationSelect }) => {
 
     const markerLayer = new VectorLayer({ source: vectorSource });
 
-    // ✅ District Polygon Layer
-    const districtVectorLayer = new VectorLayer({
-      source: districtSource,
-      style: new Style({
-        stroke: new Stroke({ color: "blue", width: 2 }),
-        // fill: new Fill({ color: "rgba(0, 0, 255, 0.1)" }),
-      }),
-    });
-
     const olMap = new Map({
       target: mapRef.current,
       layers: [
         new TileLayer({ source: new OSM() }),
-        districtVectorLayer, // Layer for District Boundaries
-        markerLayer, // Layer for Marker
+        markerLayer,
       ],
       view: new View({
-        center: fromLonLat([74.3436, 31.5497]),
+        center: initialCoords,
         zoom: 12,
       }),
     });
 
     setMap(olMap);
-    setDistrictLayer(districtVectorLayer);
 
-    // ✅ Fetch District Boundaries
-    fetchDistrictBoundaries(districtVectorLayer);
-
-    // ✅ Fetch User's Location
-    getCurrentLocation(olMap, marker);
-
-    // ✅ Allow Marker Dragging
-    const modify = new Modify({ source: vectorSource });
-    olMap.addInteraction(modify);
-
-    modify.on("modifyend", (event) => {
-      const newCoords = event.features.item(0).getGeometry().getCoordinates();
-      const newLonLat = toLonLat(newCoords);
-      setLocation({ lat: newLonLat[1], lng: newLonLat[0] });
-      fetchDistrict(newLonLat[0], newLonLat[1]); // Fetch district based on new marker position
-    });
+    if (!isEditing) {
+      getCurrentLocation(olMap, marker);
+      const modify = new Modify({ source: vectorSource });
+      olMap.addInteraction(modify);
+      modify.on("modifyend", (event) => {
+        const newCoords = event.features.item(0).getGeometry().getCoordinates();
+        const newLonLat = toLonLat(newCoords);
+        setLocation({ lat: newLonLat[1], lng: newLonLat[0] });
+        onLocationSelect({ lat: newLonLat[1], lng: newLonLat[0] });
+      });
+    }
 
     return () => olMap.setTarget(null);
   }, []);
 
-  // 📌 Fetch User's Current Location
   const getCurrentLocation = (olMap, marker) => {
-    if (navigator.geolocation) {
+    if (navigator.geolocation && !isEditing) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const userCoords = fromLonLat([position.coords.longitude, position.coords.latitude]);
           marker.getGeometry().setCoordinates(userCoords);
           olMap.getView().setCenter(userCoords);
           olMap.getView().setZoom(15);
-          fetchDistrict(position.coords.longitude, position.coords.latitude);
+          setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+          onLocationSelect({ lat: position.coords.latitude, lng: position.coords.longitude });
         },
         (error) => console.error("Geolocation error:", error),
         { enableHighAccuracy: true }
@@ -109,78 +91,29 @@ const OpenLayersLocationPicker = ({ onLocationSelect }) => {
     }
   };
 
-  // 📌 Fetch District Name Based on Coordinates
-  const fetchDistrict = async (lon, lat) => {
-    try {
-      onLocationSelect({ lat, lng: lon, district: '' });
-      // const response = await AxiosBase.get(`/pmc/DistrictByLatLon?lat=${lat}&lon=${lon}`);
-      // if (response.data && response.data.district_name) {
-      //   setDistrict(response.data.district_name);
-      //   onLocationSelect({ lat, lng: lon, district: response.data.district_name });
-      // } else {
-      //   setDistrict("District not found");
-      // }
-    } catch (error) {
-      console.error("Error fetching district:", error);
-      setDistrict("Error fetching district");
-    }
-  };
-
-  // 📌 Fetch and Render District Boundaries
-  const fetchDistrictBoundaries = async (districtVectorLayer) => {
-    try {
-      const response = await AxiosBase.get('/pmc/districts-public');
-      const districtData = response.data.filter((d) => d.geom);
-
-      const geoJsonFeatures = districtData.map((district) => ({
-        type: "Feature",
-        geometry: parse(district.geom.replace("SRID=4326;", "")), // Convert WKT to GeoJSON
-        properties: {
-          district_id: district.district_id,
-          district_name: district.district_name,
-        },
-      }));
-
-      const geoJson = { type: "FeatureCollection", features: geoJsonFeatures };
-      const vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(geoJson, { featureProjection: "EPSG:3857" }),
-      });
-
-      districtVectorLayer.setSource(vectorSource);
-    } catch (error) {
-      console.error("Error fetching district boundaries:", error);
-    }
-  };
-
   return (
     <div>
       <div ref={mapRef} style={{ height: "600px", width: "100%" }} />
-
-      {/* ✅ Go to Current Location Button */}
-      <button
-        type="button"
-        onClick={() => getCurrentLocation(map, markerFeature)}
-        style={{
-          marginTop: "10px",
-          padding: "10px",
-          backgroundColor: "#007BFF",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          borderRadius: "5px",
-        }}
-      >
-        📍 Go to Current Location
-      </button>
-
-      {/* ✅ Display location data */}
-      {/* <div className="mt-3">
-        <p><strong>Latitude:</strong> {location.lat || "Fetching..."}</p>
-        <p><strong>Longitude:</strong> {location.lng || "Fetching..."}</p>
-        <p><strong>District:</strong> {district || "Fetching..."}</p>
-      </div> */}
+      {!isEditing && (
+        <button
+          type="button"
+          onClick={() => getCurrentLocation(map, markerFeature)}
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            backgroundColor: "#007BFF",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: "5px",
+          }}
+        >
+          📍 Go to Current Location
+        </button>
+      )}
     </div>
   );
 };
+
 
 export default OpenLayersLocationPicker;

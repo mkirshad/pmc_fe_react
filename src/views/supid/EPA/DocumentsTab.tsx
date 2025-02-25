@@ -96,53 +96,56 @@ const DocumentsTab = () => {
             {/* <h2 className="text-lg font-bold mb-4">Manage Documents for District: {district_name}</h2> */}
 
             {/* ✅ Upload Form with Validation */}
-            <Form onSubmit={handleSubmit(onSubmit)} className="grid md:grid-cols-2 gap-4 mb-4">
+            <Form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 {/* Document Title */}
-                <FormItem label="Document Title" invalid={!!errors.title} errorMessage={errors.title?.message}>
-                    <Controller
-                        name="title"
-                        control={control}
-                        render={({ field }) => <Input {...field} placeholder="Enter document title" />}
-                    />
-                </FormItem>
+                    <FormItem label="Document Title" invalid={!!errors.title} errorMessage={errors.title?.message}>
+                        <Controller
+                            name="title"
+                            control={control}
+                            render={({ field }) => <Input {...field} placeholder="Enter document title" />}
+                        />
+                    </FormItem>
 
-                {/* Document Type */}
-                <FormItem label="Document Type" invalid={!!errors.documentType} errorMessage={errors.documentType?.message}>
-                    <Controller
-                        name="documentType"
-                        control={control}
-                        render={({ field }) => (
-                            <Select
-                                options={[
-                                    { label: "Notification", value: "notification" },
-                                    { label: "Minutes of Meeting", value: "minutes" },
-                                ]}
-                                value={{ label: field.value, value: field.value }}
-                                onChange={(option) => field.onChange(option?.value)}
-                            />
-                        )}
-                    />
-                </FormItem>
+                    {/* Document Type */}
+                    <FormItem label="Document Type" invalid={!!errors.documentType} errorMessage={errors.documentType?.message}>
+                        <Controller
+                            name="documentType"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    options={[
+                                        { label: "Notification", value: "Notification" },
+                                        { label: "Minutes of Meeting", value: "Minutes of Meeting" },
+                                    ]}
+                                    value={{ label: field.value, value: field.value }}
+                                    onChange={(option) => field.onChange(option?.value)}
+                                />
+                            )}
+                        />
+                    </FormItem>
 
-                {/* File Upload */}
-                <FormItem label="Upload File" invalid={!!errors.file} errorMessage={errors.file?.message}>
-                    <Controller
-                        name="file"
-                        control={control}
-                        render={({ field }) => (
-                            <input
-                                type="file"
-                                accept=".pdf,.png,.jpg,.jpeg"
-                                onChange={(e) => field.onChange(e.target.files[0])}
-                            />
-                        )}
-                    />
-                </FormItem>
-
-                {/* Submit Button */}
-                <Button type="submit" variant="solid" disabled={isSubmitting} loading={isSubmitting}>
-                    {isSubmitting ? "Uploading..." : "Upload"}
-                </Button>
+                    {/* File Upload */}
+                    <FormItem label="Upload File" invalid={!!errors.file} errorMessage={errors.file?.message}>
+                        <Controller
+                            name="file"
+                            control={control}
+                            render={({ field }) => (
+                                <input
+                                    type="file"
+                                    accept=".pdf,.png,.jpg,.jpeg"
+                                    onChange={(e) => field.onChange(e.target.files[0])}
+                                />
+                            )}
+                        />
+                    </FormItem>
+                    <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                        {/* Submit Button */}
+                        <Button type="submit" variant="solid" disabled={isSubmitting} loading={isSubmitting}>
+                            {isSubmitting ? "Uploading..." : "Upload"}
+                        </Button>
+                    </div>
+                </div>
             </Form>
 
             {/* ✅ Document List */}
