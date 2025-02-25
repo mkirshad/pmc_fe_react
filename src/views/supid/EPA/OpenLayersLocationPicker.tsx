@@ -4,15 +4,12 @@ import { Map, View } from "ol";
 import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import GeoJSON from "ol/format/GeoJSON";
 import OSM from "ol/source/OSM";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import { fromLonLat, toLonLat } from "ol/proj";
 import { Fill, Stroke, Style, Circle } from "ol/style";
 import { Modify } from "ol/interaction";
-import AxiosBase from "../../../services/axios/AxiosBase";
-import { parse } from "terraformer-wkt-parser";
 
 const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }) => {
   const mapRef = useRef(null);
@@ -60,7 +57,7 @@ const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }
     setMap(olMap);
 
     if (!isEditing) {
-      getCurrentLocation(olMap, marker);
+      getCurrentLocation(olMap, marker); // Ensure fetching location on mount
       const modify = new Modify({ source: vectorSource });
       olMap.addInteraction(modify);
       modify.on("modifyend", (event) => {
@@ -72,10 +69,10 @@ const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }
     }
 
     return () => olMap.setTarget(null);
-  }, []);
+  }, [isEditing, savedLocation]); // Added dependencies to trigger re-execution if needed
 
   const getCurrentLocation = (olMap, marker) => {
-    if (navigator.geolocation && !isEditing) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const userCoords = fromLonLat([position.coords.longitude, position.coords.latitude]);
@@ -94,7 +91,7 @@ const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }
   return (
     <div>
       <div ref={mapRef} style={{ height: "600px", width: "100%" }} />
-      {!isEditing && (
+      {!isEditing && markerFeature && map && (
         <button
           type="button"
           onClick={() => getCurrentLocation(map, markerFeature)}
@@ -114,6 +111,5 @@ const OpenLayersLocationPicker = ({ onLocationSelect, savedLocation, isEditing }
     </div>
   );
 };
-
 
 export default OpenLayersLocationPicker;
