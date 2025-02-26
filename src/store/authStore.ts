@@ -86,9 +86,7 @@ export const useSessionUser = create<AuthState & AuthAction>()(
                                 district_name: districtInfo.district_name,  // Store district_name
                             },
                         }));
-                    } else {
-                        throw new Error("Application is offline. Cannot fetch data.");
-                    }
+                    } 
                 } catch (error) {
                     console.error('Error fetching user groups:', error);
                     set((state) => ({
