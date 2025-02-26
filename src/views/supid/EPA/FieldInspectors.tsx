@@ -56,7 +56,7 @@ const Dashboard = () => {
 
     const handleResetUserForm = () => {
         setSelectedUser(null);
-        setActiveTab("tab1"); // ✅ Switch back to List Inspectors (Triggers Refetch)
+        // setActiveTab("tab1"); // ✅ Switch back to List Inspectors (Triggers Refetch)
     };
 
 
