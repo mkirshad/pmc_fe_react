@@ -12,6 +12,8 @@ import Select from "@/components/ui/Select";
 import { Form, FormItem } from "@/components/ui/Form";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaUpload } from "react-icons/fa";
+import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
+import { IconButton, Tooltip } from "@mui/material";
 
 
 const documentSchema = z.object({
@@ -92,13 +94,38 @@ const DocumentsTab = () => {
         {
             accessorKey: "file",
             header: "Download",
-            size: 100,
-            Cell: ({ row }) => (
-                <a href={row.original.file} target="_blank" rel="noopener noreferrer" className="text-blue-600">
-                    Download
-                </a>
-            ),
-        },
+            size: 80, // Reduced size for better UI balance
+            Cell: ({ row }) => {
+              const handleDownload = () => {
+                if (!row.original.document) {
+                  alert("File not available!");
+                  return;
+                }
+                window.open(row.original.document, "_blank", "noopener,noreferrer");
+              };
+          
+              return (
+                <Tooltip title="Download Document">
+                  <IconButton
+                    onClick={handleDownload}
+                    sx={{
+                      background: "linear-gradient(135deg, #007BFF, #0056b3)", // VIP Blue Gradient
+                      color: "#fff",
+                      padding: "6px", // Smaller padding for compact look
+                      borderRadius: "8px", // Slightly rounded edges
+                      transition: "0.3s ease-in-out",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #0056b3, #007BFF)", // Reversed hover effect
+                        transform: "scale(1.05)", // Slight hover scale
+                      },
+                    }}
+                  >
+                    <DownloadForOfflineIcon fontSize="medium" /> {/* Made icon smaller */}
+                  </IconButton>
+                </Tooltip>
+              );
+            },
+          }
     ];
 
     return (
@@ -192,7 +219,34 @@ const DocumentsTab = () => {
             </Form>
 
             {/* ✅ Document List */}
-            {loading ? <p>Loading documents...</p> : <MaterialReactTable columns={columns} data={documents} enablePagination />}
+            {loading ? <p>Loading documents...</p> : 
+            <
+                MaterialReactTable columns={columns} data={documents} enablePagination 
+                
+                        
+                muiTableHeadCellProps={{
+                    sx: {
+                        backgroundColor: '#f5f5f5', // Header background
+                        fontWeight: 'bold',
+                        borderBottom: '2px solid #ccc',
+                        textAlign: 'center',
+                    },
+                }}
+                muiTableBodyCellProps={{
+                    sx: {
+                        borderRight: '1px solid #ddd', // Column border
+                        padding: '10px',
+                    },
+                }}
+                muiTableBodyRowProps={{
+                    sx: {
+                        '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                        '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+                    },
+                }}
+
+                />
+            }
         </Card>
     );
 };

@@ -26,15 +26,19 @@ const InspectionReportsList = () => {
   }, []);
 
   // ✅ Define Table Columns
+  // Define Table Columns
   const columns = [
     {
       accessorKey: "id",
       header: "ID",
       size: 50,
       Cell: ({ row }) => (
-        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
+        <span
+          onClick={() => handleEditClick(row.original)}
+          className="text-blue-500 underline cursor-pointer"
+        >
           {row.original.id}
-        </a>
+        </span>
       ),
     },
     {
@@ -42,9 +46,20 @@ const InspectionReportsList = () => {
       header: "Business Name",
       size: 200,
       Cell: ({ row }) => (
-        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
-          {row.original.business_name}
-        </a>
+        <div className="flex items-center">
+          <span
+            onClick={() => handleEditClick(row.original)}
+            className="text-blue-500 underline cursor-pointer mr-2"
+          >
+            {row.original.business_name}
+          </span>
+          <IconButton
+            size="small"
+            onClick={() => handleEditClick(row.original)}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </div>
       ),
     },
     {
@@ -52,20 +67,25 @@ const InspectionReportsList = () => {
       header: "Inspection Date",
       size: 200,
       Cell: ({ row }) => (
-        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
+        <span
+          onClick={() => handleEditClick(row.original)}
+          className="text-blue-500 underline cursor-pointer"
+        >
           {row.original.inspection_date}
-        </a>
+        </span>
       ),
     },
-    
     {
       accessorKey: "business_type",
       header: "Business Type",
       size: 150,
       Cell: ({ row }) => (
-        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
+        <span
+          onClick={() => handleEditClick(row.original)}
+          className="text-blue-500 underline cursor-pointer"
+        >
           {row.original.business_type}
-        </a>
+        </span>
       ),
     },
     {
@@ -73,14 +93,32 @@ const InspectionReportsList = () => {
       header: "License Number",
       size: 150,
       Cell: ({ row }) => (
-        <a href={`/auth/EPAOperations/ReportViolation?id=${row.original.id}`} className="text-blue-500 underline">
+        <span
+          onClick={() => handleEditClick(row.original)}
+          className="text-blue-500 underline cursor-pointer"
+        >
           {row.original.license_number}
-        </a>
+        </span>
       ),
     },
-    { accessorKey: "violation_found", header: "Violation Found", size: 80, Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre> },
-    { accessorKey: "violation_type", header: "Violation Type", size: 400, Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre> },
-    { accessorKey: "action_taken", header: "Action Taken", size: 400, Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre> },
+    {
+      accessorKey: "violation_found",
+      header: "Violation Found",
+      size: 80,
+      Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre>,
+    },
+    {
+      accessorKey: "violation_type",
+      header: "Violation Type",
+      size: 400,
+      Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre>,
+    },
+    {
+      accessorKey: "action_taken",
+      header: "Action Taken",
+      size: 400,
+      Cell: ({ cell }) => <pre>{formatJsonColumn(cell.getValue())}</pre>,
+    },
     { accessorKey: "total_confiscation", header: "Total Confiscation (KG)", size: 200 },
     { accessorKey: "district", header: "District", size: 150 },
     { accessorKey: "created_at", header: "Created At", size: 200 },
