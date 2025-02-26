@@ -116,7 +116,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
     
     useEffect(() => {
-        AxiosBase.get('/pmc/inspection-report/all_other_single_use_plastics/')
+        AxiosBase.get('/pmc/inspection-report-cached/all_other_single_use_plastics/')
             .then(response => {
                 // console.log("API Response:", response.data); // Log entire API response
                 setOptions(response.data.single_use_plastic_items || []); // Ensure it's always an array
