@@ -139,6 +139,8 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
         }
     }, [defaultValues?.fineRecoveryBreakup]);
     
+ 
+    
    // ✅ Watches Fine Amount
    const fineAmount = useWatch({ control, name: "fineAmount", defaultValue: 0 });
 
@@ -206,12 +208,23 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
         district: "",
       });
     
-    const handleLocationSelect = (locationData) => {
-    // console.log("Selected Location:", locationData);
-    setSelectedLocation(locationData); // Store the selected location
-    // console.log(selectedLocation)
+      const handleLocationSelect = (locationData) => {
+        console.log("Selected Location:", locationData);
+        
+        if (!locationData.lat || !locationData.lng) {
+            console.warn("Latitude or Longitude is missing, retrying...");
+        }
+    
+        setSelectedLocation({
+            lat: locationData.lat || selectedLocation.lat,  // Preserve previous valid lat
+            lng: locationData.lng || selectedLocation.lng,  // Preserve previous valid lng
+            district: locationData.district || selectedLocation.district,
+        });
     };
 
+
+
+    
      // This method is reused from your Banner for backspace handling
      const handleKeyDown = (e) => {
         if (e.key === 'Backspace') {
@@ -256,6 +269,24 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
     const savedLocation = latitude && longitude ? { lat: latitude, lng: longitude } : null;
 
+    useEffect(() => {
+        const retryFetchingLocation = () => {
+            if (!selectedLocation.lat || !selectedLocation.lng) {
+                console.log("Retrying location fetch...");
+    
+                // Check if there's a previously saved location
+                if (savedLocation) {
+                    setSelectedLocation(savedLocation);
+                } else {
+                    console.warn("No valid location found, please select again.");
+                }
+            }
+        };
+    
+        const interval = setInterval(retryFetchingLocation, 2000); // Retry every 2 seconds
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, [selectedLocation.lat, selectedLocation.lng, savedLocation]);
+    
     return (
         <Card>
             <h4 className="mb-6">Inspection Report - {district_name}</h4>
@@ -665,8 +696,11 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             control={control}
                             render={({ field }) => {
                                 useEffect(() => {
-                                    field.onChange(selectedLocation.lat); // ✅ Update form state when selectedLocation.lat changes
-                                }, [selectedLocation.lat]); // Reactively updates
+                                    if (!selectedLocation.lat) {
+                                        console.warn("Latitude is missing, setting default...");
+                                    }
+                                    field.onChange(selectedLocation.lat || 0); // Ensure default value
+                                }, [selectedLocation.lat]);
 
                                 return (
                                     <Input
@@ -686,8 +720,11 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             control={control}
                             render={({ field }) => {
                                 useEffect(() => {
-                                    field.onChange(selectedLocation.lng); // ✅ Update form state when selectedLocation.lng changes
-                                }, [selectedLocation.lng]); 
+                                    if (!selectedLocation.lng) {
+                                        console.warn("Longitude is missing, setting default...");
+                                    }
+                                    field.onChange(selectedLocation.lng || 0); // Ensure default value
+                                }, [selectedLocation.lng]);
 
                                 return (
                                     <Input
@@ -700,6 +737,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                             }}
                         />
                     </FormItem>
+
 
                     <Controller
                         name="fineRecoveryBreakup"
