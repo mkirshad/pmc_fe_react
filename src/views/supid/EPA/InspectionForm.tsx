@@ -37,9 +37,10 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
 
         OtherSingleUseItems: z.array(z.string()).optional(),
 
-        // ✅ Directly adding latitude, longitude, and district
-        latitude: z.coerce.number().nullable(),
-        longitude: z.coerce.number().nullable(),
+        // ✅ Make `latitude` and `longitude` required
+        latitude: z.coerce.number().min(-90, { message: "Latitude is required and must be valid (-90 to 90)" }),
+        longitude: z.coerce.number().min(-180, { message: "Longitude is required and must be valid (-180 to 180)" }),
+        
         district: z.string().optional(),
 
         // ✅ New Fields Added for Validation

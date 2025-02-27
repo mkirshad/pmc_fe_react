@@ -286,7 +286,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
         const interval = setInterval(retryFetchingLocation, 2000); // Retry every 2 seconds
         return () => clearInterval(interval); // Cleanup on unmount
     }, [selectedLocation.lat, selectedLocation.lng, savedLocation]);
-    
+
     return (
         <Card>
             <h4 className="mb-6">Inspection Report - {district_name}</h4>
@@ -684,13 +684,16 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                 />
 
                 {/* Display Selected Location */}
-                {selectedLocation.lat && selectedLocation.lng && (
+                {(
                     
                     <div style={{ marginTop: "20px", padding: "10px", border: "1px solid #ccc" }}  >
                     <h3>Selected Location Details:</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                     
-                    <FormItem label="Latitude">
+                    <FormItem label="Latitude"
+                    invalid={Boolean(errors.latitude)}
+                    errorMessage={errors.latitude?.message}
+                    >
                         <Controller
                             name="latitude"
                             control={control}
@@ -714,7 +717,10 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                         />
                     </FormItem>
 
-                    <FormItem label="Longitude">
+                    <FormItem label="Longitude"
+                        invalid={Boolean(errors.longitude)}
+                        errorMessage={errors.longitude?.message}
+                    >
                         <Controller
                             name="longitude"
                             control={control}
