@@ -4,6 +4,7 @@ import AxiosBase from '../services/axios/AxiosBase';
 import { Link } from 'react-router-dom'; // For navigation
 import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
+import { AiOutlineFileExcel } from "react-icons/ai"; // Using a relevant Excel icon
 
 // Utility function to flatten nested objects and handle null values
 // Utility function to flatten nested objects and handle remarks
@@ -360,6 +361,24 @@ const Home = () => {
 
 console.log('selectedRowId:', selectedRowId)
 console.log(selectedRowId)
+const handleExport = async () => {
+    try {
+    const response = await AxiosBase.post(
+        "/pmc/export-applicant/",
+        { applicant_ids: flattenedData?.map((row) => row.id) },
+        { responseType: "blob" }
+    );
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Applicant_Details_${new Date().toISOString()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    } catch (error) {
+    console.error("Export failed:", error);
+    }
+};
     return (
         <div>
                 {/* Display Tiles */}
@@ -389,6 +408,24 @@ console.log(selectedRowId)
 </div>
 
         ) : (
+            <>
+                        <div className="grid md:grid-cols-5 gap-5 items-center mb-4">
+                            {/* Left-aligned warning message */}
+                            <h6 className="text-red-500 col-span-3">
+                                Records highlighted in red require immediate attention, as they have been returned from a next step.
+                            </h6>
+                            <span></span>
+                            {/* Right-aligned Export button with icon */}
+                            <button
+                                type="button"
+                                onClick={handleExport}
+                                className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
+                            >
+                                <AiOutlineFileExcel className="mr-2 text-xl" />
+                                Export to Excel
+                            </button>
+                        </div>
+                        
             <MaterialReactTable
                     key={selectedRowId} // Force re-render when selectedRowId changes
                     columns={[
@@ -414,6 +451,7 @@ console.log(selectedRowId)
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting
                 />
+                </>
                 )}
         </div>
     );
