@@ -173,37 +173,59 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
               .filter(category => category !== 'Unknown')
           ));
 
-          const series = categories.map(category => {
-            const dataPoints = districts.map(district => {
-              const record = respons.data.district_data.find(item => item.registration_for === category && item.businessprofile__district__district_name === district);
-              return record ? record.count : 0;
-            });
-            return { name: category, data: dataPoints };
-          });
-
-          setChartData({
-            series: series,
-            options: {
-              chart: {
-                type: 'bar',
-                height: 550,
-                stacked: true,
-                events: {
-                  dataPointSelection: (event, chartContext, config) => {
-                    const { seriesIndex, dataPointIndex } = config;
-                    const seriesName = series[seriesIndex].name;
-                    const category = districts[dataPointIndex];
-                    showStatistics(seriesName, category);
-                    console.log(`Series: ${seriesName}, Category: ${category}`);
-                  },
-                },
-              },
-              title: { text: 'Applications by Category and District' },
-              xaxis: { categories: districts },
-              legend: { position: 'right' },
-              plotOptions: { bar: { horizontal: false, borderRadius: 5 } },
-              colors: ['#F97316', '#3B82F6', '#22C55E', '#EAB308'],
+          const series = [
+            {
+                name: "Producer",
+                data: districts.map(district => {
+                    const record = district_data.find(item => item.registration_for === "Producer" && item.businessprofile__district__district_name === district);
+                    return record ? record.count : 0;
+                }),
             },
+            {
+                name: "Consumer",
+                data: districts.map(district => {
+                    const record = district_data.find(item => item.registration_for === "Consumer" && item.businessprofile__district__district_name === district);
+                    return record ? record.count : 0;
+                }),
+            },
+            {
+                name: "Collector",
+                data: districts.map(district => {
+                    const record = district_data.find(item => item.registration_for === "Collector" && item.businessprofile__district__district_name === district);
+                    return record ? record.count : 0;
+                }),
+            },
+            {
+                name: "Recycler",
+                data: districts.map(district => {
+                    const record = district_data.find(item => item.registration_for === "Recycler" && item.businessprofile__district__district_name === district);
+                    return record ? record.count : 0;
+                }),
+            },
+        ];
+        
+          setChartData({
+              series: series,
+              options: {
+                  chart: {
+                      type: "bar",
+                      height: 550,
+                      stacked: true,
+                      events: {
+                          dataPointSelection: (event, chartContext, config) => {
+                              const { seriesIndex, dataPointIndex } = config;
+                              const seriesName = series[seriesIndex].name;
+                              const category = districts[dataPointIndex];
+                              showStatistics(seriesName, category);
+                          },
+                      },
+                  },
+                  title: { text: "Applications by Category and District" },
+                  xaxis: { categories: districts },
+                  legend: { position: "right" },
+                  plotOptions: { bar: { horizontal: false, borderRadius: 5 } },
+                  colors: ["#F97316", "#3B82F6", "#EAB308", "#22C55E"], // Ensuring correct colors
+              },
           });
           setTilesData(dynamicTiles);
           
@@ -397,7 +419,7 @@ export const KPIDashboardBase: React.FC<BaseKPIDashboardProps> = ({
         text: 'All Stack Holders',
       },
       xaxis: {
-        categories: ['Producers', 'Consumers', 'Recyclers', 'Collectors'],
+        categories: ['Producers', 'Consumers', 'Collectors', 'Recyclers'],
         labels:
         {
           formatter: (val) => `${val}`,
