@@ -41,18 +41,6 @@ console.log('id is:', id)
     const [thankYouPopupType, setTankYouPopupType ] = useState("success");
 
     const onChange = (nextStep: number) => {
-        
-
-        
-        // if (nextStep === 4){
-        //     setStep(6)
-        //     return
-        // }
-        // if (nextStep === 5){
-        //     setStep(2)
-        //     return
-        // }
-
         if (nextStep < 0) {
             setStep(0)
         } else if (nextStep > 6) {
@@ -60,6 +48,12 @@ console.log('id is:', id)
         } else {
             setStep(nextStep)
         }
+
+        // Scroll to top when navigating
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth", // Smooth scrolling effect
+        });
     }
     
     const onNext = () => onChange(step + 1)
@@ -1037,10 +1031,22 @@ const LicenseDetailFormData = getValuesFromLicenseDetail()
                 navigate("/home"); // Redirect to home after closing the popup
             }
         };
+
+const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Default: Mobile if width < 768px
+
+useEffect(() => {
+    const handleResize = () => {
+        setIsMobile(window.innerWidth < 768); // Update state on window resize
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+}, []);
+
     return (
         <>
 
-<Steps current={step} className='mb-5'>
+<Steps current={step} className='mb-5' vertical={isMobile}>
             <Steps.Item title="Applicant Detail" />
             <Steps.Item title="Business Detail" />
             <Steps.Item title="License Detail" />
