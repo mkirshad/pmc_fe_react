@@ -16,7 +16,7 @@ import {
     LOGO_X_GUTTER,
 } from '@/constants/theme.constant'
 import type { Mode } from '@/@types/theme'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 type SideNavProps = {
     translationSetup?: boolean
@@ -24,16 +24,6 @@ type SideNavProps = {
     className?: string
     contentClass?: string
     mode?: Mode
-}
-
-const sideNavStyle = {
-    width: SIDE_NAV_WIDTH,
-    minWidth: SIDE_NAV_WIDTH,
-}
-
-const sideNavCollapseStyle = {
-    width: SIDE_NAV_COLLAPSED_WIDTH,
-    minWidth: SIDE_NAV_COLLAPSED_WIDTH,
 }
 
 const SideNav = ({
@@ -45,33 +35,47 @@ const SideNav = ({
 }: SideNavProps) => {
     const defaultMode = useThemeStore((state) => state.mode)
     const direction = useThemeStore((state) => state.direction)
-    const sideNavCollapse = useThemeStore(
-        (state) => state.layout.sideNavCollapse,
-    )
+    
+    // Remove state from theme store and use local state for hover effect
+    const [isHovered, setIsHovered] = useState(false)
+    const [isDelayedHovered, setDelayedIsHovered] = useState(false)
+    
 
     const currentRouteKey = useRouteKeyStore((state) => state.currentRouteKey)
-
     const userAuthority = useSessionUser((state) => state.user.authority)
-
     const fetchUserGroups = useSessionUser((state) => state.fetchUserGroups)
-console.log('its here kkj')
+
     useEffect(() => {
-        console.log('userAuthority',userAuthority)
-        // if (!userAuthority || userAuthority.length === 0) {
-            fetchUserGroups() // Fetch user groups if userAuthority is empty
-        // }
+        console.log('userAuthority', userAuthority)
+        fetchUserGroups() // Fetch user groups if needed
     }, [])
+
+
+    
 
     return (
         <div
-            style={sideNavCollapse ? sideNavCollapseStyle : sideNavStyle}
+            style={{
+                width: isHovered ? SIDE_NAV_WIDTH : SIDE_NAV_COLLAPSED_WIDTH,
+                minWidth: isHovered ? SIDE_NAV_WIDTH : SIDE_NAV_COLLAPSED_WIDTH,
+                transition: 'width 0.3s ease-in-out',
+            }}
             className={classNames(
                 'side-nav',
                 background && 'side-nav-bg',
-                !sideNavCollapse && 'side-nav-expand',
+                isHovered && 'side-nav-expand',
                 className,
             )}
+            onMouseEnter={() => {
+                setIsHovered(true);
+                setTimeout(() => setDelayedIsHovered(true), 1);
+            }}
+            onMouseLeave={() => {
+                setIsHovered(false);
+                setTimeout(() => setDelayedIsHovered(false), 1);
+            }}
         >
+            {/* Logo */}
             <Link
                 to={appConfig.authenticatedEntryPath}
                 className="side-nav-header flex flex-col justify-center"
@@ -80,25 +84,26 @@ console.log('its here kkj')
                 <Logo
                     imgClass="max-h-10"
                     mode={mode || defaultMode}
-                    type={sideNavCollapse ? 'streamline' : 'full'}
+                    type={isHovered ? 'full' : 'streamline'}
                     className={classNames(
-                        sideNavCollapse && 'ltr:ml-[11.5px] ltr:mr-[11.5px]',
-                        sideNavCollapse
-                            ? SIDE_NAV_CONTENT_GUTTER
-                            : LOGO_X_GUTTER,
+                        isHovered ? LOGO_X_GUTTER : SIDE_NAV_CONTENT_GUTTER
                     )}
                 />
             </Link>
+
+            {/* Navigation Content */}
             <div className={classNames('side-nav-content', contentClass)}>
                 <ScrollBar style={{ height: '100%' }} direction={direction}>
+                    {(isHovered === isDelayedHovered) && 
                     <VerticalMenuContent
-                        collapsed={sideNavCollapse}
+                        collapsed={!isHovered}
                         navigationTree={navigationConfig}
                         routeKey={currentRouteKey}
                         direction={direction}
                         translationSetup={translationSetup}
                         userAuthority={userAuthority || []}
                     />
+                    }
                 </ScrollBar>
             </div>
         </div>
