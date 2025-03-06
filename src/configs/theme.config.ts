@@ -24,7 +24,7 @@ export const themeConfig: ThemeConfig = {
     panelExpand: false,
     controlSize: 'md',
     layout: {
-        type: THEME_ENUM.LAYOUT_TOP_BAR_CLASSIC,
+        type: THEME_ENUM.LAYOUT_COLLAPSIBLE_SIDE,
         sideNavCollapse: false,
     },
 }

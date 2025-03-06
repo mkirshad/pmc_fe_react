@@ -35,7 +35,7 @@ const ThemeConfigurator = ({ callBackClose }: ThemeConfiguratorProps) => {
                     <LayoutSwitcher />
                 </div>
             </div>
-            <CopyButton />
+            {/* <CopyButton /> */}
         </div>
     )
 }
