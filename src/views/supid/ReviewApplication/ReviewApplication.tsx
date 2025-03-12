@@ -288,7 +288,7 @@ const handleChangeManualFields = (fieldName, value) => {
     number_of_machines: "Number of machines",
     total_capacity_value: "Average Production Capacity (Kg per day)",
     date_of_setting_up: "Date of Business Setting Up",
-    total_waste_generated_value: "Averrage Waste Generated (Kg per day)",
+    total_waste_generated_value: "Average Waste Generated (Kg per day)",
     has_waste_storage_capacity: "Has Waste Storage Capacity?",
     waste_disposal_provision: "Waste Disposal Provision",
 

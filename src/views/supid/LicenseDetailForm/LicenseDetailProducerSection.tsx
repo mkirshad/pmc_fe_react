@@ -378,7 +378,7 @@ const parseDate = (dateString) => {
 
                 {/* Total Waste Generated Value */}
                 <FormItem
-                    label="Averrage Waste Generated (Kg per day)"
+                    label="Average Waste Generated (Kg per day)"
                     invalid={Boolean(errors.total_waste_generated_value)}
                     errorMessage={errors.total_waste_generated_value?.message}
                 >
