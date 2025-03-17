@@ -20,7 +20,7 @@ const ClubDirectory = () => {
   const [clubLayer, setClubLayer] = useState(null);
   const [clubs, setClubs] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [districtData, setDistrictData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Initialize Map
   useEffect(() => {
@@ -43,30 +43,30 @@ const ClubDirectory = () => {
     return () => map.setTarget(null);
   }, []);
 
-  // Fetch districts once
+  // Fetch and display districts once
   useEffect(() => {
+    if (!districtLayer || !mapInstance) return;
+
     const fetchDistricts = async () => {
+      setLoading(true);
       try {
         const res = await AxiosBase.get('/pmc/idm_districts-club-counts/');
-        setDistrictData(res.data);
         const vectorSource = new VectorSource({
           features: new GeoJSON().readFeatures(res.data, { featureProjection: 'EPSG:3857' }),
         });
-
         districtLayer.setSource(vectorSource);
-
         mapInstance.getView().fit(vectorSource.getExtent(), { padding: [50, 50, 50, 50], duration: 500 });
       } catch (error) {
         console.error('Error fetching districts:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (districtLayer && mapInstance) {
-      fetchDistricts();
-    }
+    fetchDistricts();
   }, [districtLayer, mapInstance]);
 
-  // District style
+  // District styling with selection
   useEffect(() => {
     if (!districtLayer) return;
 
@@ -74,7 +74,7 @@ const ClubDirectory = () => {
       const isSelected = feature.get('id') === selectedDistrict;
       return new Style({
         stroke: new Stroke({ color: isSelected ? 'red' : 'blue', width: isSelected ? 3 : 2 }),
-        fill: new Fill({ color: isSelected ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 0, 255, 0.1)' }),
+        fill: new Fill({ color: isSelected ? 'rgba(255,0,0,0.1)' : 'rgba(0,0,255,0.1)' }),
         text: new Text({
           text: `${feature.get('name')} (${feature.get('club_count')})`,
           font: '12px sans-serif',
@@ -85,7 +85,7 @@ const ClubDirectory = () => {
     });
   }, [districtLayer, selectedDistrict]);
 
-  // Fetch clubs
+  // Fetch clubs once
   useEffect(() => {
     const fetchClubs = async () => {
       const res = await AxiosBase.get('/pmc/idm_clubs_geojson_all/');
@@ -97,7 +97,6 @@ const ClubDirectory = () => {
   // Display club points
   useEffect(() => {
     if (!clubLayer) return;
-
     const source = clubLayer.getSource();
     source.clear();
 
@@ -105,30 +104,32 @@ const ClubDirectory = () => {
       const coords = fromLonLat(club.geometry.coordinates);
       const feature = new Feature({ geometry: new Point(coords) });
       feature.setStyle(new Style({
-        image: new CircleStyle({ radius: 5, fill: new Fill({ color: '#22C55E' }), stroke: new Stroke({ color: '#fff', width: 1 }) }),
+        image: new CircleStyle({
+          radius: 5,
+          fill: new Fill({ color: '#22C55E' }),
+          stroke: new Stroke({ color: '#fff', width: 1 }),
+        }),
       }));
       source.addFeature(feature);
     });
   }, [clubLayer, clubs]);
 
-  // Map click handler
+  // Handle map click for district selection
   useEffect(() => {
     if (!mapInstance || !districtLayer) return;
 
     const handleMapClick = (event) => {
       const features = mapInstance.getFeaturesAtPixel(event.pixel);
-
       if (features.length > 0) {
         const selectedFeature = features[0];
         const districtId = selectedFeature.get('id');
-
         if (selectedDistrict === districtId) {
           setSelectedDistrict(null);
           mapInstance.getView().setCenter([8127130, 3658593]);
           mapInstance.getView().setZoom(7);
         } else {
           setSelectedDistrict(districtId);
-          mapInstance.getView().fit(selectedFeature.getGeometry().getExtent(), { padding: [50, 50, 50, 50], maxZoom: 10 });
+          mapInstance.getView().fit(selectedFeature.getGeometry().getExtent(), { padding: [50,50,50,50], maxZoom: 10 });
         }
       } else {
         setSelectedDistrict(null);
@@ -154,7 +155,15 @@ const ClubDirectory = () => {
 
   return (
     <div className="flex flex-row p-4 gap-4">
-      <div ref={mapRef} className="w-1/2" style={{ height: '850px' }} />
+      <div className="relative w-1/2">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        )}
+        <div ref={mapRef} style={{ height: '850px' }} />
+      </div>
+
       <div style={{ flex: 1 }}>
         <MaterialReactTable
           columns={columns}
