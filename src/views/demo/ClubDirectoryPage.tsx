@@ -12,7 +12,7 @@ import ClubDirectory from '@/views/demo/ClubDirectory'; // Adjust the path as ne
 const ClubDirectoryPage = () => {
     const headerText = <h6 className="header-text">
         <span className="font-bold">Management Information System</span>
-        <span className="text-sm ml-2">Environmental Educational Club Directory</span>
+        <span className="text-sm ml-2">Educational Environmental Club Directory</span>
       </h6>
   
     return (

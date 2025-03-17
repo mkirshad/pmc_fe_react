@@ -6,7 +6,10 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import OSM from 'ol/source/OSM';
-import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Fill, Stroke, Style, Text, Circle as CircleStyle } from 'ol/style';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { fromLonLat } from 'ol/proj';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { MaterialReactTable } from 'material-react-table';
 
@@ -14,10 +17,10 @@ const ClubDirectory = () => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [districtLayer, setDistrictLayer] = useState(null);
+  const [clubLayer, setClubLayer] = useState(null);
   const [clubs, setClubs] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [districtData, setDistrictData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Initialize Map
   useEffect(() => {
@@ -28,9 +31,13 @@ const ClubDirectory = () => {
     });
 
     const districtVecLayer = new VectorLayer({ source: new VectorSource() });
+    const clubsVecLayer = new VectorLayer({ source: new VectorSource() });
+
     map.addLayer(districtVecLayer);
+    map.addLayer(clubsVecLayer);
 
     setDistrictLayer(districtVecLayer);
+    setClubLayer(clubsVecLayer);
     setMapInstance(map);
 
     return () => map.setTarget(null);
@@ -39,7 +46,6 @@ const ClubDirectory = () => {
   // Fetch districts once
   useEffect(() => {
     const fetchDistricts = async () => {
-      setLoading(true);
       try {
         const res = await AxiosBase.get('/pmc/idm_districts-club-counts/');
         setDistrictData(res.data);
@@ -52,9 +58,6 @@ const ClubDirectory = () => {
         mapInstance.getView().fit(vectorSource.getExtent(), { padding: [50, 50, 50, 50], duration: 500 });
       } catch (error) {
         console.error('Error fetching districts:', error);
-      }
-      finally {
-        setLoading(false);
       }
     };
 
@@ -91,6 +94,23 @@ const ClubDirectory = () => {
     fetchClubs();
   }, []);
 
+  // Display club points
+  useEffect(() => {
+    if (!clubLayer) return;
+
+    const source = clubLayer.getSource();
+    source.clear();
+
+    clubs.forEach((club) => {
+      const coords = fromLonLat(club.geometry.coordinates);
+      const feature = new Feature({ geometry: new Point(coords) });
+      feature.setStyle(new Style({
+        image: new CircleStyle({ radius: 5, fill: new Fill({ color: '#22C55E' }), stroke: new Stroke({ color: '#fff', width: 1 }) }),
+      }));
+      source.addFeature(feature);
+    });
+  }, [clubLayer, clubs]);
+
   // Map click handler
   useEffect(() => {
     if (!mapInstance || !districtLayer) return;
@@ -121,10 +141,9 @@ const ClubDirectory = () => {
     return () => mapInstance.un('click', handleMapClick);
   }, [mapInstance, districtLayer, selectedDistrict]);
 
-  const filteredClubs = useMemo(() => {
-    if (!selectedDistrict) return clubs;
-    return clubs.filter((c) => c.properties.district_id === selectedDistrict);
-  }, [selectedDistrict, clubs]);
+  const filteredClubs = useMemo(() => (
+    selectedDistrict ? clubs.filter((c) => c.properties.district_id === selectedDistrict) : clubs
+  ), [selectedDistrict, clubs]);
 
   const columns = useMemo(() => [
     { accessorKey: 'properties.district', header: 'District', size: 150 },
@@ -135,14 +154,7 @@ const ClubDirectory = () => {
 
   return (
     <div className="flex flex-row p-4 gap-4">
-        <div className="relative w-1/2">
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
-              <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            </div>
-          )}
-        <div ref={mapRef} style={{ height: '850px' }} />
-      </div>
+      <div ref={mapRef} className="w-1/2" style={{ height: '850px' }} />
       <div style={{ flex: 1 }}>
         <MaterialReactTable
           columns={columns}
