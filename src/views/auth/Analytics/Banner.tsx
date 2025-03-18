@@ -82,7 +82,7 @@ const formatTrackingNumber = (value, isBackspace) => {
   };
 
   const bannedItems = [
-    "Plastic shopping/carry bags (having thickness less than 75 micron)",
+    "Plastic shopping/carry bags (having thickness less than 75 micron or size less than 12 x 16 inch)",
         "Disposal Food Boxes made from polystyrene (Styrofoam)",
     "Cutlery such as Forks, Spoons, Knives, Straw, Trays, Stirrers, etc.",
     "Candy sticks",
