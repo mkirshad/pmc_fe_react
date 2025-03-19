@@ -1,0 +1,1 @@
+import{r as u,y as c,j as s}from"./index-Dy_vMV_4.js";import{l as b}from"./isNil-Dl0pxJa8.js";const m=u.forwardRef((t,o)=>{const{absolute:e,className:a,resetDefaultClass:l,...r}=t,n=c(!l&&"close-button button-press-feedback",e&&"absolute z-10",a);return s.jsx("button",{ref:o,className:n,type:"button",...r,children:s.jsx(b,{})})});m.displayName="CloseButton";export{m as C};
