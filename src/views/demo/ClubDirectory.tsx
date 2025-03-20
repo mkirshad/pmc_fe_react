@@ -12,6 +12,7 @@ import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { MaterialReactTable } from 'material-react-table';
+import { FaChartBar, FaCity, FaBuilding, FaMapMarkedAlt, FaLandmark } from 'react-icons/fa';
 
 const ClubDirectory = () => {
   const mapRef = useRef(null);
@@ -21,6 +22,7 @@ const ClubDirectory = () => {
   const [clubs, setClubs] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [districtStats, setDistrictStats] = useState([]);
 
   // Initialize Map
   useEffect(() => {
@@ -51,6 +53,7 @@ const ClubDirectory = () => {
       setLoading(true);
       try {
         const res = await AxiosBase.get('/pmc/idm_districts-club-counts/');
+        setDistrictStats(res.data.features);
         const vectorSource = new VectorSource({
           features: new GeoJSON().readFeatures(res.data, { featureProjection: 'EPSG:3857' }),
         });
@@ -153,25 +156,66 @@ const ClubDirectory = () => {
     { accessorKey: 'properties.head_name', header: 'Head Name', size: 200 },
   ], []);
 
+  const topDistricts = useMemo(() => {
+    const sortedDistricts = [...districtStats]
+      .sort((a, b) => b.properties.club_count - a.properties.club_count)
+      .slice(0, 4);
+    
+    return [{ properties: { name: "Total Clubs", club_count: clubs.length } }, ...sortedDistricts];
+  }, [districtStats, clubs]);  
+  
+  const tileDefs = [
+    { bgColor: 'bg-gray-500', icon: <FaChartBar className="text-white text-3xl" /> },
+    { bgColor: 'bg-orange-500', icon: <FaCity className="text-white text-3xl" /> },
+    { bgColor: 'bg-blue-500', icon: <FaBuilding className="text-white text-3xl" /> },
+    { bgColor: 'bg-yellow-500', icon: <FaMapMarkedAlt className="text-white text-3xl" /> },
+    { bgColor: 'bg-green-500', icon: <FaLandmark className="text-white text-3xl" /> },
+  ];
+
   return (
-    <div className="flex flex-row p-4 gap-4">
-      <div className="relative w-1/2">
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
-            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-          </div>
-        )}
-        <div ref={mapRef} style={{ height: '850px' }} />
+
+    <div className="flex flex-col p-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
+        {topDistricts.map((dist, idx) => (
+            <div
+              key={idx}
+              // onClick={() => handleTileClick(tile.key)}
+              className={`shadow-md rounded p-6 w-full cursor-pointer transition opacity-100
+                ${tileDefs[idx].bgColor}
+                `}
+            >
+              <div className="flex items-center space-x-2">
+                {tileDefs[idx].icon}
+                <h2 className="text-2xl font-bold text-white">
+                  {dist.properties.name}
+                </h2>
+                <p className="text-2xl font-bold text-white">
+                  {dist.properties.club_count}
+                </p>
+              </div>
+            </div>
+        ))}
       </div>
 
-      <div style={{ flex: 1 }}>
-        <MaterialReactTable
-          columns={columns}
-          data={filteredClubs}
-          initialState={{ pagination: { pageSize: 15 } }}
-          enableZebraStripes
-          enableColumnResizing
-        />
+      <div className="flex flex-row p-4 gap-4">
+        <div className="relative w-1/2">
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+              <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+          )}
+          <div ref={mapRef} style={{ height: '850px' }} />
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <MaterialReactTable
+            columns={columns}
+            data={filteredClubs}
+            initialState={{ pagination: { pageSize: 15 } }}
+            enableZebraStripes
+            enableColumnResizing
+          />
+        </div>
       </div>
     </div>
   );
