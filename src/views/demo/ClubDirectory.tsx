@@ -161,7 +161,7 @@ const ClubDirectory = () => {
       .sort((a, b) => b.properties.club_count - a.properties.club_count)
       .slice(0, 4);
     
-    return [{ properties: { name: "Total Clubs", club_count: clubs.length } }, ...sortedDistricts];
+    return [{ properties: { name: "Total Clubs", club_count: clubs.length, id:null } }, ...sortedDistricts];
   }, [districtStats, clubs]);  
   
   const tileDefs = [
@@ -171,7 +171,7 @@ const ClubDirectory = () => {
     { bgColor: 'bg-yellow-500', icon: <FaMapMarkedAlt className="text-white text-3xl" /> },
     { bgColor: 'bg-green-500', icon: <FaLandmark className="text-white text-3xl" /> },
   ];
-
+// console.log('topDistricts',topDistricts)
   return (
 
     <div className="flex flex-col p-4 gap-4">
@@ -179,10 +179,12 @@ const ClubDirectory = () => {
         {topDistricts.map((dist, idx) => (
             <div
               key={idx}
-              // onClick={() => handleTileClick(tile.key)}
-              className={`shadow-md rounded p-6 w-full cursor-pointer transition opacity-100
+             
+              className={`shadow-md rounded p-6 w-full cursor-pointer transition 
+                ${selectedDistrict===null || selectedDistrict===dist.properties.id ? 'opacity-100':'opacity-50'}
                 ${tileDefs[idx].bgColor}
                 `}
+                onClick={() => setSelectedDistrict(dist.properties.id)}
             >
               <div className="flex items-center space-x-2">
                 {tileDefs[idx].icon}
