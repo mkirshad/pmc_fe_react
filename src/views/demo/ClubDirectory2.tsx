@@ -13,7 +13,7 @@ import { fromLonLat } from 'ol/proj';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { MaterialReactTable } from 'material-react-table';
 import { FaChartBar, FaCity, FaBuilding, FaMapMarkedAlt, FaLandmark } from 'react-icons/fa';
-import { FaBell } from 'react-icons/fa';
+import { FaFilePdf } from 'react-icons/fa';
 
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
@@ -351,7 +351,7 @@ const handleRowClick = (row) => {
                         {/* Notification Bell */}
                         {selectedClub.notification_path && (
                         <div className="flex items-center space-x-2 border-t pt-3">
-                            <FaBell
+                            <FaFilePdf
                             size={24}
                             className="text-blue-500 cursor-pointer transition-transform transform hover:scale-110"
                             onClick={() => window.open(`/api/pmc/media${selectedClub.notification_path}`, "_blank")}
