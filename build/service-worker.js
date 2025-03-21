@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v235"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v236"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -16,7 +16,7 @@ const CACHE_FILES = [
     "/manifest.json",
     "/pub",
     "/mis-directory",
-    "/mis/directory",
+    "/mis/clubs/directory",
     "/mis/clubs/directory",
     "/mis/recycling-efficiency",
     "/sign-in",
@@ -24,6 +24,7 @@ const CACHE_FILES = [
     "/forgot-password",
     "/reset-password",
     "/auth/mis/directory",
+    "/auth/mis/clubs/directory",
     "/auth/EPAOperations/AllInspections",
     "/auth/EPAOperations/ReportViolation",
     "/auth/EPAOperation/Dashboard",

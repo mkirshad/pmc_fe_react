@@ -213,9 +213,37 @@ const ClubDirectory = () => {
           <MaterialReactTable
             columns={columns}
             data={filteredClubs}
-            initialState={{ pagination: { pageSize: 10 } }}
+            initialState={{ pagination: { pageSize: 15 } }}
             enableZebraStripes
             enableColumnResizing
+            muiTableBodyRowProps={({ row }) => ({
+              onClick: () => handleRowClick(row),
+              style: { cursor: 'pointer' }, // Make rows visually clickable
+              sx: {
+                  '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                  '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+              },
+            })}
+
+            muiTableProps={{
+                sx: {
+                    border: '1px solid #ddd', // Table border
+                },
+            }}
+            muiTableHeadCellProps={{
+                sx: {
+                    backgroundColor: '#f5f5f5', // Header background
+                    fontWeight: 'bold',
+                    borderBottom: '2px solid #ccc',
+                    textAlign: 'center',
+                },
+            }}
+            muiTableBodyCellProps={{
+                sx: {
+                    borderRight: '1px solid #ddd', // Column border
+                    padding: '10px',
+                },
+            }}
           />
         </div>
       </div>

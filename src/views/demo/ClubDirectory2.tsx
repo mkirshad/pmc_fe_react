@@ -13,6 +13,13 @@ import { fromLonLat } from 'ol/proj';
 import AxiosBase from '../../services/axios/AxiosBase';
 import { MaterialReactTable } from 'material-react-table';
 import { FaChartBar, FaCity, FaBuilding, FaMapMarkedAlt, FaLandmark } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
+
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+
 
 const ClubDirectory = () => {
   const mapRef = useRef(null);
@@ -23,7 +30,7 @@ const ClubDirectory = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [loading, setLoading] = useState(false);
   const [districtStats, setDistrictStats] = useState([]);
-
+  const [selectedClub, setSelectedClub] = useState(null);
   // Initialize Map
   useEffect(() => {
     const map = new Map({
@@ -150,11 +157,76 @@ const ClubDirectory = () => {
   ), [selectedDistrict, clubs]);
 
   const columns = useMemo(() => [
-    { accessorKey: 'properties.district', header: 'District', size: 150 },
-    { accessorKey: 'properties.name', header: 'School Name', size: 225 },
-    { accessorKey: 'properties.address', header: 'Address', size: 225 },
-    { accessorKey: 'properties.head_name', header: 'Head Name', size: 200 },
+    {
+      accessorKey: 'properties.district',
+      header: 'District',
+      size: 150,
+      Cell: ({ cell }) => (
+        <a
+          href={`#`} // Modify the URL if needed
+          className="text-blue-500 hover:underline"
+          onClick={(e) => {
+            e.preventDefault();
+            setSelectedDistrict(cell.getValue());
+          }}
+        >
+          {cell.getValue()}
+        </a>
+      ),
+    },
+    {
+      accessorKey: 'properties.name',
+      header: 'School Name',
+      size: 225,
+      Cell: ({ cell }) => (
+        <a
+          href={`#`} // Modify the URL if needed
+          className="text-blue-500 hover:underline"
+          onClick={(e) => {
+            e.preventDefault();
+            setSelectedClub(cell.row.original.properties);
+          }}
+        >
+          {cell.getValue()}
+        </a>
+      ),
+    },
+    {
+      accessorKey: 'properties.address',
+      header: 'Address',
+      size: 225,
+      Cell: ({ cell }) => (
+        <a
+          href={`#`} // Modify the URL if needed
+          className="text-blue-500 hover:underline"
+          onClick={(e) => {
+            e.preventDefault();
+            setSelectedClub(cell.row.original.properties);
+          }}
+        >
+          {cell.getValue()}
+        </a>
+      ),
+    },
+    {
+      accessorKey: 'properties.head_name',
+      header: 'Head Name',
+      size: 200,
+      Cell: ({ cell }) => (
+        <a
+          href={`#`} // Modify the URL if needed
+          className="text-blue-500 hover:underline"
+          onClick={(e) => {
+            e.preventDefault();
+            setSelectedClub(cell.row.original.properties);
+          }}
+        >
+          {cell.getValue()}
+        </a>
+      ),
+    },
   ], []);
+  
 
   const topDistricts = useMemo(() => {
     const sortedDistricts = [...districtStats]
@@ -172,6 +244,10 @@ const ClubDirectory = () => {
     { bgColor: 'bg-green-500', icon: <FaLandmark className="text-white text-3xl" /> },
   ];
 // console.log('topDistricts',topDistricts)
+const handleRowClick = (row) => {
+    setSelectedClub(row.original.properties);
+  };
+  
   return (
 
     <div className="flex flex-col p-4 gap-4">
@@ -213,12 +289,100 @@ const ClubDirectory = () => {
           <MaterialReactTable
             columns={columns}
             data={filteredClubs}
-            initialState={{ pagination: { pageSize: 10 } }}
+            initialState={{ pagination: { pageSize: 15 } }}
             enableZebraStripes
             enableColumnResizing
+            muiTableBodyRowProps={({ row }) => ({
+                onClick: () => handleRowClick(row),
+                style: { cursor: 'pointer' }, // Make rows visually clickable
+                sx: {
+                    '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                    '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+                },
+              })}
+
+              muiTableProps={{
+                sx: {
+                    border: '1px solid #ddd', // Table border
+                },
+            }}
+            muiTableHeadCellProps={{
+                sx: {
+                    backgroundColor: '#f5f5f5', // Header background
+                    fontWeight: 'bold',
+                    borderBottom: '2px solid #ccc',
+                    textAlign: 'center',
+                },
+            }}
+            muiTableBodyCellProps={{
+                sx: {
+                    borderRight: '1px solid #ddd', // Column border
+                    padding: '10px',
+                },
+            }}
           />
         </div>
       </div>
+
+      
+      <Modal open={!!selectedClub} onClose={() => setSelectedClub(null)} aria-labelledby="club-details-modal">
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-lg">
+                {selectedClub && (
+                    <>
+                    {/* Title */}
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{selectedClub.name}</h2>
+
+                    {/* Info Grid */}
+                    <div className="space-y-3">
+                        <p className="text-gray-600">
+                        <span className="font-semibold text-gray-900">District:</span> {selectedClub.district}
+                        </p>
+                        <p className="text-gray-600">
+                        <span className="font-semibold text-gray-900">Address:</span> {selectedClub.address}
+                        </p>
+                        <p className="text-gray-600">
+                        <span className="font-semibold text-gray-900">Head Name:</span> {selectedClub.head_name}
+                        </p>
+                        <p className="text-gray-600">
+                        <span className="font-semibold text-gray-900">Head Mobile:</span> {selectedClub.head_mobile}
+                        </p>
+
+                        {/* Notification Bell */}
+                        {selectedClub.notification_path && (
+                        <div className="flex items-center space-x-2 border-t pt-3">
+                            <FaBell
+                            size={24}
+                            className="text-blue-500 cursor-pointer transition-transform transform hover:scale-110"
+                            onClick={() => window.open(`/api/pmc/media/${selectedClub.notification_path}`, "_blank")}
+                            />
+                            <a
+                            href={`/api/pmc/media/${selectedClub.notification_path}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 font-semibold hover:underline"
+                            >
+                            View Notification
+                            </a>
+                        </div>
+                        )}
+                    </div>
+
+                    {/* Close Button */}
+                    <div className="mt-5 flex justify-end">
+                        <button
+                        onClick={() => setSelectedClub(null)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+                        >
+                        Close
+                        </button>
+                    </div>
+                    </>
+                )}
+                </div>
+            </div>
+        </Modal>;
+
     </div>
   );
 };

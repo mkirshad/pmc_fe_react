@@ -149,6 +149,9 @@ const formatTrackingNumber = (value, isBackspace) => {
               <Link to="/mis/recycling-efficiency" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
                 Management Information System - Recycling Efficiency
               </Link>
+              <Link to="/mis/clubs/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+                Management Information System - Educational Environmental Club Directory
+              </Link>
             </>
           }
         </div>
