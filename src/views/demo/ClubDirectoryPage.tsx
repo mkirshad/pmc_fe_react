@@ -1,6 +1,6 @@
 // MISDirectoryPage.jsx
 import React from 'react';
-import HeaderTemplate from './HeaderTemplate2'; // Adjust the path as necessary
+import HeaderTemplate from './HeaderTemplate'; // Adjust the path as necessary
 import ClubDirectory from '@/views/demo/ClubDirectory'; // Adjust the path as necessary
 
 /**

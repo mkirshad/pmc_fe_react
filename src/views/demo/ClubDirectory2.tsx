@@ -159,7 +159,7 @@ const ClubDirectory = () => {
   const topDistricts = useMemo(() => {
     const sortedDistricts = [...districtStats]
       .sort((a, b) => b.properties.club_count - a.properties.club_count)
-      .slice(0, 4);
+      .slice(0, 3);
     
     return [{ properties: { name: "Total Clubs", club_count: clubs.length, id:null } }, ...sortedDistricts];
   }, [districtStats, clubs]);  
@@ -175,7 +175,7 @@ const ClubDirectory = () => {
   return (
 
     <div className="flex flex-col p-4 gap-4">
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {topDistricts.map((dist, idx) => (
             <div
               key={idx}

@@ -116,6 +116,16 @@ const navigationConfig: NavigationTree[] = [
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: ['Super'],
                 subMenu: [],
+            },
+            {
+                key: 'auth.mis.clubs-directory',
+                path: '/auth/mis/clubs/directory',
+                title: 'Educational Environmental Club Directory',
+                translateKey: 'nav.analyticsMenu.analytics1',
+                icon: 'FaAddressBook',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: ['Super', 'EEC'],
+                subMenu: [],
             }
         ],
     },

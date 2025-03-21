@@ -12,7 +12,12 @@ export const protectedRoutes: Routes = [
         component: lazy(() => import('@/views/demo/MISDirectory')),
         authority: [],
     },
-    
+    {
+        key: 'auth.mis.clubs-directory',
+        path: `/auth/mis/clubs/directory`,
+        component: lazy(() => import('@/views/demo/ClubDirectory2')),
+        authority: ['EEC', 'Super'],
+    },    
     {
         key: 'auth.EPAOperation.AllInspections',
         path: `/auth/EPAOperations/AllInspections`,
