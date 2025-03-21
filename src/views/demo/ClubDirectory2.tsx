@@ -167,7 +167,7 @@ const ClubDirectory = () => {
           className="text-blue-500 hover:underline"
           onClick={(e) => {
             e.preventDefault();
-            setSelectedDistrict(cell.getValue());
+            setSelectedClub(cell.row.original.properties);
           }}
         >
           {cell.getValue()}
@@ -354,10 +354,10 @@ const handleRowClick = (row) => {
                             <FaBell
                             size={24}
                             className="text-blue-500 cursor-pointer transition-transform transform hover:scale-110"
-                            onClick={() => window.open(`/api/pmc/media/${selectedClub.notification_path}`, "_blank")}
+                            onClick={() => window.open(`/api/pmc/media${selectedClub.notification_path}`, "_blank")}
                             />
                             <a
-                            href={`/api/pmc/media/${selectedClub.notification_path}`}
+                            href={`/api/pmc/media${selectedClub.notification_path}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-500 font-semibold hover:underline"
