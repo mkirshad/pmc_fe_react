@@ -54,7 +54,7 @@ const navigationConfig: NavigationTree[] = [
             translateKey: 'nav.collapseMenu.analyticsMenu',
             icon: 'MdAnalytics',
             type: NAV_ITEM_TYPE_COLLAPSE,
-            authority: ['Analytics', 'Analytics1', 'Analytics2', 'Analytics3'],
+            authority: ['Analytics', 'Analytics1', 'Analytics2', 'Analytics3', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
             subMenu: [
                 {
                     key: 'analyticsMenu.analytics1',
@@ -63,7 +63,7 @@ const navigationConfig: NavigationTree[] = [
                     translateKey: 'nav.analyticsMenu.analytics1',
                     icon: 'FaChartLine',
                     type: NAV_ITEM_TYPE_ITEM,
-                    authority: ['Analytics1'],
+                    authority: ['Analytics1', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
                     subMenu: [],
                 },
                 {
@@ -95,7 +95,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.collapseMenu.analyticsMenu',
         icon: 'FaDatabase',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: ['Analytics3'],
+        authority: ['Analytics3',  'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
         subMenu: [
             {
                 key: 'auth.mis.directory',
@@ -104,7 +104,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'FaAddressBook',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['Super'],
+                authority: ['Super', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
                 subMenu: [],
             },
             {
@@ -124,7 +124,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'FaAddressBook',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['Super', 'EEC'],
+                authority: ['Super', 'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
                 subMenu: [],
             }
         ],
