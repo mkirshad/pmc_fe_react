@@ -82,14 +82,17 @@ const ClubDirectory = () => {
 
     districtLayer.setStyle((feature) => {
       const isSelected = feature.get('id') === selectedDistrict;
+      if(feature.get('club_count')===0) return;
       return new Style({
         stroke: new Stroke({ color: isSelected ? 'red' : 'blue', width: isSelected ? 3 : 2 }),
         fill: new Fill({ color: isSelected ? 'rgba(255,0,0,0.1)' : 'rgba(0,0,255,0.1)' }),
         text: new Text({
           text: `${feature.get('name')} (${feature.get('club_count')})`,
-          font: '12px sans-serif',
+          font: 'bold 10px sans-serif',
           fill: new Fill({ color: '#000' }),
           stroke: new Stroke({ color: '#fff', width: 3 }),
+          overflow: true, // <<< This allows text outside of geometry
+          // placement: 'point', // <<< Ensures it's placed at centroid, not along line
         }),
       });
     });
@@ -105,24 +108,25 @@ const ClubDirectory = () => {
   }, []);
 
   // Display club points
-  useEffect(() => {
-    if (!clubLayer) return;
-    const source = clubLayer.getSource();
-    source.clear();
+  // Comment Temporarily
+  // useEffect(() => {
+  //   if (!clubLayer) return;
+  //   const source = clubLayer.getSource();
+  //   source.clear();
 
-    clubs.forEach((club) => {
-      const coords = fromLonLat(club.geometry.coordinates);
-      const feature = new Feature({ geometry: new Point(coords) });
-      feature.setStyle(new Style({
-        image: new CircleStyle({
-          radius: 5,
-          fill: new Fill({ color: '#22C55E' }),
-          stroke: new Stroke({ color: '#fff', width: 1 }),
-        }),
-      }));
-      source.addFeature(feature);
-    });
-  }, [clubLayer, clubs]);
+  //   clubs.forEach((club) => {
+  //     const coords = fromLonLat(club.geometry.coordinates);
+  //     const feature = new Feature({ geometry: new Point(coords) });
+  //     feature.setStyle(new Style({
+  //       image: new CircleStyle({
+  //         radius: 5,
+  //         fill: new Fill({ color: '#22C55E' }),
+  //         stroke: new Stroke({ color: '#fff', width: 1 }),
+  //       }),
+  //     }));
+  //     source.addFeature(feature);
+  //   });
+  // }, [clubLayer, clubs]);
 
   // Handle map click for district selection
   useEffect(() => {
@@ -136,15 +140,15 @@ const ClubDirectory = () => {
         if (selectedDistrict === districtId) {
           setSelectedDistrict(null);
           mapInstance.getView().setCenter([8127130, 3658593]);
-          mapInstance.getView().setZoom(7);
+          // mapInstance.getView().setZoom(7); // Temporary Comment
         } else {
           setSelectedDistrict(districtId);
-          mapInstance.getView().fit(selectedFeature.getGeometry().getExtent(), { padding: [50,50,50,50], maxZoom: 10 });
+          // mapInstance.getView().fit(selectedFeature.getGeometry().getExtent(), { padding: [50,50,50,50], maxZoom: 10 });  // Temporary Comment
         }
       } else {
         setSelectedDistrict(null);
         mapInstance.getView().setCenter([8127130, 3658593]);
-        mapInstance.getView().setZoom(7);
+        // mapInstance.getView().setZoom(7);  // Temporary Comment
       }
     };
 
