@@ -31,6 +31,7 @@ const ClubDirectory = () => {
   const [loading, setLoading] = useState(false);
   const [districtStats, setDistrictStats] = useState([]);
   const [selectedClub, setSelectedClub] = useState(null);
+  const [showNotice, setShowNotice] = useState(true);
   // Initialize Map
   useEffect(() => {
     const map = new Map({
@@ -255,6 +256,19 @@ const handleRowClick = (row) => {
   return (
 
     <div className="flex flex-col p-4 gap-4">
+      {showNotice && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded relative">
+          <p className="font-medium">
+            To access Head Contact Number and Club Notification, please click on the Club Name.
+          </p>
+          <button
+            className="absolute top-2 right-2 text-yellow-700 hover:text-yellow-900"
+            onClick={() => setShowNotice(false)}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         {topDistricts.map((dist, idx) => (
             <div
@@ -385,7 +399,7 @@ const handleRowClick = (row) => {
                 )}
                 </div>
             </div>
-        </Modal>;
+        </Modal>
 
     </div>
   );
