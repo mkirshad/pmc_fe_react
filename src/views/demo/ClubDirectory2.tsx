@@ -20,7 +20,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-
 const ClubDirectory = () => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
@@ -230,6 +229,29 @@ const ClubDirectory = () => {
         </a>
       ),
     },
+
+    {
+      header: 'Map',
+      size: 50,
+      Cell: ({ row }) => {
+        const { name, district } = row.original.properties;
+        const mapLink = getGoogleMapsLink(name, district);
+        return (
+          <a
+            href={mapLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open in Google Maps"
+            className="text-blue-500 hover:text-blue-700"
+            // onClick={(e) => {
+              // e.preventDefault();
+            // }}
+          >
+            <FaMapMarkedAlt size={20} />
+          </a>
+        );
+      },
+    },
   ], []);
   
 
@@ -252,6 +274,16 @@ const ClubDirectory = () => {
 const handleRowClick = (row) => {
     setSelectedClub(row.original.properties);
   };
+
+  
+  const getGoogleMapsLink = (schoolName, district) => {
+    const formatText = (text) =>
+      text?.replace(/\d+/g, '') // Remove numbers
+          .replace(/\s+/g, '+') || ''; // Replace spaces with +
+  
+    return `https://www.google.com/maps/search/${formatText(schoolName)}+${formatText(district)}/@32.6577675,71.9992096,9.25z`;
+  };
+
   
   return (
 
@@ -259,7 +291,7 @@ const handleRowClick = (row) => {
       {showNotice && (
         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded relative">
           <p className="font-medium">
-            To access Head Contact Number and Club Notification, please click on the Club Name.
+            To access Head Contact Number and Club Notification, please click on the School Name.
           </p>
           <button
             className="absolute top-2 right-2 text-yellow-700 hover:text-yellow-900"
@@ -293,14 +325,14 @@ const handleRowClick = (row) => {
         ))}
       </div>
 
-      <div className="flex flex-row p-4 gap-4">
-        <div className="relative w-1/2">
+      <div className="flex flex-col p-4 gap-4 md:flex-row">
+        <div className="relative md:w-1/2">
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
               <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
             </div>
           )}
-          <div ref={mapRef} style={{ height: '850px' }} />
+          <div ref={mapRef} style={{ height: '850px', width : '500px' }} />
         </div>
 
         <div style={{ flex: 1 }}>
@@ -311,7 +343,7 @@ const handleRowClick = (row) => {
             enableZebraStripes
             enableColumnResizing
             muiTableBodyRowProps={({ row }) => ({
-                onClick: () => handleRowClick(row),
+                // onClick: () => handleRowClick(row),
                 style: { cursor: 'pointer' }, // Make rows visually clickable
                 sx: {
                     '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
@@ -385,6 +417,28 @@ const handleRowClick = (row) => {
                         </div>
                         )}
                     </div>
+
+                  {/* Google Maps Link */}
+                  <div className="flex items-center space-x-2 border-t pt-3 mt-3">
+                    <FaMapMarkedAlt
+                      size={24}
+                      className="text-green-600 cursor-pointer transition-transform transform hover:scale-110"
+                      onClick={() =>
+                        window.open(
+                          getGoogleMapsLink(selectedClub.name, selectedClub.district),
+                          '_blank'
+                        )
+                      }
+                    />
+                    <a
+                      href={getGoogleMapsLink(selectedClub.name, selectedClub.district)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 font-semibold hover:underline"
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
 
                     {/* Close Button */}
                     <div className="mt-5 flex justify-end">

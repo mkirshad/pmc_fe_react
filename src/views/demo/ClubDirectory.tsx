@@ -14,6 +14,7 @@ import AxiosBase from '../../services/axios/AxiosBase';
 import { MaterialReactTable } from 'material-react-table';
 import { FaChartBar, FaCity, FaBuilding, FaMapMarkedAlt, FaLandmark } from 'react-icons/fa';
 
+
 const ClubDirectory = () => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
@@ -159,6 +160,25 @@ const ClubDirectory = () => {
     { accessorKey: 'properties.name', header: 'School Name', size: 225 },
     { accessorKey: 'properties.address', header: 'Address', size: 225 },
     { accessorKey: 'properties.head_name', header: 'Head Name', size: 200 },
+    {
+      header: 'Map',
+      size: 50,
+      Cell: ({ row }) => {
+        const { name, district } = row.original.properties;
+        const mapLink = getGoogleMapsLink(name, district);
+        return (
+          <a
+            href={mapLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open in Google Maps"
+            className="text-blue-500 hover:text-blue-700"
+          >
+            <FaMapMarkedAlt size={20} />
+          </a>
+        );
+      },
+    },
   ], []);
 
   const topDistricts = useMemo(() => {
@@ -177,6 +197,14 @@ const ClubDirectory = () => {
     { bgColor: 'bg-green-500', icon: <FaLandmark className="text-white text-3xl" /> },
   ];
 // console.log('topDistricts',topDistricts)
+const getGoogleMapsLink = (schoolName, district) => {
+  const formatText = (text) =>
+    text?.replace(/\d+/g, '') // Remove numbers
+        .replace(/\s+/g, '+') || ''; // Replace spaces with +
+
+  return `https://www.google.com/maps/search/${formatText(schoolName)}+${formatText(district)}/@32.6577675,71.9992096,9.25z`;
+};
+
   return (
 
     <div className="flex flex-col p-4 gap-4">
@@ -217,14 +245,14 @@ const ClubDirectory = () => {
         ))}
       </div>
 
-      <div className="flex flex-row p-4 gap-4">
-        <div className="relative w-1/2">
+      <div className="flex flex-col p-4 gap-4 md:flex-row">
+        <div className="relative">
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
               <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
             </div>
           )}
-          <div ref={mapRef} style={{ height: '850px' }} />
+          <div ref={mapRef} style={{ height: '850px', width : '500px'  }} />
         </div>
 
         <div style={{ flex: 1 }}>
