@@ -101,7 +101,7 @@ const ClubDirectory = () => {
   // Fetch clubs once
   useEffect(() => {
     const fetchClubs = async () => {
-      const res = await AxiosBase.get('/pmc/idm_clubs_geojson_all/');
+      const res = await AxiosBase.get('/pmc/idm_clubs/all/');
       setClubs(res.data.features);
     };
     fetchClubs();
