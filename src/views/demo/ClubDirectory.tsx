@@ -202,8 +202,8 @@ const getGoogleMapsLink = (schoolName, district) => {
     text?.replace(/\d+/g, '') // Remove numbers
         .replace(/\s+/g, '+') || ''; // Replace spaces with +
 
-  return `https://www.google.com/maps/search/${formatText(schoolName)}+${formatText(district)}/@32.6577675,71.9992096,9.25z`;
-};
+  return `https://www.google.com/maps/search/?api=1&query=${formatText(schoolName)}+${formatText(district)}`;
+}
 
   return (
 

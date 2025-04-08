@@ -140,20 +140,16 @@ const formatTrackingNumber = (value, isBackspace) => {
           <Link onClick={()=>{setTrackingPopupOpen(true); setDialogContent(null); setTankYouPopupType('info');}} to="" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
             Track Application
           </Link>
-          {
-            paramSuper &&
-            <>
+
               <Link to="/mis/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
                 Management Information System - Public Directory
               </Link>
-              <Link to="/mis/recycling-efficiency" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* <Link to="/mis/recycling-efficiency" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
                 Management Information System - Recycling Efficiency
-              </Link>
+              </Link> */}
               <Link to="/mis/clubs/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
                 Management Information System - Educational Environmental Club Directory
               </Link>
-            </>
-          }
         </div>
 
         <ConfirmDialog

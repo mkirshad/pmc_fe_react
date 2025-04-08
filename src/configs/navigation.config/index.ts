@@ -95,7 +95,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.collapseMenu.analyticsMenu',
         icon: 'FaDatabase',
         type: NAV_ITEM_TYPE_COLLAPSE,
-        authority: ['Analytics3',  'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
+        authority: ['Analytics3',  'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super', ''],
         subMenu: [
             {
                 key: 'auth.mis.directory',
@@ -104,7 +104,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'FaAddressBook',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['Super', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
+                authority: ['Super', 'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super', ''],
                 subMenu: [],
             },
             {
@@ -124,7 +124,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'FaAddressBook',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['Super', 'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
+                authority: ['Super', 'EEC', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super', ''],
                 subMenu: [],
             }
         ],

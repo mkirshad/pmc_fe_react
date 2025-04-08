@@ -18,6 +18,9 @@ import { Link } from 'react-router-dom';
 import { Divider, Select, MenuItem } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
 import { Box, Paper, Typography, } from "@mui/material";
+import { FaInfoCircle } from 'react-icons/fa';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 // Helper function
 function getCategoryColor(category) {
@@ -34,6 +37,58 @@ function getCategoryColor(category) {
       return 'gray';
   }
 }
+
+
+
+const tileDefs = [
+  {
+    key: "Produced",
+    bgColor: "bg-orange-500",
+    icon: <FaIndustry className="text-white text-3xl" />,
+    info: "Produced: Total amount (Kg/Day) calculated by summing the 'Average Production Capacity (Kg/day)' from all Producer registrations.",
+  },
+  {
+    key: "Distributed",
+    bgColor: "bg-blue-500",
+    icon: <FaUser className="text-white text-3xl" />,
+    info: "Distributed: Total amount (Kg/Day) calculated by summing the 'Average Sale (Kg/day)' from all Distributor registrations.",
+  },
+  {
+    key: "Collected",
+    bgColor: "bg-yellow-500",
+    icon: <FaTruck className="text-white text-3xl" />,
+    info: "Collected: Total amount (Kg/Day) calculated by summing the 'Average Collection (Kg/day)' from all Collector registrations.",
+  },
+  {
+    key: "W-Collected",
+    bgColor: "bg-yellow-500",
+    icon: <FaRecycle className="text-white text-3xl" />,
+    info: "Waste Collected: Total waste amount (Kg/Day) calculated by summing the 'Average Waste Collection (Kg/day)' from all Recycler registrations.",
+  },
+  {
+    key: "Recycled",
+    bgColor: "bg-green-500",
+    icon: <FaRecycle className="text-white text-3xl" />,
+    info: "Recycled: Total recycled waste (Kg/Day) calculated by summing the 'Average Waste Disposal (Kg/day)' from all Recycler registrations.",
+  },
+  {
+    key: "Un-Managed",
+    bgColor: 'bg-gray-500',
+    icon: <FaChartBar className="text-white text-3xl" />,
+    info: "Unmanaged Waste: Calculated as the higher of Collected or Waste Collected minus Recycled. Indicates the waste not managed by recycling.",
+  },
+];
+
+const tileDefs2 = [
+  {
+    key: "Recycling Efficiency",
+    bgColor: "bg-green-500",
+    icon: <FaRecycle className="text-white text-3xl" />,
+    info: "Recycling Efficiency (%): Indicates how effectively waste is recycled. Calculated as (Recycled ÷ Maximum of Collected or Waste Collected) × 100.",
+  },
+];
+
+
 const MISDirectory = () => {
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
@@ -57,7 +112,15 @@ const MISDirectory = () => {
   const [DEFAULT_CENTER, setDefaultCenter] = useState([8054803.349056441,3623248.3407283584]); 
   const [DEFAULT_ZOOM, setDefaultZoom] = useState(6.53343814691434);
   const [RADIUS, setRadius] = useState(4)
-  
+  const [modalInfo, setModalInfo] = useState({ open: false, title: "", content: "" });
+
+  const openModal = (title, content) => {
+    setModalInfo({ open: true, title, content });
+  };
+
+  const closeModal = () => {
+    setModalInfo({ open: false, title: "", content: "" });
+  };
 
   // ================ 1) Map Initialization =================
   useEffect(() => {
@@ -453,15 +516,18 @@ const MISDirectory = () => {
         enabledCategories={enabledCategories}
         setEnabledCategories={setEnabledCategories}
         enabledTotal={enabledTotal}
+        openModal = {openModal}
       />
 
 
       <div className="">
-      <div
-          ref={mapRef}
-          style={{ height: '600px', width: '500px' }}
-          className="mb-4"
-        />        
+      <div className="flex justify-center mt-4 mb-4">
+        <div
+            ref={mapRef}
+            style={{ height: '600px', width: '1000px' }}
+            className="mb-4 mt-4"
+          />        
+        </div>
         <div className="">
         <MyDataTable
             data={filteredApplicants}
@@ -472,12 +538,64 @@ const MISDirectory = () => {
             columnFilters={columnFilters}
             districtOptions={districtOptions}
             onColumnFiltersChange={handleColumnFiltersChange}
+            openModal = {openModal}
           />
         </div>
 
       </div>
+
+{/* <ConfirmDialog
+    isOpen={modalInfo.open}
+    title={modalInfo.title}
+    onClose={closeModal}
+    onRequestClose={closeModal}
+    onCancel={closeModal}
+    onConfirm={closeModal}
+  >
+    <p>{modalInfo.content}</p>
+
+    {modalInfo.title === "Recycling Efficiency" && (
+      <div className="mt-2">
+        <strong>District Color Coding:</strong>
+        <ul className="list-disc pl-4 mt-2">
+          <li><span style={{ color: '#FF6347' }}>■</span> Tomato Red (0%): Critical</li>
+          <li><span style={{ color: '#FFA500' }}>■</span> Orange (1-19%): Very Low Efficiency</li>
+          <li><span style={{ color: '#90EE90' }}>■</span> Light Green (20-49%): Moderate Efficiency</li>
+          <li><span style={{ color: '#22C55E' }}>■</span> Medium Green (50-79%): Good Efficiency</li>
+          <li><span style={{ color: '#008000' }}>■</span> Dark Green (80-100%): Excellent Efficiency</li>
+        </ul>
+      </div>
+    )}
+  </ConfirmDialog> */}
+  
+  
+<Dialog open={modalInfo.open} onClose={closeModal}>
+  <DialogTitle>{modalInfo.title}</DialogTitle>
+  <DialogContent>
+    <p>{modalInfo.content}</p>
+    {modalInfo.title === "Recycling Efficiency" && (
+      <div className="mt-2">
+        <strong>District Color Coding:</strong>
+        <ul className="list-disc pl-4 mt-2">
+          <li><span style={{ color: '#FF6347' }}>■</span> Tomato Red (0%): Critical</li>
+          <li><span style={{ color: '#FFA500' }}>■</span> Orange (1-19%): Very Low Efficiency</li>
+          <li><span style={{ color: '#90EE90' }}>■</span> Light Green (20-49%): Moderate Efficiency</li>
+          <li><span style={{ color: '#22C55E' }}>■</span> Medium Green (50-79%): Good Efficiency</li>
+          <li><span style={{ color: '#008000' }}>■</span> Dark Green (80-100%): Excellent Efficiency</li>
+        </ul>
+      </div>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={closeModal} variant="contained" autoFocus>OK</Button>
+  </DialogActions>
+</Dialog>
+
     </div>
   );
+
+
+
 };
 
 const CategoryTiles = ({
@@ -485,6 +603,7 @@ const CategoryTiles = ({
   enabledCategories,   
   setEnabledCategories,
   enabledTotal,
+  openModal
 }) => {
   
   // const handleTileClick = (cat) => {
@@ -517,19 +636,7 @@ const CategoryTiles = ({
     return stats[cat] || 0;
   }
 
-  const tileDefs = [
-    { key: "Produced", bgColor: "bg-orange-500", icon: <FaIndustry className="text-white text-3xl" /> },
-    { key: "Distributed", bgColor: "bg-blue-500", icon: <FaUser className="text-white text-3xl" /> },
-    { key: "Collected", bgColor: "bg-yellow-500", icon: <FaTruck className="text-white text-3xl" /> },
-    { key: "W-Collected", bgColor: "bg-yellow-500", icon: <FaRecycle className="text-white text-3xl" /> },
-    { key: "Recycled", bgColor: "bg-green-500", icon: <FaRecycle className="text-white text-3xl" /> },
-    { key: "Un-Managed", bgColor: 'bg-gray-500',    icon: <FaChartBar className="text-white text-3xl" /> },
-    
-  ];
-
-  const tileDefs2 = [
-    { key: "Recycling Efficiency", bgColor: "bg-green-500", icon: <FaRecycle className="text-white text-3xl" /> },
-  ];
+  
 
   return (
     <>
@@ -552,32 +659,31 @@ const CategoryTiles = ({
 
       {/* Tile Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {tileDefs.map((tile) => {
-          // const enabled = isTileEnabled(tile.key);
+      { tileDefs.concat(tileDefs2).map((tile) => {
           const value = getTileDisplayValue(tile.key);
-
           return (
             <div
               key={tile.key}
-              // onClick={() => handleTileClick(tile.key)}
-              className={`flex items-center justify-start p-4 rounded-lg shadow-md transition cursor-pointer
-                opacity-100
-                 ${tile.bgColor}`}
+              className={`flex items-center justify-start p-4 rounded-lg shadow-md transition cursor-pointer opacity-100 ${tile.bgColor} ${tile.key === "Un-Managed" || tile.key === "Recycling Efficiency" ? "col-span-2" : ""}`}
             >
-              {/* ${enabled ? "opacity-100" : "opacity-50"} */}
-              {/* Icon */}
               <div className="mr-3">{tile.icon}</div>
-              {/* Text */}
-              <h2 className="text-lg font-bold text-white">{tile.key} {value.toFixed(0)}</h2>
+              <h2 className="text-lg font-bold text-white">
+                {tile.key} {tile.key === "Recycling Efficiency" ? `${value}%` : value.toFixed(0)}
+              </h2>
+              <FaInfoCircle
+                className="ml-auto cursor-pointer text-white"
+                onClick={() => openModal(tile.key, tile.info)}
+              />
             </div>
           );
-        })}
+        })
+      }
       </div>
       </Paper>
 
 
 
-      <Paper elevation={3} sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, position: "relative" }} className='mt-1'>
+      {/* <Paper elevation={3} sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, position: "relative" }} className='mt-1'>
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
           {tileDefs2.map((tile) => {
             // const enabled = isTileEnabled(tile.key);
@@ -590,15 +696,17 @@ const CategoryTiles = ({
                 className={`flex items-center justify-start p-4 rounded-lg shadow-md transition cursor-pointer
                   opacity-100  ${tile.bgColor}`}
               >
-                {/* Icon */}
+
                 <div className="mr-3">{tile.icon}</div>
-                {/* Text */}
-                <h2 className="text-lg font-bold text-white">{tile.key} {value}</h2>
+
+                <h2 className="text-lg font-bold text-white">
+                  {tile.key} {value != null ? `${value}%` : '0%'}
+                </h2>
               </div>
             );
           })}
         </div>
-      </Paper>
+      </Paper> */}
     </>
   );
 };
@@ -630,7 +738,8 @@ const CategoryTiles = ({
     setEnabledCategories,
     columnFilters,
     districtOptions,
-    onColumnFiltersChange
+    onColumnFiltersChange,
+    openModal
   }) => {
 console.log('districtOptions', districtOptions)
 
@@ -646,52 +755,142 @@ console.log('districtOptions', districtOptions)
       },
       {
         accessorKey: 'produced_kg_per_day',
-        header: 'Produced',
+        header: 'Produced (Kg/day)',
+        Header: ({ column }) => (
+          <div className="flex items-center">
+            <span>Produced (Kg/day)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              onClick={() => openModal("Produced", tileDefs[0].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'distributed_kg_per_day',
-        header: 'Distributed',
+        header: 'Distributed (Kg/day)',
+        Header: () => (
+          <div className="flex items-center">
+            <span>Distributed (Kg/day)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              size={22}
+              onClick={() => openModal("Distributed", tileDefs[1].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'collected_kg_per_day',
-        header: 'Collected',
+        header: 'Collected (Kg/day)',
+        Header: () => (
+          <div className="flex items-center">
+            <span>Collected (Kg/day)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              onClick={() => openModal("Collected", tileDefs[2].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'waste_collected_kg_per_day',
-        header: 'Waste Collected',
+        header: 'Waste Collected (Kg/day)',
+        Header: () => (
+          <div className="flex items-center">
+            <span>Waste Collected (Kg/day)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              size={25}
+              onClick={() => openModal("Waste Collected", tileDefs[3].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'waste_disposed_kg_per_day',
-        header: 'Waste Recycled',
+        header: 'Waste Recycled (Kg/day)',
+        Header: () => (
+          <div className="flex items-center">
+            <span>Waste Recycled (Kg/day)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              size={25}
+              onClick={() => openModal("Recycled", tileDefs[4].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'unmanaged_waste_kg_per_day',
-        header: 'Unmanaged Waste',
+        header: 'Unmanaged Waste (Kg/day)',
+          Header: () => (
+            <div className="flex items-center">
+              <span>Unmanaged Waste (Kg/day)</span>
+              <FaInfoCircle
+                className="ml-1 cursor-pointer text-blue-500"
+                size={25}
+                onClick={() => openModal("Un-Managed", tileDefs[5].info)}
+              />
+            </div>
+          ),
         minSize: 50,
         maxSize: 50,
         size: 50,
       },
       {
         accessorKey: 'recycling_efficiency',
-        header: 'Recycling Efficiency',
+        header: 'Recycling Efficiency (%)',
+        Header: () => (
+          <div className="flex items-center">
+            <span>Recycling Efficiency (%)</span>
+            <FaInfoCircle
+              className="ml-1 cursor-pointer text-blue-500"
+              size={25}
+              onClick={() => openModal("Recycling Efficiency", tileDefs2[0].info)}
+            />
+          </div>
+        ),
         minSize: 50,
         maxSize: 50,
         size: 50,
+        Cell: ({ cell }) => {
+          const value = parseFloat(cell.getValue()) || 0;
+          let color = '';
+      
+          if (value <= 0) {
+            color = '#FF6347'; // Tomato Red
+          } else if (value < 20) {
+            color = '#FFA500'; // Orange
+          } else if (value < 50) {
+            color = '#90EE90'; // Light Green
+          } else if (value < 80) {
+            color = '#22C55E'; // Medium Green
+          } else {
+            color = '#008000'; // Dark Green
+          }
+      
+          return (
+            <span style={{ color, fontWeight: 'bold' }}>
+              {value.toFixed(2)}%
+            </span>
+          );
+        },
       },
       // ... any other columns ...
     ],
@@ -707,7 +906,7 @@ console.log('districtOptions', districtOptions)
       initialState={{
         showColumnFilters: false, // Hide column filters by default
         // density: 'compact', // Set compact view
-        pagination: { pageSize: 5 }, // Set 7 rows per page
+        pagination: { pageSize: 10 }, // Set 7 rows per page
       }}
     />
     
