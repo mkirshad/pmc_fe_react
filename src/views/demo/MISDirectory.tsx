@@ -17,6 +17,7 @@ import { FaIndustry, FaUser, FaRecycle, FaTruck, FaChartBar } from 'react-icons/
 import { Link } from 'react-router-dom';
 import { Divider, Select, MenuItem, Box } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
+import { useLocation } from 'react-router-dom';
 
 // Helper function
 function getCategoryColor(category) {
@@ -629,7 +630,12 @@ const CategoryTiles = ({
     districtOptions,
     onColumnFiltersChange
   }) => {
-console.log('districtOptions', districtOptions)
+    
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    
+    // Check if "viewAll" is explicitly set to "true"
+    const viewAll = queryParams.get('viewAll') === 'true';
 
   // // // 1) Gather unique district names for the District filter
   // const districtOptions = useMemo(() => {
@@ -786,7 +792,7 @@ console.log('districtOptions', districtOptions)
       initialState={{
         showColumnFilters: false, // Hide column filters by default
         // density: 'compact', // Set compact view
-        pagination: { pageSize: 5 }, // Set 7 rows per page
+        pagination: { pageSize: viewAll ? 100000 : 5 },
       }}
     />
     
