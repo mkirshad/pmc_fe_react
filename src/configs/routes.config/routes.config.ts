@@ -165,7 +165,7 @@ export const protectedRoutes: Routes = [
         component: lazy(() =>
             import('@/views/demo/AnalyticsView')
         ),
-        authority: ['Analytics1'],
+        authority: ['Analytics1', 'Admin', 'DEO', 'DG', 'DO', 'LSM', 'LSO', 'TL', 'Super'],
     },
     {
         key: 'signUp',
