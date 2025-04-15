@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache version
-const CACHE_NAME = "pwa-cache-v246"; // Increment version to force cache update
+const CACHE_NAME = "pwa-cache-v247"; // Increment version to force cache update
 const STORE_NAME = "offline-requests";
 const DB_NAME = "OfflineDB";
 const API_CACHE_NAME = "api-cache";
@@ -47,7 +47,9 @@ const CACHE_FILES = [
     "/group-collapse-menu-item-view-2",
     "/analytics1",
     "/spuid-signup",
-    "/spuid-review"
+    "/spuid-review",
+    "/robots.txt",
+    "/sitemap.xml",
 ];
 
 // ✅ Install Event - Cache Static Assets
