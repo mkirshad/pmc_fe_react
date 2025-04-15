@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Public Routes -->
+  <url><loc>https://plmis.epapunjab.pk/pub</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/mis-directory</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/mis/directory</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/mis/clubs/directory</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/mis/recycling-efficiency</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/sign-in</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/sign-up</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/forgot-password</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/reset-password</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/track-application</loc></url>
+  <url><loc>https://plmis.epapunjab.pk/spuid-signup</loc></url>
+
+  <!-- You can skip protected routes if they require auth -->
+
+</urlset>
