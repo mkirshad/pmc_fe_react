@@ -104,6 +104,7 @@ const flattenObject = (obj) => {
         total_fee_amount: formatCurrency(totalFeeAmount.toFixed(2)), // Include total fee amount
         verified_fee_amount: formatCurrency(verifiedFeeAmount.toFixed(2)), // Include verified fee amount
         is_assigned_back: isAssignedBack? 'Yes':'No', // Flag for highlighting
+        created_by_username: obj.created_by_username,
     };
 };
 
@@ -275,6 +276,7 @@ const Home = () => {
             'total_fee_amount',
             'verified_fee_amount',
             'is_assigned_back', // Include this column
+            'created_by_username',
         ];
     
         const flattenedData = sanitizeData(data); // Ensure sanitized data

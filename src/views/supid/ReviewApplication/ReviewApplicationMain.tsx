@@ -32,6 +32,7 @@ const CustomerEdit = () => {
         useState(false)
 
     const [isSubmiting, setIsSubmiting] = useState(false)
+    const [movementDirection, setMovementDirection] = useState<'forward' | 'backward' | null>(null)
 
     const onChange = (nextStep: number) => {
         if (nextStep === 3){
@@ -55,6 +56,7 @@ const CustomerEdit = () => {
     const onNext = () => onChange(step + 1)
 
     const onPrevious = () => onChange(step - 1)
+
 
 
     useEffect(() => {
@@ -807,6 +809,7 @@ function fnGroupList(group) {
 
  <ReviewAndSavePage
  groupList= {groupList}
+ setMovementDirection={setMovementDirection}
  >
                 <Container>
                     <div className="flex items-center justify-between px-8">
@@ -841,8 +844,16 @@ function fnGroupList(group) {
                                 type="button"
                                 onClick={submitApplication}
                                 loading={isSubmiting}
+                                disabled={!movementDirection} // disabled unless forward/backward is selected
                             >
-                                Save
+                            {
+                                (movementDirection === 'forward' && groupList[2]?.label === 'Download License')? 'License has been issued' :
+                                movementDirection === 'forward'
+                                ? `Forward to "${groupList[2]?.label || 'Next Stage'}"`
+                                : movementDirection === 'backward'
+                                    ? `Backward to "${groupList[0]?.label || 'Previous Stage'}"`
+                                    : 'Select any of above options'
+                            }
                             </Button>
                         </div>
                     </div>

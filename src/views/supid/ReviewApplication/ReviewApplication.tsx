@@ -7,6 +7,7 @@ import {
   Checkbox,
   FormControlLabel,
   Card,
+  Box,
   CardContent,
   Typography,
 } from "@mui/material";
@@ -21,7 +22,7 @@ import { Tooltip } from 'react-tooltip'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { useSessionUser } from '@/store/authStore';
 
-const ReviewAndSavePage = ({ groupList, children }) => {
+const ReviewAndSavePage = ({ groupList, children, setMovementDirection }) => {
   const [selectedGroup, setSelectedGroup] = useState(
     groupList !== undefined && groupList.length > 1 ? groupList[1].value : ""
   );
@@ -135,44 +136,6 @@ const handleChangeRemarks = (event) => {
   updateApplicantDetail(data_applicantDetail);
 };
 
-const handleCheckboxChange = (event) => {
-  const { name, checked } = event.target;
-
-  // Ensure only one checkbox is selected at a time
-  const updatedState = {
-    previousStage: name === "previousStage" ? checked : false,
-    nextStage: name === "nextStage" ? checked : false,
-  };
-
-  setCheckboxState(updatedState);
-
-  let updatedRemarks = "";
-  let updatedGroup = null;
-  let data_applicantDetail = {};
-
-  if (name === "previousStage" && checked) {
-    updatedGroup = groupList[0]?.value;
-    data_applicantDetail = { assignedGroup2: updatedGroup };
-    updatedRemarks = `As per the verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc.`;
-  } else if (name === "nextStage" && checked) {
-    updatedGroup = groupList[2]?.value;
-    data_applicantDetail = { assignedGroup2: updatedGroup };
-    updatedRemarks = isAuthorizedDEO
-      ? "As per the verification, all codal formalities for the issuance of the license have been fulfilled."
-      : isAuthorizedDG
-      ? "Approved. License has been issued."
-      : `As per the verification, please proceed for issuance of the license.`;
-  }
-
-  // Update selected group and applicant details
-  if (checked) {
-    setSelectedGroup(updatedGroup);
-    updateApplicantDetail(data_applicantDetail);
-    setRemarks(updatedRemarks); // Update remarks only if a checkbox is checked
-  }
-};
-
-// End 20250218
 const loadApplicantResponses = async (applicantId) => {
   try {
       const transformedResponses = applicantDetail.field_responses.reduce((acc, item) => {
@@ -202,6 +165,7 @@ const loadApplicantResponses = async (applicantId) => {
             comment: response === 'No' ? prev[key]?.comment || '' : null, // Clear comment for "Yes"
         },
     }));
+    
 };
 
 const handleCommentChange = (key, comment) => {
@@ -213,6 +177,49 @@ const handleCommentChange = (key, comment) => {
     },
   }));
 };
+
+
+const handleCheckboxChange = (event) => {
+  const { name, checked } = event.target;
+  setMovementDirection(null);
+  // Ensure only one checkbox is selected at a time
+  const updatedState = {
+    previousStage: name === "previousStage" ? checked : false,
+    nextStage: name === "nextStage" ? checked : false,
+  };
+
+  setCheckboxState(updatedState);
+
+  let updatedRemarks = "";
+  let updatedGroup = null;
+  let data_applicantDetail = {};
+
+  if (name === "previousStage" && checked) {
+    updatedGroup = groupList[0]?.value;
+    data_applicantDetail = { assignedGroup2: updatedGroup };
+    updatedRemarks = `As per the verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc.`;
+    setMovementDirection("backward"); // ✅ Set direction
+  } else if (name === "nextStage" && checked) {
+    updatedGroup = groupList[2]?.value;
+    data_applicantDetail = { assignedGroup2: updatedGroup };
+    updatedRemarks = isAuthorizedDEO
+      ? "As per the verification, all codal formalities for the issuance of the license have been fulfilled."
+      : isAuthorizedDG
+      ? "Approved. License has been issued."
+      : `As per the verification, please proceed for issuance of the license.`;
+    setMovementDirection("forward"); // ✅ Set direction
+  } else {
+    setMovementDirection(null);
+  }
+
+  // Update selected group and applicant details
+  if (checked) {
+    setSelectedGroup(updatedGroup);
+    updateApplicantDetail(data_applicantDetail);
+    setRemarks(updatedRemarks); // Update remarks only if a checkbox is checked
+  }
+};
+
 
 const handleDocumentFormSubmit = async (document, document_description) => {
   const formData = new FormData();
@@ -395,8 +402,8 @@ const handleChangeManualFields = (fieldName, value) => {
                     name={`response-${key}`}
                     value="Yes"
                     checked={fieldResponses[key]?.response === "Yes"}
-                    onChange={() => handleCheckboxChangeYesNo(key, "Yes")}
                     disabled={disabled}
+                    onChange={() => {handleCheckboxChangeYesNo(key, "Yes"); }}
                   />
                   <span>Yes</span>
                 </label>
@@ -406,8 +413,8 @@ const handleChangeManualFields = (fieldName, value) => {
                     name={`response-${key}`}
                     value="No"
                     checked={fieldResponses[key]?.response === "No"}
-                    onChange={() => handleCheckboxChangeYesNo(key, "No")}
                     disabled={disabled}
+                    onChange={() => {handleCheckboxChangeYesNo(key, "No");}}
                   />
                   <span>No</span>
                 </label>
@@ -1066,6 +1073,24 @@ const handleChangeManualFields = (fieldName, value) => {
           <Card>
             <CardContent>
               <FormControl>
+                {/* Yellowish Note */}
+                <Box
+                  sx={{
+                    backgroundColor: '#fff3cd',
+                    color: '#856404',
+                    padding: '10px 12px',
+                    borderRadius: '4px',
+                    marginBottom: '16px',
+                    border: '1px solid #ffeeba',
+                  }}
+                >
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    Note:
+                  </Typography>
+                  <Typography variant="body2">
+                    Please select any of the below actions:
+                  </Typography>
+                </Box>
                 <FormControlLabel
                   control={
                     <Checkbox
