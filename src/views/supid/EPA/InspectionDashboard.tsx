@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { MaterialReactTable } from "material-react-table";
-import { IconButton } from "@mui/material";
+import { IconButton, Button, Stack } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AxiosBase from "../../../services/axios/AxiosBase";
 import { useNavigate } from "react-router-dom";
 import { useSessionUser } from '@/store/authStore';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 const InspectionReportsList = () => {
   const [reports, setReports] = useState([]);
@@ -66,6 +67,57 @@ const InspectionReportsList = () => {
     },
   ];
 
+  const downloadExcel = async () => {
+    try {
+      const response = await AxiosBase.get("/pmc/inspection-report/export-district-summary-excel/", {
+        responseType: 'blob', // Important to get binary data
+      });
+  
+      // Create a blob from the response
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+  
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'district_summary.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url); // Clean up
+    } catch (error) {
+      console.error("Failed to download Excel file:", error);
+    }
+  };
+
+
+  const downloadPDF = async () => {
+    try {
+      const response = await AxiosBase.get("/pmc/inspection-report/export-district-summary-pdf/", {
+        responseType: 'blob', // Important to get binary data
+      });
+  
+      // Create a blob from the response
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+  
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'district_summary.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url); // Clean up
+    } catch (error) {
+      console.error("Failed to download Excel file:", error);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold mb-4">Inspection Reports {district_name!==''?' - ':''} {district_name}</h2>
@@ -76,6 +128,27 @@ const InspectionReportsList = () => {
           <p className="mt-4 text-lg font-medium text-gray-600">Loading data, please wait...</p>
         </div>
       ) : (
+
+        <div>
+          <Stack direction="row" spacing={2} className="mb-4">
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<FileDownloadIcon />}
+            onClick={downloadExcel}
+          >
+            Export to Excel
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<FileDownloadIcon />}
+            onClick={downloadPDF}
+          >
+            Export to PDF
+          </Button>
+        </Stack>
+
         <MaterialReactTable
           columns={columns}
           data={reports}
@@ -105,7 +178,9 @@ const InspectionReportsList = () => {
           }}
           enableZebraStripes={true}
         />
-      )}
+      </div>
+      )
+      }
     </div>
   );
 };
