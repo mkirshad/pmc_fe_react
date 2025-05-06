@@ -60,7 +60,7 @@
   background: linear-gradient(135deg, #a8e6cf, #dcedc1);
   padding: 30px 20px 0px;
   width: 100%;
-  height: 100vh; /* 100% of the viewport height */
+  height: 1000vh; /* 100% of the viewport height */
 }
 
 
@@ -71,7 +71,7 @@
   background: linear-gradient(135deg, #a8e6cf, #dcedc1);
   padding: 30px 20px 0px;
   width: 100%;
-  height: 510vh; /* 100% of the viewport height */
+  height: 1000vh; /* 100% of the viewport height */
 }
 
 .banner-container22 {
@@ -80,7 +80,7 @@
   background: linear-gradient(135deg, #a8e6cf, #dcedc1);
   padding: 30px 20px 0px;
   width: 100%;
-  height: 220vh; /* 100% of the viewport height */
+  height: 1000vh; /* 100% of the viewport height */
 }
 
 .banner-header {

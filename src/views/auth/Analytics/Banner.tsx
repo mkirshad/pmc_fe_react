@@ -119,10 +119,14 @@ const formatTrackingNumber = (value, isBackspace) => {
 
           <span className="header-text">PMIS</span>
         </div>
-        <nav className="banner-nav">
-          <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            Login
-          </Link>
+        <nav className="flex flex-col md:flex-row items-center md:items-start justify-center md:justify-end gap-3">
+        <Link
+          to="/sign-in"
+          className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 text-sm md:text-base font-semibold w-full md:w-auto text-center"
+        >
+          Login
+        </Link>
+
         </nav>
       </header>
 
@@ -130,27 +134,36 @@ const formatTrackingNumber = (value, isBackspace) => {
         <motion.div className="banner-text" variants={textVariants}>
           <h1>Plastic Management Information System</h1>
         </motion.div>
-        <div className="banner-links">
-          <Link to="/sign-up?redirectUrl=/spuid-signup" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            Apply New License
-          </Link>
-          <Link to="/sign-in" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            My Applications
-          </Link>
-          <Link onClick={()=>{setTrackingPopupOpen(true); setDialogContent(null); setTankYouPopupType('info');}} to="" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-            Track Application
-          </Link>
 
-              <Link to="/mis/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-                Management Information System - Public Directory
+        <div className="banner-links flex flex-col md:flex-row flex-wrap items-center md:items-start justify-center md:justify-start gap-3 md:gap-4">
+            {[
+              { label: "Apply New License", to: "/sign-up?redirectUrl=/spuid-signup" },
+              { label: "My Applications", to: "/sign-in" },
+              { label: "Track Application", to: "", action: true },
+              { label: "MIS - Public Directory", to: "/mis/directory" },
+              { label: "MIS - Educational Environmental Club Directory", to: "/mis/clubs/directory" }
+            ].map((link, idx) => (
+              <Link
+                key={idx}
+                to={link.to}
+                onClick={
+                  link.action
+                    ? () => {
+                        setTrackingPopupOpen(true);
+                        setDialogContent(null);
+                        setTankYouPopupType("info");
+                      }
+                    : undefined
+                }
+                className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 text-sm md:text-base font-semibold w-full md:w-auto text-center"
+              >
+                {link.label}
               </Link>
-              {/* <Link to="/mis/recycling-efficiency" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-                Management Information System - Recycling Efficiency
-              </Link> */}
-              <Link to="/mis/clubs/directory" className="nav-link transition-all duration-300 ease-in-out transform hover:scale-105">
-                Management Information System - Educational Environmental Club Directory
-              </Link>
-        </div>
+            ))}
+          </div>
+
+
+
 
         <ConfirmDialog
             isOpen={trackingPopupOpen}
