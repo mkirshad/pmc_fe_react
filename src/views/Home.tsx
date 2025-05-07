@@ -311,7 +311,10 @@ const Home = () => {
             navigate('/home-do');
         }else if(userGroups.includes('Super')){
             navigate('/home-super');
+        }else if(userGroups.includes('Inspector')){
+            navigate('/auth/EPAOperations/AllInspections');
         }
+        
     }, [userGroups, navigate]); // Run only once on component load
     
 console.log('selectedRowId:', selectedRowId)
