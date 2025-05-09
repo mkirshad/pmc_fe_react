@@ -72,7 +72,6 @@ const sanitizeData = (data) => {
 const Home = () => {
     const [flattenedData, setFlattenedData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [userGroups, setUserGroups] = useState([]);
     const [step, setStep] = useState(0); // State to track the current step
     const [selectedRowId, setSelectedRowId] = useState(null); // State for the selected radio button
     const [statistics, setStatistics] = useState({});
@@ -133,15 +132,7 @@ const Home = () => {
             console.error('Error downloading the PDF:', error);
         }
     };
-    
 
-    const handleStepClick = (index) => {
-        console.log('its here')
-        if (groups[index] === 'Download License' && groups[step] === 'Download License') {
-            downloadFile(); // Trigger file download if "Completed" step is clicked
-        }
-        // setStep(index); // Update the active step
-    };
 
     // Extract columns and flattened data
     // Extract columns and flattened data
@@ -197,125 +188,90 @@ const Home = () => {
         };
 
     const navigate = useNavigate();
+
     useEffect(() => {
-        
-
- 
-
-                       
         const fetchData = async () => {
             setLoading(true); // Show the loading spinner
-
-            // try {
-            //     const response = await AxiosBase.get(`/pmc/ping/`, {
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //         },
-            //     });
-            // } catch (error) {
-            //     navigate('/error');
-            // }
-
+    
             try {
-                let groupsResponse = [];
-                try {
-                    if(navigator.onLine){
-                        const response = await AxiosBase.get(`/pmc/user-groups/`, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                        });
-                        groupsResponse = response.data || [];
-                        setUserGroups(groupsResponse.map(group => group.name));
-                    }else{
-                        throw new Error("Application is offline. Cannot fetch data.");
-                    }                
-                } catch (error) {
-                    console.error('Error fetching user groups:', error);
-                    // Set user groups to an empty array if an error occurs
-                    setUserGroups([]);
-                }
-                console.log('groupsResponse', groupsResponse)
-                if(navigator.onLine){
+                if (navigator.onLine) {
                     const response = await AxiosBase.get(`/pmc/applicant-detail/`, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                
-                const dataApplicants = response.data;
     
-                if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                    const extracted = extractColumns(dataApplicants, (groupsResponse.length>0), (groupsResponse.map(group => group.name))[0]);
-                    setFlattenedData(extracted.flattenedData);
-                    setColumns(extracted.columns);
+                    const dataApplicants = response.data;
     
-                    // Debugging: Log the last row
-                    console.log('Flattened Data:', extracted.flattenedData);
-                    const lastRow = extracted.flattenedData[extracted.flattenedData.length - 1];
-                    console.log('Last Row:', lastRow);
+                    if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
+                        const extracted = extractColumns(dataApplicants, (userAuthority.length > 0), userAuthority[0]);
+                        setFlattenedData(extracted.flattenedData);
+                        setColumns(extracted.columns);
     
-                    if (lastRow && lastRow.id) {
-                        setSelectedRowId(lastRow.id); // Set last row ID as selected
-                        console.log('Last Row ID:', lastRow.id);
+                        // Debugging: Log the last row
+                        console.log('Flattened Data:', extracted.flattenedData);
+                        const lastRow = extracted.flattenedData[extracted.flattenedData.length - 1];
+                        console.log('Last Row:', lastRow);
     
-                        const groupIndex = groups.indexOf(lastRow.assigned_group);
-                        if (groupIndex !== -1) {
-                            setStep(groupIndex); // Set the step to match the last row's assigned group
+                        if (lastRow && lastRow.id) {
+                            setSelectedRowId(lastRow.id); // Set last row ID as selected
+                            console.log('Last Row ID:', lastRow.id);
+    
+                            const groupIndex = groups.indexOf(lastRow.assigned_group);
+                            if (groupIndex !== -1) {
+                                setStep(groupIndex); // Set the step to match the last row's assigned group
+                            }
                         }
                     }
+                } else {
+                    throw new Error("Application is offline. Cannot fetch applicant details.");
                 }
-
-                }else{
-                    throw new Error("Application is offline. Cannot fetch data.");
-                }
-
-                if(navigator.onLine){
-                // Fetch statistics for groups
+    
+                if (navigator.onLine) {
+                    // Fetch statistics for groups
                     const statsResponse = await AxiosBase.get(`/pmc/fetch-statistics-view-groups/`, {
                         headers: {
-                        "Content-Type": "multipart/form-data",
+                            "Content-Type": "multipart/form-data",
                         },
                     });
-                
-                setStatistics(statsResponse.data); // Save statistics to state
-
-                }else{
-                    throw new Error("Application is offline. Cannot fetch data.");
+    
+                    setStatistics(statsResponse.data); // Save statistics to state
+                } else {
+                    throw new Error("Application is offline. Cannot fetch statistics.");
                 }
-                
+    
             } catch (error) {
                 console.error('Error fetching data:', error);
-            } finally{
+            } finally {
                 setLoading(false); // Hide the loading spinner
             }
-          };
+        };
     
         fetchData();
-
+    
         setSelectedRowId(25);
         const groupIndex = groups.indexOf('LSO');
         if (groupIndex !== -1) {
             setStep(groupIndex); // Update the Steps component
         }
-
+    
     }, []); // Run only once on component load
+    
 
     useEffect(() => {
-        console.log('userGroups:', userGroups)
-        if(userGroups.includes('DEO') || userGroups.includes('DG')){
+        console.log('userGroups:', userAuthority)
+        if(userAuthority.includes('DEO') || userAuthority.includes('DG')){
             navigate('/home-deo');
-        }else if(userGroups.includes('Admin')){
+        }else if(userAuthority.includes('Admin')){
             navigate('/home-admin');
-        }else if(userGroups.includes('DO')){
+        }else if(userAuthority.includes('DO')){
             navigate('/home-do');
-        }else if(userGroups.includes('Super')){
+        }else if(userAuthority.includes('Super')){
             navigate('/home-super');
-        }else if(userGroups.includes('Inspector')){
+        }else if(userAuthority.length === 1 && userAuthority[0] === 'Inspector'){
             navigate('/auth/EPAOperations/AllInspections');
-        }
-        
-    }, [userGroups, navigate]); // Run only once on component load
+        }        
+    }, [userAuthority, navigate]); // Run only once on component load
     
 console.log('selectedRowId:', selectedRowId)
 console.log(selectedRowId)
@@ -365,9 +321,9 @@ const handleExport = async () => {
                 ))}
             </Steps> 
 */}
-            {userGroups.length > 0 && 
+            {userAuthority.length > 0 && 
             <div className='mb-4'>
-                <h3>{userGroups.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
+                <h3>{userAuthority.filter(group => group !== "Download License" && group !== "Applicant" && group !== 'LSM2').join(" - ")} Dashboard</h3>
             </div>
             }
 
@@ -437,7 +393,7 @@ const handleExport = async () => {
                     }}
                     enableColumnResizing={true}
                     // columnResizeMode="onChange" // default
-                    enableTopToolbar={userGroups.length>0} // Disables the top-right controls entirely
+                    enableTopToolbar={userAuthority.length>0} // Disables the top-right controls entirely
                     // enableGlobalFilter={false} // Disables the global search/filter box
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting
