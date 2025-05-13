@@ -101,6 +101,7 @@ const ReviewAndSavePage = ({ groupList, children, setMovementDirection }) => {
   const group = searchParams.get("group");
   const disabled = !isAuthorizedDO;
   const disabled_lsm = !isAuthorizedLSM && !isAuthorizedLSM2;
+  const [laborDeptRegistered, setLaborDeptRegistered] = useState(false);
 
   useEffect(() => {
     setSelectedGroup(
@@ -128,6 +129,14 @@ useEffect(() => {
   updateApplicantDetail({"manualFields":manualFields, "readOnly":disabled});
 
 }, [manualFields])
+
+useEffect(() => {
+  if (manualFields?.labor_dept_registration_status === "Yes") {
+    setLaborDeptRegistered(true);
+  } else {
+    setLaborDeptRegistered(false);
+  }
+}, [manualFields.labor_dept_registration_status]);
 
 // Start 20250218
 const handleChangeRemarks = (event) => {
@@ -861,9 +870,10 @@ const handleChangeManualFields = (fieldName, value) => {
                     name="labor_dept_registration_status"
                     value="Yes"
                     checked={manualFields.labor_dept_registration_status === "Yes"}
-                    onChange={() =>
-                      handleChangeManualFields("labor_dept_registration_status", "Yes")
-                    }
+                    onChange={() => {
+                      handleChangeManualFields("labor_dept_registration_status", "Yes");
+                      setLaborDeptRegistered(true); // ✅ Enable upload
+                    }}
                     disabled={disabled}
                   />
                   <span>Yes, please provide details</span>
@@ -874,9 +884,10 @@ const handleChangeManualFields = (fieldName, value) => {
                     name="labor_dept_registration_status"
                     value="No"
                     checked={manualFields.labor_dept_registration_status === "No"}
-                    onChange={() =>
-                      handleChangeManualFields("labor_dept_registration_status", "No")
-                    }
+                    onChange={() => {
+                      handleChangeManualFields("labor_dept_registration_status", "No");
+                      setLaborDeptRegistered(false); // ✅ Disable upload
+                    }}
                     disabled={disabled}
                   />
                   <span>No</span>
@@ -937,6 +948,32 @@ const handleChangeManualFields = (fieldName, value) => {
             </FormItem>
           </div>
         )}
+
+      {(isAuthorizedDO || !disabled_lsm) && laborDeptRegistered && (
+        <Card sx={manualFieldStyles}>
+          <CardContent>
+            <Typography variant="h6" sx={{ color: "#007bff", marginBottom: "10px" }}>
+              Upload 'Registration with Labor Department' Document
+            </Typography>
+
+            <FormItem
+              label="Registration with Labor Department"
+              invalid={Boolean(errors.registrationWithLaborDept)}
+              errorMessage={errors.registrationWithLaborDept?.message}
+            >
+              <Input
+                type="file"
+                accept=".pdf,.png,.jpg"
+                onChange={(e) =>
+                  handleDocumentFormSubmit(e.target.files[0], "Registration with Labor Deparment")
+                }
+                disabled={disabled_lsm && !isAuthorizedDO}
+              />
+            </FormItem>
+          </CardContent>
+        </Card>
+      )}
+
       </CardContent>
     </Card>
 
@@ -974,17 +1011,6 @@ const handleChangeManualFields = (fieldName, value) => {
                 className="mr-2"
               />
               Identity Document
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="documentType"
-                value="Registration with Labor Deparment"
-                checked={documentType === "Registration with Labor Deparment"}
-                onChange={handleDocumentTypeChange}
-                className="mr-2"
-              />
-              Registration with Labor Deparment
             </label>
           </div>
         </div>
