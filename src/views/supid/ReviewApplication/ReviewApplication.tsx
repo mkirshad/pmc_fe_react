@@ -975,6 +975,17 @@ const handleChangeManualFields = (fieldName, value) => {
               />
               Identity Document
             </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="documentType"
+                value="Registration with Labor Deparment"
+                checked={documentType === "Registration with Labor Deparment"}
+                onChange={handleDocumentTypeChange}
+                className="mr-2"
+              />
+              Registration with Labor Deparment
+            </label>
           </div>
         </div>
 
