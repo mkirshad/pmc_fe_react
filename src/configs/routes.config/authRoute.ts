@@ -28,6 +28,12 @@ const authRoute: Routes = [
     },
     {
         key: 'pub',
+        path: `/ComingSoon`,
+        component: lazy(() => import('@/views/demo/ComingSoon')),
+        authority: [],
+    },
+    {
+        key: 'pub',
         path: `/mis/recycling-efficiency`,
         component: lazy(() => import('@/views/demo/MISRecyclingEfficiencyPage')),
         authority: [],

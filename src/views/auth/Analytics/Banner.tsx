@@ -160,8 +160,28 @@ const formatTrackingNumber = (value, isBackspace) => {
                 {link.label}
               </Link>
             ))}
+
+
           </div>
 
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            animate={{ y: [0, -5, 0], boxShadow: "0 0 8px #22c55e" }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="mt-10"
+          >
+            <Link
+              // to="/ComingSoon"
+              className="relative text-white bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 text-sm md:text-base font-semibold w-full md:w-auto text-center"
+              onClick={() => alert("🚧 Coming Soon 🚧\nThis feature will be available shortly.")}
+
+            >
+              Register for Competition
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                New
+              </span>
+            </Link>
+          </motion.div>
 
 
 

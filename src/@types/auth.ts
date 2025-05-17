@@ -1,6 +1,8 @@
 export type SignInCredential = {
     username: string
     password: string
+    captcha_input: string
+    captcha_token: string
 }
 
 export type SignInResponse = {
