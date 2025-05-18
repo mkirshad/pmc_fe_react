@@ -88,7 +88,7 @@ const navigationConfig: NavigationTree[] = [
                 },
             ],
         },
-    {
+        {
         key: 'auth.mis',
         path: '',
         title: 'Management Information System',
@@ -189,6 +189,16 @@ const navigationConfig: NavigationTree[] = [
                 subMenu: [],
             }
         ],
+    },
+    {
+        key: 'register-competition',
+        path: '/register-competition',
+        title: 'Competition Registration',
+        translateKey: 'nav.spuid.signup',
+        icon: 'FaClipboardList',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [],
+        subMenu: [],
     },
 
 ]

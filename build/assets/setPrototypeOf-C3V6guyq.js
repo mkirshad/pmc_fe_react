@@ -1,0 +1,1 @@
+function i(t,r){if(t==null)return{};var o={};for(var e in t)if({}.hasOwnProperty.call(t,e)){if(r.indexOf(e)!==-1)continue;o[e]=t[e]}return o}function n(t,r){return n=Object.setPrototypeOf?Object.setPrototypeOf.bind():function(o,e){return o.__proto__=e,o},n(t,r)}export{n as _,i as a};

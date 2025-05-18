@@ -36,13 +36,13 @@ const validationSchema: ZodType<SignInFormSchema> = z.object({
         .string({ required_error: 'Please enter your password' })
         .min(1, { message: 'Please enter your password' }),
     
-    captcha_input: z
-        .string({ required_error: 'Please enter the CAPTCHA' })
-        .min(1, { message: 'Please enter the CAPTCHA' }),
+    // captcha_input: z
+    //     .string({ required_error: 'Please enter the CAPTCHA' })
+    //     .min(1, { message: 'Please enter the CAPTCHA' }),
 
-    captcha_token: z
-        .string({ required_error: 'CAPTCHA token missing' })
-        .min(1, { message: 'CAPTCHA token missing' }),
+    // captcha_token: z
+    //     .string({ required_error: 'CAPTCHA token missing' })
+    //     .min(1, { message: 'CAPTCHA token missing' }),
 })
 
 const SignInForm = (props: SignInFormProps) => {
@@ -164,7 +164,7 @@ const SignInForm = (props: SignInFormProps) => {
                     />
                 </FormItem>
 
-                <FormItem label="Enter Captcha">
+                {/* <FormItem label="Enter Captcha">
                     <div className="flex items-center gap-2 mb-2">
                         <img
                             src={captchaImage}
@@ -193,7 +193,7 @@ const SignInForm = (props: SignInFormProps) => {
                         )}
                     />
                     <input type="hidden" value={captchaToken} {...register('captcha_token')} />
-                </FormItem>
+                </FormItem> */}
                 {passwordHint}
                 <Button
                     block

@@ -6,6 +6,8 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import Input from '@/components/ui/Input';
 import AxiosBase from '../../../services/axios/AxiosBase';
 import { useSearchParams } from "react-router-dom";
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 
 const Banner = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,8 @@ const Banner = () => {
     const [trackingPopupType, setTankYouPopupType ] = useState("info");
     const [trackingNumber, setTrackingNumber] = useState('');
     const [dialogContent, setDialogContent] = useState(null)
+    const [competitionPopupOpen, setCompetitionPopupOpen] = useState(true); // Default true on page load
+
     const closeTrackingPopup = () => {
       setTrackingPopupOpen(false);
   };
@@ -171,9 +175,9 @@ const formatTrackingNumber = (value, isBackspace) => {
             className="mt-10"
           >
             <Link
-              // to="/ComingSoon"
+              to="/sign-up?redirectUrl=register-competition"
               className="relative text-white bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 text-sm md:text-base font-semibold w-full md:w-auto text-center"
-              onClick={() => alert("🚧 Coming Soon 🚧\nThis feature will be available shortly.")}
+              // onClick={() => alert("🚧 Coming Soon 🚧\nThis feature will be available shortly.")}
 
             >
               Register for Competition
@@ -228,6 +232,59 @@ const formatTrackingNumber = (value, isBackspace) => {
         </div>
         <span>In case of any violation found any where, please report at <a style={{fontSize:20}} href="tel:1374"> <b>1373</b> </a></span>
       </div>
+
+      <Modal
+        open={competitionPopupOpen}
+        onClose={() => setCompetitionPopupOpen(false)}
+        aria-labelledby="competition-announcement"
+        aria-describedby="competition-description"
+      >
+        <Box
+  sx={{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+  }}
+>
+<button
+  onClick={() => setCompetitionPopupOpen(false)}
+  className="absolute top-3 right-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-md transition"
+  aria-label="Close Modal"
+>
+  &times;
+</button>
+          <h2 className="text-lg font-bold mb-2 text-center">🎨 Competition Announcement</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <img src="/img/flyers/a.jpg" alt="3D Model Competition" className="w-full rounded" />
+            <img src="/img/flyers/b.jpg" alt="Poster Painting Competition" className="w-full rounded" />
+          </div>
+          <div className="mt-4 text-center">
+            <Link
+              to="/sign-up?redirectUrl=register-competition"
+              className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+            >
+              Register for Competition
+            </Link>
+          </div>
+          <div className="text-center mt-2">
+            <button
+              onClick={() => setCompetitionPopupOpen(false)}
+              className="text-sm text-gray-600 hover:underline mt-2"
+            >
+              Close
+            </button>
+          </div>
+        </Box>
+      </Modal>
+
       <div className="mb-0">
                 <Divider textAlign="left">
                 </Divider>

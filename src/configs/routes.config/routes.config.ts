@@ -176,6 +176,14 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'register-competition',
+        path: '/register-competition',
+        component: lazy(() =>
+            import('@/views/auth/competition/CompetitionFormPage')
+        ),
+        authority: [],
+    },
+    {
         key: 'single.signup2',
         path: '/spuid-signup/:id',
         component: lazy(() =>
