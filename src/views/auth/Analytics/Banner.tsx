@@ -175,7 +175,7 @@ const formatTrackingNumber = (value, isBackspace) => {
             className="mt-10"
           >
             <Link
-              to="/sign-up?redirectUrl=register-competition"
+              to="/sign-up?redirectUrl=/register-competition"
               className="relative text-white bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 text-sm md:text-base font-semibold w-full md:w-auto text-center"
               // onClick={() => alert("🚧 Coming Soon 🚧\nThis feature will be available shortly.")}
 
@@ -268,7 +268,7 @@ const formatTrackingNumber = (value, isBackspace) => {
           </div>
           <div className="mt-4 text-center">
             <Link
-              to="/sign-up?redirectUrl=register-competition"
+              to="/sign-up?redirectUrl=/register-competition"
               className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
             >
               Register for Competition
