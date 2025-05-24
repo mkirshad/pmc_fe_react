@@ -193,8 +193,8 @@ const Home = () => {
                 const dataApplicants = response.data;
                 console.log(dataApplicants)
     
-                if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                    const extracted = extractColumns(dataApplicants, (groupsResponse.length>0), (groupsResponse.map(group => group.name))[0]);
+                if (Array.isArray(dataApplicants) && (dataApplicants.length > 0)) {
+                    const extracted = extractColumns(dataApplicants, (groupsResponse.length>0 && groupsResponse[0] !== ''), (groupsResponse.map(group => group.name))[0]);
                     setFlattenedData(extracted.flattenedData);
                     setColumns(extracted.columns);
                 }

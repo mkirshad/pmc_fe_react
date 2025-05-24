@@ -203,8 +203,8 @@ const Home = () => {
     
                     const dataApplicants = response.data;
     
-                    if (Array.isArray(dataApplicants) && dataApplicants.length > 0) {
-                        const extracted = extractColumns(dataApplicants, (userAuthority.length > 0), userAuthority[0]);
+                    if (Array.isArray(dataApplicants) && (dataApplicants.length > 0) ) {
+                        const extracted = extractColumns(dataApplicants, (userAuthority.length > 0 && userAuthority[0] !== ''), userAuthority[0]);
                         setFlattenedData(extracted.flattenedData);
                         setColumns(extracted.columns);
     
