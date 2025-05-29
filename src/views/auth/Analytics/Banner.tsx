@@ -17,7 +17,7 @@ const Banner = () => {
     const [trackingPopupType, setTankYouPopupType ] = useState("info");
     const [trackingNumber, setTrackingNumber] = useState('');
     const [dialogContent, setDialogContent] = useState(null)
-    const [competitionPopupOpen, setCompetitionPopupOpen] = useState(true); // Default true on page load
+    const [competitionPopupOpen, setCompetitionPopupOpen] = useState(false); // Default true on page load
 
     const closeTrackingPopup = () => {
       setTrackingPopupOpen(false);
@@ -168,7 +168,7 @@ const formatTrackingNumber = (value, isBackspace) => {
 
           </div>
 
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 1.1 }}
             animate={{ y: [0, -5, 0], boxShadow: "0 0 8px #22c55e" }}
             transition={{ duration: 1.5, repeat: Infinity }}
@@ -185,7 +185,7 @@ const formatTrackingNumber = (value, isBackspace) => {
                 New
               </span>
             </Link>
-          </motion.div>
+          </motion.div> */}
 
 
 
