@@ -30,7 +30,17 @@ const schema = z.object({
       return file.size <= 10 * 1024 * 1024; // Check file size
     }, {
       message: 'Back Student Card must be a file smaller than 10 MB.',
+    }).optional(),
+
+    photoObject: z.union([z.instanceof(File), z.null(), z.undefined()])
+    .optional()
+    .refine(file => {
+      if (file === null || file === undefined) return true; // Skip validation if null or undefined
+      return file.size <= 10 * 1024 * 1024; // Check file size
+    }, {
+      message: 'Objeect Photo must be a file smaller than 10 MB.',
     }).optional()
+
 })
 
 const CompetitionFormPage = () => {
@@ -67,7 +77,13 @@ const CompetitionFormPage = () => {
         if (data.studentCardBack instanceof File) {
             formData.append("student_card_back", data.studentCardBack);
         }
-    
+
+        if (data.photoObject instanceof File) {
+            formData.append("photo_object", data.photoObject);
+        }
+
+        
+
         try {
             const headers = { "Content-Type": "multipart/form-data" };
             const response = await AxiosBase.post("/pmc/competition/register/", formData, { headers });
@@ -103,7 +119,8 @@ const CompetitionFormPage = () => {
                     competitionType: '',
                     mobile: '',
                     studentCardFront: undefined,
-                    studentCardBack: undefined
+                    studentCardBack: undefined,
+                    photoObject: undefined
                 });
                 
             } else {

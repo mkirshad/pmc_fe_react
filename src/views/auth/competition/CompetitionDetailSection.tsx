@@ -40,6 +40,13 @@ const competitionAvailability = {
     University: ['poster', 'painting'] // ❌ No 3D Model for university
 }
 
+const getLabel = (value: string) => {
+    if (!value) return 'object';
+    return value
+        .split('_')
+        .map(v => v.charAt(0).toUpperCase() + v.slice(1))
+        .join(' ');
+};
 
 const CompetitionDetailSection = ({ control, errors, readOnly = false, watch }: OverviewSectionProps) => {
     const grade = watch('grade')
@@ -137,6 +144,21 @@ const CompetitionDetailSection = ({ control, errors, readOnly = false, watch }: 
                 <FormItem label="Student Card Back">
                     <Controller
                         name="studentCardBack"
+                        control={control}
+                        render={({ field }) => (
+                        <Input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={(e) => field.onChange(e.target.files?.[0])}
+                        />
+                        )}
+                    />
+                </FormItem>
+
+                <FormItem label={`Photo of your ${getLabel(watch('competitionType'))}`}>
+                    <Controller
+                        name="photoObject"
                         control={control}
                         render={({ field }) => (
                         <Input
