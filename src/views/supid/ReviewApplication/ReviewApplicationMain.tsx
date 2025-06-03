@@ -78,13 +78,24 @@ const CustomerEdit = () => {
         return (
           <div>
             <h5>Application Assignments</h5>
-            {data.map((item) => (
+            {data.map((item, index) => (
               <div key={item.id} style={{ marginBottom: "20px" }}>
+                {/* <div style={{ fontWeight: "bold", }}>
+                    {index + 1})
+                </div> */}
+                <div><strong>{index + 1}) Assigned By:</strong> {item.created_by} ({item.created_by_group})</div>
                 <div><strong>Assigned Group:</strong> {item.assigned_group}</div>
                 <div><strong>Remarks:</strong> {item.remarks || "No remarks"}</div>
                 <div>
                   <strong>Updated Date/Time:</strong>{" "}
-                  {new Date(item.created_at).toLocaleString()}
+                  {new Date(item.created_at).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                    })}
                 </div>
               </div>
             ))}
