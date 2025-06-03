@@ -138,6 +138,7 @@ useEffect(() => {
   }
 }, [manualFields.labor_dept_registration_status]);
 
+
 // Start 20250218
 const handleChangeRemarks = (event) => {
   setRemarks(event.target.value);
@@ -207,6 +208,38 @@ const handleCheckboxChange = (event) => {
     updatedGroup = groupList[0]?.value;
     data_applicantDetail = { assignedGroup2: updatedGroup };
     updatedRemarks = `As per the verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc.`;
+ 
+    // Validation
+      const allRequiredKeys = Object.entries(applicantDetail)
+      .concat(Object.entries(businessEntity))
+      .concat(Object.entries(businessDetailIndividual))
+      .concat(Object.entries(licenseDetail))
+      .concat(Object.entries(licenseDetailProducer))
+      .concat(Object.entries(licenseDetailConsumer))
+      .concat(Object.entries(licenseDetailCollector))
+      .concat(Object.entries(licenseDetailRecycler))
+      .map(([key, _]) => key)
+      .filter((key) => keyToTitleMapping[key]); // only those shown in UI
+      
+      const missingSelections = allRequiredKeys.filter(
+        (key) => !fieldResponses[key] || !fieldResponses[key].response
+      );
+      
+      const missingComments = allRequiredKeys.filter(
+        (key) =>
+          fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment
+      );
+      
+      if (missingSelections.length > 0) {
+        alert("Please select Yes or No for all fields before proceeding.");
+        return;
+      }
+    
+      if (missingComments.length > 0) {
+        alert("For all fields where 'No' is selected, comments are required.");
+        return;
+      }
+ 
     setMovementDirection("backward"); // ✅ Set direction
   } else if (name === "nextStage" && checked) {
     updatedGroup = groupList[2]?.value;
@@ -216,6 +249,38 @@ const handleCheckboxChange = (event) => {
       : isAuthorizedDG
       ? "Approved. License has been issued."
       : `As per the verification, please proceed for issuance of the license.`;
+
+    // Validation
+      const allRequiredKeys = Object.entries(applicantDetail)
+      .concat(Object.entries(businessEntity))
+      .concat(Object.entries(businessDetailIndividual))
+      .concat(Object.entries(licenseDetail))
+      .concat(Object.entries(licenseDetailProducer))
+      .concat(Object.entries(licenseDetailConsumer))
+      .concat(Object.entries(licenseDetailCollector))
+      .concat(Object.entries(licenseDetailRecycler))
+      .map(([key, _]) => key)
+      .filter((key) => keyToTitleMapping[key]); // only those shown in UI
+      
+      const missingSelections = allRequiredKeys.filter(
+        (key) => !fieldResponses[key] || !fieldResponses[key].response
+      );
+      
+      const missingComments = allRequiredKeys.filter(
+        (key) =>
+          fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment
+      );
+      
+      if (missingSelections.length > 0) {
+        alert("Please select Yes or No for all fields before proceeding.");
+        return;
+      }
+      
+      if (missingComments.length > 0) {
+        alert("For all fields where 'No' is selected, comments are required.");
+        return;
+      }
+
     setMovementDirection("forward"); // ✅ Set direction
   } else {
     setMovementDirection(null);
@@ -429,18 +494,24 @@ const handleChangeManualFields = (fieldName, value) => {
                 </label>
               </div>
 
-                       {/* Comment Input */}
-                <div className="w-full md:flex-[5]">
-                  {fieldResponses[key]?.response === "No" && (
+              {/* Always show comment input if Yes or No is selected */}
+              <div className="w-full md:flex-[5]">
+                {(fieldResponses[key]?.response === "Yes" || fieldResponses[key]?.response === "No") && (
+                  <div>
                     <Input
                       type="textarea"
                       placeholder="Add comment"
                       value={fieldResponses[key]?.comment || ""}
                       onChange={(e) => handleCommentChange(key, e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-2"
+                      className={`w-full border ${fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment ? "border-red-500" : "border-gray-300"} rounded-lg p-2`}
                       readOnly={disabled}
                     />
-                  )}
+                    {/* Validation message */}
+                    {fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment && (
+                      <span className="text-red-500 text-sm">Comment is required for 'No'</span>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>
