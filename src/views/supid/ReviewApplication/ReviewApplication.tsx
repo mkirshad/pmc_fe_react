@@ -53,7 +53,7 @@ const ReviewAndSavePage = ({ groupList, children, setMovementDirection }) => {
     }
   };
 
-
+  const excludedValidationFields = ["verifiedFeeAmount", "registration_required_for_other_other_text"];
   const {
     applicantDetail,
     businessDetailIndividual,
@@ -102,6 +102,12 @@ const ReviewAndSavePage = ({ groupList, children, setMovementDirection }) => {
   const disabled = !isAuthorizedDO;
   const disabled_lsm = !isAuthorizedLSM && !isAuthorizedLSM2;
   const [laborDeptRegistered, setLaborDeptRegistered] = useState(false);
+
+  const [missingSelections, setMissingSelections] = useState([]);
+  const [missingComments, setMissingComments] = useState([]);
+
+  const isFieldMissing = (key) => missingSelections.includes(key);
+  const isCommentMissing = (key) => missingComments.includes(key);
 
   useEffect(() => {
     setSelectedGroup(
@@ -198,8 +204,6 @@ const handleCheckboxChange = (event) => {
     nextStage: name === "nextStage" ? checked : false,
   };
 
-  setCheckboxState(updatedState);
-
   let updatedRemarks = "";
   let updatedGroup = null;
   let data_applicantDetail = {};
@@ -219,19 +223,21 @@ const handleCheckboxChange = (event) => {
       .concat(Object.entries(licenseDetailCollector))
       .concat(Object.entries(licenseDetailRecycler))
       .map(([key, _]) => key)
-      .filter((key) => keyToTitleMapping[key]); // only those shown in UI
+      .filter((key) => keyToTitleMapping[key] && !excludedValidationFields.includes(key)); // only those shown in UI
       
       const missingSelections = allRequiredKeys.filter(
         (key) => !fieldResponses[key] || !fieldResponses[key].response
       );
       
+
       const missingComments = allRequiredKeys.filter(
         (key) =>
           fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment
       );
-      
+      setMissingSelections(missingSelections);
+      setMissingComments(missingComments);
       if (missingSelections.length > 0) {
-        alert("Please select Yes or No for all fields before proceeding.");
+        alert("Please select Yes or No for all fields before proceeding. For: " + missingSelections.join(", "));
         return;
       }
     
@@ -260,7 +266,7 @@ const handleCheckboxChange = (event) => {
       .concat(Object.entries(licenseDetailCollector))
       .concat(Object.entries(licenseDetailRecycler))
       .map(([key, _]) => key)
-      .filter((key) => keyToTitleMapping[key]); // only those shown in UI
+      .filter((key) => keyToTitleMapping[key] && !excludedValidationFields.includes(key)); // only those shown in UI
       
       const missingSelections = allRequiredKeys.filter(
         (key) => !fieldResponses[key] || !fieldResponses[key].response
@@ -270,9 +276,12 @@ const handleCheckboxChange = (event) => {
         (key) =>
           fieldResponses[key]?.response === "No" && !fieldResponses[key]?.comment
       );
+
+      setMissingSelections(missingSelections);
+      setMissingComments(missingComments);
       
       if (missingSelections.length > 0) {
-        alert("Please select Yes or No for all fields before proceeding.");
+        alert("Please select Yes or No for all fields before proceeding. For: " + missingSelections.join(", "));
         return;
       }
       
@@ -285,6 +294,8 @@ const handleCheckboxChange = (event) => {
   } else {
     setMovementDirection(null);
   }
+
+  setCheckboxState(updatedState);
 
   // Update selected group and applicant details
   if (checked) {
@@ -469,7 +480,14 @@ const handleChangeManualFields = (fieldName, value) => {
      
   
               {/* Yes/No Radio Buttons */}
-              <div className="w-full md:flex-[3] flex items-center justify-center space-x-4 mt-2 md:mt-0">
+              {!excludedValidationFields.includes(key) && (
+              <div className="w-full md:flex-[3] flex items-center justify-center space-x-4 mt-2 md:mt-0"          
+                style={{
+                        border: isFieldMissing(key) ? '2px solid red' : '',
+                        padding: isFieldMissing(key) ? '5px' : '',
+                        borderRadius: isFieldMissing(key) ? '6px' : '',
+                      }}
+              >
                 <label className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -493,6 +511,7 @@ const handleChangeManualFields = (fieldName, value) => {
                   <span>No</span>
                 </label>
               </div>
+              )}
 
               {/* Always show comment input if Yes or No is selected */}
               <div className="w-full md:flex-[5]">
