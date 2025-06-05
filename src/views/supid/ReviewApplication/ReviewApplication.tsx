@@ -53,7 +53,7 @@ const ReviewAndSavePage = ({ groupList, children, setMovementDirection }) => {
     }
   };
 
-  const excludedValidationFields = ["verifiedFeeAmount", "registration_required_for_other_other_text"];
+  const excludedValidationFields = ["verifiedFeeAmount"];
   const {
     applicantDetail,
     businessDetailIndividual,
@@ -218,13 +218,17 @@ const handleCheckboxChange = (event) => {
       .concat(Object.entries(businessEntity))
       .concat(Object.entries(businessDetailIndividual))
       .concat(Object.entries(licenseDetail))
-      .concat(Object.entries(licenseDetailProducer))
-      .concat(Object.entries(licenseDetailConsumer))
+      // .concat(Object.entries(licenseDetailProducer))
+      // .concat(Object.entries(licenseDetailConsumer))
       .concat(Object.entries(licenseDetailCollector))
-      .concat(Object.entries(licenseDetailRecycler))
-      .map(([key, _]) => key)
-      .filter((key) => keyToTitleMapping[key] && !excludedValidationFields.includes(key)); // only those shown in UI
-      
+      // .concat(Object.entries(licenseDetailRecycler))
+       .filter(([key, value]) =>
+          keyToTitleMapping[key] &&                               // Must be shown in UI
+          !excludedValidationFields.includes(key) &&              // Not excluded
+          value !== null && value !== undefined && value !== ""  // Value must not be empty
+        )
+        .map(([key, _]) => key);
+        
       const missingSelections = allRequiredKeys.filter(
         (key) => !fieldResponses[key] || !fieldResponses[key].response
       );
@@ -265,8 +269,12 @@ const handleCheckboxChange = (event) => {
       .concat(Object.entries(licenseDetailConsumer))
       .concat(Object.entries(licenseDetailCollector))
       .concat(Object.entries(licenseDetailRecycler))
-      .map(([key, _]) => key)
-      .filter((key) => keyToTitleMapping[key] && !excludedValidationFields.includes(key)); // only those shown in UI
+      .filter(([key, value]) =>
+        keyToTitleMapping[key] &&                               // Must be shown in UI
+        !excludedValidationFields.includes(key) &&              // Not excluded
+        value !== null && value !== undefined && value !== ""  // Value must not be empty
+      )
+      .map(([key, _]) => key);
       
       const missingSelections = allRequiredKeys.filter(
         (key) => !fieldResponses[key] || !fieldResponses[key].response
@@ -469,7 +477,7 @@ const handleChangeManualFields = (fieldName, value) => {
                   {keyToTitleMapping[key] || key}:
                 </span>
                 <span className="text-normal break-words">
-                  {typeof value === "object" && value !== null
+                  {1===1 //typeof value === "object" // && value !== null
                     ? JSON.stringify(value, null, 2)
                     : key === "licenseType" && value === "Consumer"
                     ? "Stockist/Distributor/Supplier"
