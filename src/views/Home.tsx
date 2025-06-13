@@ -205,7 +205,16 @@ const extractColumns = (data, hasUserGroup, group) => {
                                         href={downloadUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        style={{ color: 'blue', textDecoration: 'underline' }}
+                                        style={{ 
+                                            backgroundColor: '#2563eb',
+                                            color: 'white',
+                                            padding: '5px 10px',
+                                            borderRadius: '6px',
+                                            fontSize: '0.9rem',
+                                            fontWeight: '500',
+                                            display: 'inline-block',
+                                            textDecoration: 'none',
+                                        }}
                                         title="Download License PDF"
                                     >
                                         {assignedGroup}
