@@ -43,6 +43,11 @@ const convertKeysToCamelCase = (data) => {
             fineRecoveryBreakup: data.fine_recovery_breakup || null,
             // affidavit: data.affidavit || null,  // Assuming it's a file upload
             syncStatus: data.syncStatus || undefined,  // Tracks offline edits
+
+            // confiscationReceipt: ,
+            receiptBookNumber: data.receipt_book_number || null,
+            receiptNumber: data.receipt_number || null,
+            // paymentChallan: 
     };
 };
 
@@ -110,6 +115,11 @@ const CustomerEdit = () => {
             fine_recovery_breakup: values.fineRecoveryBreakup || null,
             affidavit: values.affidavit || null,  // Assuming it's a file upload
         
+            confiscation_receipt: values.confiscationReceipt,
+            receipt_book_number: values.receiptBookNumber || null,
+            receipt_number: values.receiptNumber || null,
+            payment_challan: values.paymentChallan || null,
+
             syncStatus: id ? 'patch' : 'post', // ✅ Mark as "patch" or "post"
         };
 

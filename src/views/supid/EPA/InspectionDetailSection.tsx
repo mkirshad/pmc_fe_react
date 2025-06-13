@@ -11,6 +11,7 @@ import NumericInput from '@/components/shared/NumericInput';
 import AxiosBase from '../../../services/axios/AxiosBase' 
 import { Button } from "@/components/ui/Button";
 import { useSessionUser } from '@/store/authStore';
+import { format, parseISO } from 'date-fns'; // install with: npm install date-fns
 
 type InspectionDetailSectionProps = {
     control: any;
@@ -89,6 +90,23 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
 
     // Track total confiscation in state
     const [totalConfiscation, setTotalConfiscation] = useState(0);
+
+    useEffect(() => {
+        if (watchFineRecoveryStatus === 'Recovered') {
+            const today = format(new Date(), 'yyyy-MM-dd'); // ISO format for <input type="date" />
+
+            const fineAmount = parseInt(watchFineAmount) || 0;
+
+            const newEntry = {
+                date: today,
+                amount: fineAmount,
+                isNew: true,
+            };
+
+            setRecoveryEntries([newEntry]);
+            setTotalRecovery(fineAmount);
+        }
+    }, [watchFineRecoveryStatus, watchFineAmount]);
 
     // Calculate Total Confiscation whenever values change
     useEffect(() => {
@@ -297,9 +315,19 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                     <Controller
                         name="inspectionDate"
                         control={control}
-                        render={({ field }) => (
-                            <Input type="date" {...field} readOnly={readOnly}/>
-                        )}
+                        render={({ field }) => {
+                            const formattedDate = field.value
+                                ? format(new Date(field.value), 'dd/MM/yyyy')
+                                : '';
+                            return (
+                                <Input
+                                    type="text"
+                                    {...field}
+                                    value={formattedDate}
+                                    readOnly={true}
+                                />
+                            );
+                        }}
                     />
                 </FormItem>
 
@@ -484,7 +512,7 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                     )}
                     
                     {watchActionTaken.includes('Confiscation') && (
-                        <FormItem label="Total Confiscation (KG)"
+                        <FormItem label="Total Confiscation (KG)*"
                             invalid={Boolean(errors.totalConfiscation)}
                             errorMessage={errors.totalConfiscation?.message}
                         >
@@ -509,6 +537,67 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                         </FormItem>
                     )}
 
+
+                {watchActionTaken.includes('Confiscation') && (
+                    <>
+                        <FormItem
+                        label="Confiscation Receipt Upload*"
+                        invalid={Boolean(errors.confiscationReceipt)}
+                        errorMessage={errors.confiscationReceipt?.message}
+                        >
+                        <Controller
+                            name="confiscationReceipt"
+                            control={control}
+                            render={({ field }) => (
+                            <Input
+                                type="file"
+                                accept=".pdf,.png,.jpg,.jpeg"
+                                onChange={(e) => field.onChange(e.target.files[0] || null)}
+                                disabled={readOnly}
+                            />
+                            )}
+                        />
+                        </FormItem>
+
+                        <FormItem
+                        label="Receipt Book Number*"
+                        invalid={Boolean(errors.receiptBookNumber)}
+                        errorMessage={errors.receiptBookNumber?.message}
+                        >
+                        <Controller
+                            name="receiptBookNumber"
+                            control={control}
+                            render={({ field }) => (
+                            <Input
+                                type="number"
+                                placeholder="Enter Receipt Book Number"
+                                {...field}
+                                readOnly={readOnly}
+                            />
+                            )}
+                        />
+                        </FormItem>
+
+                        <FormItem
+                        label="Receipt Number*"
+                        invalid={Boolean(errors.receiptNumber)}
+                        errorMessage={errors.receiptNumber?.message}
+                        >
+                        <Controller
+                            name="receiptNumber"
+                            control={control}
+                            render={({ field }) => (
+                            <Input
+                                type="number"
+                                placeholder="Enter Receipt Number"
+                                {...field}
+                                readOnly={readOnly}
+                            />
+                            )}
+                        />
+                        </FormItem>
+                    </>
+                )}
                         
                 {(watchActionTaken.includes('Fine Imposed'))&&
                         (
@@ -537,11 +626,9 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                                 <Select
                                     options={[
                                         { label: 'Pending', value: 'Pending' },
-                                        { label: 'Partial', value: 'Partial' },
                                         { label: 'Recovered', value: 'Recovered' },
                                     ]}
-                                    
-                                    value={{ label: field.value, value: field.value }}
+                                    value={{ label: field.value || 'Pending', value: field.value || 'Pending' }} // ✅ fallback
                                     onChange={(option) => field.onChange(option?.value)}
                                     isDisabled={readOnly && field.value === 'Recovered'}
                                 />
@@ -602,10 +689,9 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                      errorMessage={errors.fineAmount?.fineRecoveryBreakup}
                     >
                         <Input
-                            type="date"
-                            value={entry.date}
-                            onChange={(e) => updateRecoveryEntry(index, "date", e.target.value)}
-                            readOnly={!entry.isNew} // ❌ Only allow editing for new entries
+                        type="text"
+                        value={entry.date ? format(parseISO(entry.date), 'dd/MM/yyyy') : ''}
+                        readOnly
                         />
                     </FormItem>
 
@@ -616,20 +702,31 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                         <NumericInput
                             value={entry.amount}
                             onChange={(e) => updateRecoveryEntry(index, "amount", e.target.value)}
-                            readOnly={!entry.isNew} // ❌ Only allow editing for new entries
+                            // readOnly={!entry.isNew} // ❌ Only allow editing for new entries
+                            readOnly
                         />
                     </FormItem>
                 </div>
             ))}
 
-            {/* ✅ Add New Recovery Button (Disabled if fully recovered) */}
-            <Button type='button' onClick={addRecoveryEntry} disabled={totalRecovery >= fineAmount } className='mt-7'>
-                + Add Recovery
-            </Button>
-
-
-
-
+                    <FormItem
+                        label="Payment Challan Upload*"
+                        invalid={Boolean(errors.paymentChallan)}
+                        errorMessage={errors.paymentChallan?.message}
+                    >
+                        <Controller
+                            name="paymentChallan"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    type="file"
+                                    accept=".pdf,.png,.jpg,.jpeg"
+                                    onChange={(e) => field.onChange(e.target.files[0] || null)}
+                                    disabled={readOnly}
+                                />
+                            )}
+                        />
+                    </FormItem>
 
                     </>
                 )}

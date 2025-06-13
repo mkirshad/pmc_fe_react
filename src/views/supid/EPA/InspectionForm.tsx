@@ -48,7 +48,7 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
 
         fineAmount: z.coerce.number().optional(), // Allow numbers
 
-        fineRecoveryStatus: z.enum(["Pending", "Partial", "Recovered"]).optional(), // Dropdown
+        fineRecoveryStatus: z.enum(["Pending", "Recovered"]).optional(), // Dropdown
 
         fineRecoveryDate: z.string().optional(), // Date field (optional)
 
@@ -69,8 +69,75 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
         // ✅ Affidavit (File Upload)
         affidavit: z
             .instanceof(File, { message: "Must be a valid file" })
-            .optional()
+            .optional(),
 
+        // New fields for confiscation
+        confiscationReceipt: z.union([z.instanceof(File), z.null(), z.undefined()]).optional(),
+        receiptBookNumber: z.string().optional(),
+        receiptNumber: z.string().optional(),
+        paymentChallan: z
+                        .union([z.instanceof(File), z.null(), z.undefined()])
+                        .optional(),
+                        
+}).superRefine((data, ctx) => {
+
+    if (data.fineRecoveryStatus === "Recovered") {
+        if (!data.paymentChallan) {
+            ctx.addIssue({
+                path: ["paymentChallan"],
+                message: "Payment challan is required when fine is recovered",
+                code: z.ZodIssueCode.custom,
+            });
+        } else if (data.paymentChallan.size > 10 * 1024 * 1024) {
+            ctx.addIssue({
+                path: ["paymentChallan"],
+                message: "Payment challan must be smaller than 10MB",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+    }
+
+    const isConfiscation = data.actionTaken?.includes("Confiscation");
+    if (isConfiscation) {
+        if (!data.confiscationReceipt) {
+            ctx.addIssue({
+                path: ["confiscationReceipt"],
+                message: "Confiscation receipt is required",
+                code: z.ZodIssueCode.custom,
+            });
+        } else if (data.confiscationReceipt.size > 10 * 1024 * 1024) {
+            ctx.addIssue({
+                path: ["confiscationReceipt"],
+                message: "Confiscation receipt must be smaller than 10MB",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+
+        if (!data.receiptBookNumber || data.receiptBookNumber.trim() === "") {
+            ctx.addIssue({
+                path: ["receiptBookNumber"],
+                message: "Receipt book number is required",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+
+        if (!data.receiptNumber || data.receiptNumber.trim() === "") {
+            ctx.addIssue({
+                path: ["receiptNumber"],
+                message: "Receipt number is required",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+
+        // ✅ 3. Add your `totalConfiscation` > 0 validation
+        if (!data.totalConfiscation || data.totalConfiscation <= 0) {
+            ctx.addIssue({
+                path: ["totalConfiscation"],
+                message: "Total confiscation must be greater than 0 KG",
+                code: z.ZodIssueCode.custom,
+            });
+        }
+    }
 });
 
 const InspectionForm = ({ onFormSubmit, defaultValues = {}, readOnly, children }: CommonProps) => {
