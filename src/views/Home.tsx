@@ -6,6 +6,7 @@ import Steps from '@/components/ui/Steps';
 import { useNavigate } from 'react-router-dom';
 import Tabs from '@/components/ui/Tabs'
 import { HiOutlineHome, HiOutlineUser, HiOutlinePhone, HiViewList, HiDocumentDownload } from 'react-icons/hi'
+import { FaFilePdf } from 'react-icons/fa';
 import { useSessionUser } from '@/store/authStore';
 import { AiOutlineFileExcel } from "react-icons/ai"; // Using a relevant Excel icon
 
@@ -136,56 +137,118 @@ const Home = () => {
 
     // Extract columns and flattened data
     // Extract columns and flattened data
-    const extractColumns = (data, hasUserGroup, group) => {
-            const allowedColumns = [
-                'first_name',
-                'last_name',
-                'cnic',
-                'mobile_no',
-                'application_status',
-                'tracking_number',
-                'assigned_group',
-                'registration_for',
-                'application_Start_Time',
-                'application_Submission_Time',
-                'remarks',
-            ]; // List of allowed columns
-        
-            const flattenedData = sanitizeData(data); // Ensure sanitized data
-            const firstRecord = flattenedData[0];
-            console.log(data)
-            const columns = [
-                ...Object.keys(firstRecord)
-                    .filter((key) => allowedColumns.includes(key)) // Only include allowed columns
-                    .map((key) => ({
+const extractColumns = (data, hasUserGroup, group) => {
+    const allowedColumns = [
+        'first_name',
+        'last_name',
+        'cnic',
+        'mobile_no',
+        'application_status',
+        'tracking_number',
+        'assigned_group',
+        'registration_for',
+        'application_Start_Time',
+        'application_Submission_Time',
+        'remarks',
+    ];
 
+    const flattenedData = sanitizeData(data);
+    const firstRecord = flattenedData[0];
+
+    const columns = [
+        // Optional: PDF icon column
+        {
+            accessorKey: 'download',
+            header: '',
+            size: 50,
+            Cell: ({ row }) => {
+                const assignedGroup = row.original.assigned_group;
+                if (assignedGroup === 'Download License') {
+                    const downloadUrl = `/api/pmc/license-pdf?license_number=${row.original.tracking_number}`;
+                    return (
+                        <a
+                            href={downloadUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Download License"
+                        >
+                            <FaFilePdf
+                                style={{
+                                    fontSize: '1.5rem',
+                                    color: '#d32f2f',
+                                    cursor: 'pointer',
+                                }}
+                            />
+                        </a>
+                    );
+                }
+                return null;
+            },
+        },
+
+        // Dynamic columns with special condition for 'assigned_group'
+        ...Object.keys(firstRecord)
+            .filter((key) => allowedColumns.includes(key))
+            .map((key) => {
+                if (key === 'assigned_group') {
+                    return {
                         accessorKey: key,
-                        header: key
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char) => char.toUpperCase()),
-                        Cell: ({ cell, row }) => {
-                            return (
-                                <span
-                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                                    onClick={() => {
-                                        const id = row.original.id;
-                                        console.log(`Clicked ${key}:`, cell.getValue());
-                                        console.log(`Navigating with ID: ${id}`);
-                                        // Perform navigation or other action
-                                        window.location.href = hasUserGroup
-                                            ? `/spuid-review/${id}?group=${group}`
-                                            : `/spuid-signup/${id}`;
-                                    }}
-                                >
-                                    {cell.getValue() || '-'}
-                                </span>
-                            );
+                        header: 'Assigned Group',
+                        Cell: ({ row }) => {
+                            const assignedGroup = row.original.assigned_group;
+                            const trackingNumber = row.original.tracking_number;
+
+                            if (assignedGroup === 'Download License') {
+                                const downloadUrl = `/api/pmc/license-pdf?license_number=${trackingNumber}`;
+                                return (
+                                    <a
+                                        href={downloadUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ color: 'blue', textDecoration: 'underline' }}
+                                        title="Download License PDF"
+                                    >
+                                        {assignedGroup}
+                                    </a>
+                                );
+                            }
+
+                            return assignedGroup;
                         },
-                    })),
-            ];
-        
-            return { flattenedData, columns };
-        };
+                    };
+                }
+
+                // Default clickable cell for all other keys
+                return {
+                    accessorKey: key,
+                    header: key
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, (char) => char.toUpperCase()),
+                    Cell: ({ cell, row }) => {
+                        const id = row.original.id;
+                        return (
+                            <span
+                                style={{
+                                    cursor: 'pointer',
+                                    color: 'blue',
+                                    textDecoration: 'underline',
+                                }}
+                                onClick={() => {
+                                    window.location.href = hasUserGroup
+                                        ? `/spuid-review/${id}?group=${group}`
+                                        : `/spuid-signup/${id}`;
+                                }}
+                            >
+                                {cell.getValue() || '-'}
+                            </span>
+                        );
+                    },
+                };
+            }),
+    ];
+
+    return { flattenedData, columns };
+};
 
     const navigate = useNavigate();
 
@@ -382,18 +445,38 @@ const handleExport = async () => {
                         ...row,
                         assigned_group_title: groupTitles[row.assigned_group] || row.assigned_group, // Add a title for the assigned group
                     }))} // Include updated data
-                    getRowId={(row) => row.id} // Explicitly set the row ID using the `id` field from your original data
-                    initialState={{
-                        showColumnFilters: false,
+                    enableColumnFilters
+                    enableSorting
+                    enableStickyHeader
+                    muiTableProps={{
+                        sx: {
+                            border: '1px solid #ddd', // Table border
+                        },
                     }}
-                    defaultColumn={{
-                        maxSize: 420,
-                        minSize: 100,
-                        size: 140, // default size is usually 180
+                    muiTableHeadCellProps={{
+                        sx: {
+                            backgroundColor: '#f5f5f5', // Header background
+                            fontWeight: 'bold',
+                            borderBottom: '2px solid #ccc',
+                            textAlign: 'center',
+                        },
                     }}
+                    muiTableBodyCellProps={{
+                        sx: {
+                            borderRight: '1px solid #ddd', // Column border
+                            padding: '10px',
+                        },
+                    }}
+                    muiTableBodyRowProps={{
+                        sx: {
+                            '&:nth-of-type(even)': { backgroundColor: '#f9f9f9' }, // Alternate row colors
+                            '&:hover': { backgroundColor: '#e0f7fa' }, // Hover effect
+                        },
+                    }}
+                    enableZebraStripes={true}
                     enableColumnResizing={true}
                     // columnResizeMode="onChange" // default
-                    enableTopToolbar={userAuthority.length>0} // Disables the top-right controls entirely
+                    enableTopToolbar={true} // Disables the top-right controls entirely
                     // enableGlobalFilter={false} // Disables the global search/filter box
                     enablePagination={true} // Optionally disable pagination controls
                     // enableSorting={false} // Optionally disable column sorting
