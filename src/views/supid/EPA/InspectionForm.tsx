@@ -72,13 +72,16 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
             .optional(),
 
         // New fields for confiscation
-        confiscationReceipt: z.union([z.instanceof(File), z.null(), z.undefined()]).optional(),
+        confiscationReceipt: z
+            .instanceof(File, { message: "Must be a valid file" })
+            .optional(),
+
         receiptBookNumber: z.string().optional(),
         receiptNumber: z.string().optional(),
+
         paymentChallan: z
-                        .union([z.instanceof(File), z.null(), z.undefined()])
-                        .optional(),
-                        
+            .instanceof(File, { message: "Must be a valid file" })
+            .optional(),
 }).superRefine((data, ctx) => {
 
     if (data.fineRecoveryStatus === "Recovered") {

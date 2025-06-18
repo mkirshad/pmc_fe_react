@@ -117,19 +117,29 @@ const useInspectionStore = create<InspectionStore>()(
                                 let headers = { "Content-Type": "application/json" };
         
                                 // ✅ Convert to FormData if a file (affidavit) is present
-                                if (report.affidavit) {
+                                if (report.affidavit || report.confiscation_receipt || report.payment_challan) {
                                     const formData = new FormData();
-                                    Object.keys(report).forEach((key) => {
-                                        if (key === "affidavit" && report.affidavit instanceof File) {
-                                            formData.append(key, report.affidavit);
-                                        } else if (report[key] !== undefined) {
-                                            formData.append(key, String(report[key]));
+
+                                    Object.entries(report).forEach(([key, value]) => {
+                                        if (value instanceof File) {
+                                            formData.append(key, value);
+                                        } else if (
+                                            ["violation_found", "violation_type", "action_taken", "confiscation_other_plastics", "other_single_use_items", "fine_recovery_breakup"].includes(key)
+                                        ) {
+                                            formData.append(key, JSON.stringify(value || [])); // arrays or objects
+                                        } else if (
+                                            ["fine_recovery_date", "de_sealed_date"].includes(key)
+                                        ) {
+                                            const formattedDate = value ? String(value).split("T")[0] : "";
+                                            formData.append(key, formattedDate);
+                                        } else if (value !== undefined && value !== null) {
+                                            formData.append(key, String(value));
                                         }
                                     });
                                     requestData = formData;
                                     headers = { "Content-Type": "multipart/form-data" };
                                 }
-        
+
                                 // ✅ Post or Patch based on syncStatus
                                 if (report.syncStatus === "post" || String(report.id).startsWith("temp-")) {
                                     if (navigator.onLine) {

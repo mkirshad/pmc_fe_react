@@ -114,8 +114,8 @@ const CustomerEdit = () => {
             de_sealed_date: values.deSealedDate || null,
             fine_recovery_breakup: values.fineRecoveryBreakup || null,
             affidavit: values.affidavit || null,  // Assuming it's a file upload
-        
-            confiscation_receipt: values.confiscationReceipt,
+
+            confiscation_receipt: values.confiscationReceipt || null,
             receipt_book_number: values.receiptBookNumber || null,
             receipt_number: values.receiptNumber || null,
             payment_challan: values.paymentChallan || null,
