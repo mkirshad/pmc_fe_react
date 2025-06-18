@@ -214,6 +214,7 @@ const handleCheckboxChange = (event) => {
     updatedRemarks = `As per the verification, please proceed to the previous stage for preliminary scrutiny/data entry, etc.`;
  
     // Validation
+      if (isAuthorizedDO) {
       const allRequiredKeys = Object.entries(applicantDetail)
       .concat(Object.entries(businessEntity))
       .concat(Object.entries(businessDetailIndividual))
@@ -249,7 +250,7 @@ const handleCheckboxChange = (event) => {
         alert("For all fields where 'No' is selected, comments are required.");
         return;
       }
- 
+    }
     setMovementDirection("backward"); // ✅ Set direction
   } else if (name === "nextStage" && checked) {
     updatedGroup = groupList[2]?.value;
@@ -261,6 +262,7 @@ const handleCheckboxChange = (event) => {
       : `As per the verification, please proceed for issuance of the license.`;
 
     // Validation
+      if (isAuthorizedDO) {
       const allRequiredKeys = Object.entries(applicantDetail)
       .concat(Object.entries(businessEntity))
       .concat(Object.entries(businessDetailIndividual))
@@ -297,6 +299,7 @@ const handleCheckboxChange = (event) => {
         alert("For all fields where 'No' is selected, comments are required.");
         return;
       }
+    }
 
     setMovementDirection("forward"); // ✅ Set direction
   } else {
