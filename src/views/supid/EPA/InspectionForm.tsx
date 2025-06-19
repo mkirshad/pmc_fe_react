@@ -18,7 +18,8 @@ const validationSchema: ZodType<InspectionReportSchema> = z.object({
         licenseNumber: z.string()
             .optional(),
 
-        violationFound: z.array(z.string()).optional(),
+        violationFound: z.string().nonempty({ message: "Please select at least one option for Violation Found" }),
+                                
         violationType: z.array(z.string()).optional(),
         
         actionTaken: z.array(z.string()).optional(),

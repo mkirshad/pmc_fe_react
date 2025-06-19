@@ -341,8 +341,8 @@ const extractColumns = (data, hasUserGroup, group) => {
         }else if(userAuthority.includes('Super')){
             navigate('/home-super');
         }else if(userAuthority.length === 1 && userAuthority[0] === 'Inspector'){
-            navigate('/auth/EPAOperations/AllInspections');
-        }        
+            navigate('/auth/EPAOperations/ReportViolation');
+        }
     }, [userAuthority, navigate]); // Run only once on component load
     
 console.log('selectedRowId:', selectedRowId)

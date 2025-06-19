@@ -369,26 +369,46 @@ const InspectionDetailSection = ({ control, errors, readOnly = false, defaultVal
                 </FormItem>
             </div>
 
-                <FormItem label="Violation Found" invalid={Boolean(errors.violationFound)} errorMessage={errors.violationFound?.message}>
-                    <Controller
-                        key={"a1"}
-                        name="violationFound"
-                        control={control}
-                        render={({ field }) => (
-                            <Checkbox.Group
-                                value={field.value || []} // Ensure the value is an array
-                                onChange={(selectedValues) => field.onChange(selectedValues)}
-                                className="flex flex-col gap-2 mb-2 ml-2"
-                            >
-                                <Checkbox {...field} value={"Yes"}  disabled={readOnly}>
-                                    Yes
-                                </Checkbox>
-                            </Checkbox.Group>
-                        )}
-                    />
-                </FormItem>
+            <FormItem
+                label="Violation Found*"
+                invalid={Boolean(errors.violationFound)}
+                errorMessage={errors.violationFound?.message}
+            >
+                <Controller
+                    name="violationFound"
+                    control={control}
+                    rules={{ required: "Please select Yes or No" }}
+                    render={({ field }) => (
+                        <div className="flex gap-4 ml-2">
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="radio"
+                                    value="Yes"
+                                    checked={field.value === "Yes"}
+                                    onChange={() => field.onChange("Yes")}
+                                    disabled={readOnly}
+                                    required
+                                />
+                                Yes
+                            </label>
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="radio"
+                                    value="No"
+                                    checked={field.value === "No"}
+                                    onChange={() => field.onChange("No")}
+                                    disabled={readOnly}
+                                    required
+                                />
+                                No
+                            </label>
+                        </div>
+                    )}
+                />
+            </FormItem>
 
-            {watchViolationFound.includes('Yes') && (
+
+            {watchViolationFound === 'Yes' && (
                 <div className="grid md:grid-cols-2 gap-4">
                     <FormItem label="Type of Violation Found*"  invalid={Boolean(errors.violationType)} errorMessage={errors.violationType?.message}>
                         {violationTypeList.map(violation => (
