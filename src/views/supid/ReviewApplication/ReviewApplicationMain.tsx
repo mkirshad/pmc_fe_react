@@ -626,6 +626,27 @@ const CustomerEdit = () => {
                 navigate('/error');
             }
         }
+        if (manualFields.pictorial_evidence_file) {
+
+            const formData2 =  new FormData();
+            formData2.append('document', manualFields.pictorial_evidence_file);
+
+            formData2.append('document_description',  'Pictorial Evidence');
+            formData2.append('applicant',  applicantDetail.id.toString());
+
+            try {
+                const response = await AxiosBase.post('/pmc/applicant-documents/', formData2, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Post successful:', response.data);
+            } catch (error) {
+                console.error('Error in POST request:', error.response || error.message);
+                navigate('/error');
+            }
+        }
         if (manualFields.flow_diagram_file) {
           
             const formData2 =  new FormData();

@@ -912,6 +912,7 @@ const handleChangeManualFields = (fieldName, value) => {
                   readOnly={disabled}
                 />
               </FormItem>
+
             </div>
           </>
         )}
@@ -1053,6 +1054,22 @@ const handleChangeManualFields = (fieldName, value) => {
             </FormItem>
           </div>
         )}
+
+
+        <FormItem
+          label="Pictorial Evidence*"
+          invalid={Boolean(errors.pictorialEvidenceFile)}
+          errorMessage={errors.pictorialEvidenceFile?.message}
+        >
+          <Input
+            type="file"
+            accept=".png,.jpg"
+            onChange={(e) =>
+              handleChangeManualFields("pictorial_evidence_file", e.target.files[0])
+            }
+            disabled={disabled}
+          />
+        </FormItem>
 
       {(isAuthorizedDO || !disabled_lsm) && laborDeptRegistered && (
         <Card sx={manualFieldStyles}>
