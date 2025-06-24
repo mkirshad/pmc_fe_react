@@ -313,6 +313,10 @@ const handleCheckboxChange = (event) => {
     setSelectedGroup(updatedGroup);
     updateApplicantDetail(data_applicantDetail);
     setRemarks(updatedRemarks); // Update remarks only if a checkbox is checked
+    updateApplicantDetail({
+      ...data_applicantDetail,
+      remarks: updatedRemarks,
+    });
   }
 };
 
