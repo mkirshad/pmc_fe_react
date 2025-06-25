@@ -145,7 +145,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.ReportViolation',
                 icon: 'MdAssignmentTurnedIn',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'LSO', 'Admin', 'Inspector'],
                 subMenu: [],
             },
             {
@@ -155,7 +155,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.AllInspections',
                 icon: 'MdFactCheck',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'LSO', 'Admin', 'Inspector'],
                 subMenu: [],
             },
             {
@@ -165,7 +165,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'MdDashboard',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['TL', 'DO', 'DEO', 'DG', 'Admin', 'Inspector'],
+                authority: ['TL', 'DO', 'DEO', 'DG', 'LSO', 'Admin', 'Inspector'],
                 subMenu: [],
             },
             {
@@ -185,7 +185,7 @@ const navigationConfig: NavigationTree[] = [
                 translateKey: 'nav.analyticsMenu.analytics1',
                 icon: 'HiOutlineDocumentText',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: ['DO', 'TL', 'DEO', 'DG', 'Admin'],
+                authority: ['DO', 'TL', 'DEO', 'DG', 'LSO', 'Admin'],
                 subMenu: [],
             }
         ],
