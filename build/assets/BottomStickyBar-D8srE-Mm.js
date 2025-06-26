@@ -1,0 +1,1 @@
+import{aj as s,j as a,f as o,w as e}from"./index-oDwQGYEA.js";const i=({children:t})=>{const{type:r}=s();return a.jsx("div",{className:o("bottom-0 left-0 right-0 z-10 mt-8 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 -mx-4 sm:-mx-8 py-4",r===e?"fixed":"sticky"),children:t})};export{i as B};

@@ -197,7 +197,7 @@ const navigationConfig: NavigationTree[] = [
         translateKey: 'nav.spuid.signup',
         icon: 'FaClipboardList',
         type: NAV_ITEM_TYPE_ITEM,
-        authority: [],
+        authority: ['TEST'],
         subMenu: [],
     },
 
